@@ -6,12 +6,42 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Mail, KeyRound, User, Smartphone } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function SignupPage() {
     const router = useRouter();
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
+
+    const validatePassword = (password: string) => {
+        const hasNumber = /\d/;
+        const hasLetter = /[a-zA-Z]/;
+        if (password.length < 8) {
+            return "Password must be at least 8 characters long.";
+        }
+        if (!hasLetter.test(password) || !hasNumber.test(password)) {
+            return "Password must contain at least one letter and one number.";
+        }
+        return "";
+    };
 
     const handleSignup = (e: React.FormEvent) => {
         e.preventDefault();
+        setError('');
+
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+            setError(passwordError);
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setError("Passwords do not match.");
+            return;
+        }
+
+        // If validation passes
         router.push('/dashboard');
     }
 
@@ -52,16 +82,34 @@ export default function SignupPage() {
             <Label htmlFor="password">Password</Label>
             <div className="relative">
                 <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="password" type="password" placeholder="••••••••" required className="pl-10" />
+                <Input 
+                  id="password" 
+                  type="password" 
+                  placeholder="••••••••" 
+                  required 
+                  className="pl-10" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
             </div>
         </div>
         <div className="grid gap-2">
             <Label htmlFor="confirm-password">Confirm Password</Label>
             <div className="relative">
                 <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="confirm-password" type="password" placeholder="••••••••" required className="pl-10" />
+                <Input 
+                  id="confirm-password" 
+                  type="password" 
+                  placeholder="••••••••" 
+                  required 
+                  className="pl-10" 
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
             </div>
         </div>
+
+        {error && <p className="text-sm text-destructive text-center">{error}</p>}
 
         <Button size="lg" className="w-full" type="submit">
           Create Account
