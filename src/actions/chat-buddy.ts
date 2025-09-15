@@ -31,6 +31,12 @@ export async function chatBuddyAction(
   prevState: ChatState,
   formData: FormData
 ): Promise<ChatState> {
+    if (!process.env.GEMINI_API_KEY) {
+        return { 
+            ...prevState,
+            error: "The GEMINI_API_KEY environment variable is not set. Please add it to your hosting provider's environment variables and redeploy." 
+        };
+    }
     
     const parsedData = ChatActionInputSchema.safeParse({
         message: formData.get('message'),
@@ -77,7 +83,7 @@ export async function chatBuddyAction(
     };
     
     try {
-        const result = await chatWithBuddy(input);
+        const result = await chatWithBuddy(input, process.env.GEMINI_API_KEY);
         
         const updatedUserMessage: Message = { ...newUserMessage, status: 'delivered' };
 
