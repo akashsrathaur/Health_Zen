@@ -35,6 +35,35 @@ function SubmitButton() {
   );
 }
 
+function LoadingState() {
+    const { pending } = useFormStatus();
+  
+    if (!pending) return null;
+  
+    return (
+      <div className="mt-8 space-y-4">
+        <Card className="animate-pulse">
+          <CardHeader>
+            <div className="h-6 w-1/2 rounded-md bg-muted"></div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="h-4 w-full rounded-md bg-muted"></div>
+            <div className="h-4 w-4/5 rounded-md bg-muted"></div>
+          </CardContent>
+        </Card>
+        <Card className="animate-pulse">
+          <CardHeader>
+            <div className="h-6 w-1/2 rounded-md bg-muted"></div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="h-4 w-full rounded-md bg-muted"></div>
+            <div className="h-4 w-4/5 rounded-md bg-muted"></div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
 export default function SymptomCheckPage() {
   const [state, formAction] = useActionState(symptomCheckAction, {
     data: null,
@@ -81,32 +110,10 @@ export default function SymptomCheckPage() {
           <CardFooter>
             <SubmitButton />
           </CardFooter>
+          {!state.data && <LoadingState />}
         </form>
       </Card>
       
-      {useFormStatus().pending && (
-        <div className="mt-8 space-y-4">
-            <Card className="animate-pulse">
-                <CardHeader>
-                    <div className="h-6 w-1/2 rounded-md bg-muted"></div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                    <div className="h-4 w-full rounded-md bg-muted"></div>
-                    <div className="h-4 w-4/5 rounded-md bg-muted"></div>
-                </CardContent>
-            </Card>
-            <Card className="animate-pulse">
-                <CardHeader>
-                    <div className="h-6 w-1/2 rounded-md bg-muted"></div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                    <div className="h-4 w-full rounded-md bg-muted"></div>
-                    <div className="h-4 w-4/5 rounded-md bg-muted"></div>
-                </CardContent>
-            </Card>
-        </div>
-      )}
-
       {state.data && (
         <div className="mt-8 space-y-4 animate-pop-in">
           <Alert>
