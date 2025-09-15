@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Loader2, MessageCircle, Send, Settings, Trash2, Upload, Share, X, Bot, User, Save, Check, CheckCheck, Maximize2 } from 'lucide-react';
+import { Loader2, MessageCircle, Send, Settings, Trash2, Upload, Share, X, Bot, User, Save, Check, CheckCheck, Maximize2, Lock } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -62,7 +62,7 @@ export function ChatBuddy() {
     const initialMessages: Message[] = [{ 
         id: nanoid(), 
         role: 'system' as const, 
-        content: `Occasionally roast you, but only out of love.`,
+        content: `Messages are just between us! I'm an AI, so let's keep it fun and not share personal secrets. I might occasionally roast you, but only out of love.`,
         timestamp: new Date().toISOString(),
     }];
 
@@ -222,17 +222,20 @@ export function ChatBuddy() {
                                                         initial={{ opacity: 0, y: 10 }}
                                                         animate={{ opacity: 1, y: 0 }}
                                                         transition={{ duration: 0.3 }}
-                                                        className={cn("group relative max-w-[75%] rounded-lg px-3 py-2 pb-4 text-sm", msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary')}>
+                                                        className={cn("group relative max-w-[75%] rounded-lg px-3 py-2 text-sm", msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary')}>
                                                         <p style={{whiteSpace: 'pre-wrap'}}>{msg.content}</p>
                                                          <div className={cn("absolute bottom-1 right-2 flex items-center gap-1 text-xs",
-                                                            msg.role === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground/70'
+                                                            msg.role === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
                                                         )}>
                                                             <span>{format(new Date(msg.timestamp), 'HH:mm')}</span>
                                                             {msg.role === 'user' && <MessageStatus status={msg.status} />}
                                                         </div>
                                                     </motion.div>
                                                 ) : (
-                                                    <div className="w-full text-center text-xs text-muted-foreground italic rounded-full bg-secondary px-3 py-1 my-2 max-w-xs mx-auto">{msg.content}</div>
+                                                    <div className="my-2 mx-auto max-w-sm rounded-lg bg-yellow-100/80 p-2 text-center text-xs text-yellow-900 dark:bg-muted/40 dark:text-gray-300 flex items-center justify-center gap-2">
+                                                        <Lock className="h-3 w-3 flex-shrink-0" />
+                                                        <p>{msg.content}</p>
+                                                    </div>
                                                 )}
                                                 {msg.role === 'user' && (
                                                     <Avatar className='h-8 w-8'>
