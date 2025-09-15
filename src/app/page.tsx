@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
+import Image from 'next/image';
 
 function LinkedInIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -31,66 +32,81 @@ function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
 
 export default function LoginPage() {
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-background via-secondary to-background">
-      <div className="mx-auto w-full max-w-md space-y-8 px-4 py-16">
-        <div className="flex flex-col items-center space-y-4 text-center">
-          <Icons.logo className="h-16 w-16" />
-          <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground">
-            Welcome to HealthZen
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Your daily dose of wellness, gamified.
+    <div className="flex min-h-screen">
+      {/* Left side: Form */}
+      <div className="relative flex-1 flex flex-col items-center justify-center bg-gradient-to-br from-background via-secondary to-background p-4 md:p-8">
+        <div className="w-full max-w-md space-y-8 py-16">
+          <div className="flex flex-col items-center space-y-4 text-center">
+            <Icons.logo className="h-16 w-16" />
+            <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground">
+              Welcome to HealthZen
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              Your daily dose of wellness, gamified.
+            </p>
+          </div>
+
+          <div className="animate-pop-in space-y-4" style={{ animationDelay: '0.3s' }}>
+            <Link href="/dashboard" className="block">
+              <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+                Get Started
+              </Button>
+            </Link>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Button variant="outline">
+                <GoogleIcon className="mr-2 h-5 w-5" />
+                Google
+              </Button>
+              <Button variant="outline">
+                <LinkedInIcon className="mr-2 h-5 w-5" />
+                LinkedIn
+              </Button>
+            </div>
+          </div>
+          <p className="px-8 text-center text-sm text-muted-foreground animate-pop-in" style={{ animationDelay: '0.5s' }}>
+            By clicking continue, you agree to our{' '}
+            <Link
+              href="/terms"
+              className="underline underline-offset-4 hover:text-primary"
+            >
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link
+              href="/privacy"
+              className="underline underline-offset-4 hover:text-primary"
+            >
+              Privacy Policy
+            </Link>
+            .
           </p>
         </div>
-
-        <div className="animate-pop-in space-y-4" style={{ animationDelay: '0.3s' }}>
-          <Link href="/dashboard" className="block">
-            <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-              Get Started
-            </Button>
-          </Link>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
-              </span>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline">
-              <GoogleIcon className="mr-2 h-5 w-5" />
-              Google
-            </Button>
-            <Button variant="outline">
-              <LinkedInIcon className="mr-2 h-5 w-5" />
-              LinkedIn
-            </Button>
-          </div>
-        </div>
-        <p className="px-8 text-center text-sm text-muted-foreground animate-pop-in" style={{ animationDelay: '0.5s' }}>
-          By clicking continue, you agree to our{' '}
-          <Link
-            href="/terms"
-            className="underline underline-offset-4 hover:text-primary"
-          >
-            Terms of Service
-          </Link>{' '}
-          and{' '}
-          <Link
-            href="/privacy"
-            className="underline underline-offset-4 hover:text-primary"
-          >
-            Privacy Policy
-          </Link>
-          .
-        </p>
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_bottom_right,_var(--tw-gradient-stops))] from-accent/10 via-transparent to-transparent" />
       </div>
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_bottom_right,_var(--tw-gradient-stops))] from-accent/10 via-transparent to-transparent" />
+
+      {/* Right side: Image */}
+      <div className="hidden md:block md:w-1/2 lg:w-3/5 relative">
+        <Image
+          src="https://picsum.photos/seed/loginhero/1200/800"
+          alt="Zen garden"
+          fill
+          className="object-cover"
+          data-ai-hint="zen garden"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+      </div>
     </div>
   );
 }
