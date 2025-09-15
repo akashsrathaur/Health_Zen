@@ -9,7 +9,7 @@ export default function AuthLayout({
 }) {
   return (
     <div className="flex min-h-screen">
-      <div className="relative flex-1 flex flex-col items-center justify-center bg-gradient-to-br from-background via-secondary to-background p-4 md:p-8">
+      <div className="relative flex-1 flex flex-col items-center justify-center bg-background p-4 md:p-8">
         <div className="absolute top-8 left-8">
             <Link href="/dashboard" className="flex items-center gap-2 text-foreground">
                 <Icons.logo className="h-8 w-8" />
@@ -19,8 +19,6 @@ export default function AuthLayout({
         <div className="w-full max-w-md space-y-8 py-16">
             {children}
         </div>
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_bottom_right,_var(--tw-gradient-stops))] from-accent/10 via-transparent to-transparent" />
       </div>
 
       <div className="hidden md:block md:w-1/2 lg:w-3/5 relative">

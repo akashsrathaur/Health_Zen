@@ -59,7 +59,7 @@ const itemVariants = {
 
 function AchievementCard({ achievement }: { achievement: Achievement }) {
   return (
-    <Card className={`flex flex-col items-center justify-center p-4 text-center transition-all duration-300 ${!achievement.unlocked ? 'opacity-50 grayscale' : 'hover:bg-secondary/80'}`}>
+    <Card className={`flex flex-col items-center justify-center p-4 text-center transition-all duration-300 ${!achievement.unlocked ? 'opacity-50 grayscale' : 'hover:bg-white/5'}`}>
       <achievement.icon className={`h-8 w-8 mb-2 ${achievement.unlocked ? 'text-primary' : 'text-muted-foreground'}`} />
       <p className="text-sm font-semibold">{achievement.name}</p>
       {!achievement.unlocked && <p className="text-xs text-muted-foreground">Locked</p>}
@@ -75,7 +75,7 @@ export default function ProgressTrackerPage() {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-headline text-3xl font-bold tracking-tight">Progress Tracker</h1>
+          <h1 className="font-headline text-3xl font-bold tracking-tight text-glow">Progress Tracker</h1>
           <p className="text-muted-foreground">
             <Balancer>Visualize your wellness journey and celebrate your milestones.</Balancer>
           </p>
@@ -104,9 +104,9 @@ export default function ProgressTrackerPage() {
             </ChartContainer>
           </CardContent>
         </Card>
-        <Card className="flex flex-col items-center justify-center bg-gradient-to-br from-[#F15BB5] to-[#FEE440] dark:from-[#F15BB5] dark:to-[#FEE440]">
+        <Card className="flex flex-col items-center justify-center bg-gradient-to-br from-accent to-yellow-400 dark:from-[#F15BB5] dark:to-[#FEE440]">
           <CardHeader className="items-center text-center">
-            <CardTitle className='text-card'>Current Streak</CardTitle>
+            <CardTitle className='text-card-foreground dark:text-black'>Current Streak</CardTitle>
             <Flame className="h-16 w-16 text-white" />
           </CardHeader>
           <CardContent>

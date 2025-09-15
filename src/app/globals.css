@@ -39,24 +39,24 @@
   }
 
   .dark {
-    --background: 0 0% 5%; /* #0D0D0D */
+    --background: 240 5% 5%; /* #0D0D0D */
     --foreground: 0 0% 98%;
-    --card: 0 0% 8%;
+    --card: 240 4% 10%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 8%;
+    --popover: 240 4% 10%;
     --popover-foreground: 0 0% 98%;
     --primary: 173 100% 48%; /* #00F5D4 Neon Teal */
-    --primary-foreground: 0 0% 5%;
+    --primary-foreground: 240 5% 5%;
     --secondary: 265 79% 66%; /* #9B5DE5 Neon Purple */
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 12%;
+    --muted: 240 4% 12%;
     --muted-foreground: 0 0% 63.9%;
     --accent: 329 84% 67%; /* #F15BB5 Coral Pink */
-    --accent-foreground: 0 0% 5%;
+    --accent-foreground: 240 5% 5%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 12%;
-    --input: 0 0% 12%;
+    --border: 240 4% 15%;
+    --input: 240 4% 12%;
     --ring: 173 100% 48%; /* #00F5D4 Neon Teal */
     
     --chart-1: 173 100% 48%; /* Neon Teal */
@@ -65,10 +65,10 @@
     --chart-4: 50 98% 62%; /* Electric Yellow */
     --chart-5: 173 100% 48%;
 
-    --sidebar-background: 0 0% 8%;
+    --sidebar-background: 240 4% 10%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 12%;
-    --sidebar-accent: 0 0% 15%;
+    --sidebar-border: 240 4% 15%;
+    --sidebar-accent: 240 4% 18%;
     --sidebar-accent-foreground: 173 100% 48%; /* Neon Teal */
     --sidebar-ring: 173 100% 48%; /* Neon Teal */
   }
@@ -84,15 +84,23 @@
 }
 
 @layer utilities {
-    @keyframes-glow {
-        from {
-            text-shadow: 0 0 4px hsl(var(--primary) / 0.5);
-        }
-        to {
-            text-shadow: 0 0 8px hsl(var(--primary) / 0.8);
-        }
+  .text-glow {
+    text-shadow: 0 0 8px hsl(var(--primary) / 0.8), 0 0 20px hsl(var(--primary) / 0.5);
+  }
+
+  .button-glow {
+      box-shadow: 0 0 10px hsl(var(--primary)), 0 0 20px hsl(var(--primary) / 0.7);
+  }
+
+  @keyframes-glow {
+    from {
+      text-shadow: 0 0 4px hsl(var(--primary) / 0.5);
     }
-    .text-glow {
-        animation: keyframes-glow 1.5s ease-in-out infinite alternate;
+    to {
+      text-shadow: 0 0 8px hsl(var(--primary) / 0.8);
     }
+  }
+  .animate-text-glow {
+      animation: keyframes-glow 1.5s ease-in-out infinite alternate;
+  }
 }
