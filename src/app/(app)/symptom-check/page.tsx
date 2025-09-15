@@ -65,7 +65,7 @@ function LoadingState() {
     );
   }
 
-  function AdvicePoints({ text }: { text: string }) {
+function AdvicePoints({ text }: { text: string }) {
     const points = text.split('\n').map(p => p.trim()).filter(p => p.startsWith('-')).map(p => p.substring(1).trim());
     
     if (points.length === 0 && text) {
@@ -103,7 +103,7 @@ export default function SymptomCheckPage() {
       <div className="text-center mb-8">
         <Bot className="mx-auto h-12 w-12 text-primary" />
         <h1 className="mt-4 font-headline text-3xl font-bold tracking-tight">
-          AI Dr. Cure
+          Dr. Cure
         </h1>
         <p className="mt-2 text-muted-foreground">
           Describe your symptoms to receive Homeopathy and Ayurvedic advice.
@@ -161,7 +161,7 @@ export default function SymptomCheckPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-               <AdvicePoints text={state.data.ayurvedicAdvice} />
+              <AdvicePoints text={state.data.ayurvedicAdvice} />
             </CardContent>
           </Card>
 

@@ -64,7 +64,7 @@ export function ChatBuddy() {
     const initialMessages: Message[] = [{ 
         id: nanoid(), 
         role: 'system' as const, 
-        content: `Might occasionally roast you, but only out of love..`,
+        content: "Messages are just between us! I'm an AI, so let's keep it fun and not share personal secrets.",
         timestamp: new Date().toISOString(),
     }];
 
@@ -139,7 +139,7 @@ export function ChatBuddy() {
                 console.error("Error in chat action:", error);
                 setError(error.message || 'An unexpected error occurred.');
                 setMessages(currentMessages => currentMessages.map(msg => 
-                    msg.id === newUserMessage.id ? { ...msg, status: 'sent' as const } : msg
+                    msg.id === newUserMessage.id ? { ...msg, status: 'sent' } : msg
                 ));
             }
         });
@@ -407,5 +407,7 @@ function BuddySettingsDialog({ isOpen, setIsOpen, persona, setPersona }: { isOpe
         </Dialog>
     );
 }
+
+    
 
     
