@@ -54,9 +54,7 @@ export async function chatBuddyAction(
     }
 
     const { message } = parsedData.data;
-    const buddyPersona = JSON.parse(parsedData.data.buddyPersona);
-    const userData = JSON.parse(parsedData.data.userData);
-    
+
     const prevMessages = prevState.messages.map(m => (
         m.role === 'user' ? { ...m, status: 'read' as const } : m
     ));
@@ -69,20 +67,24 @@ export async function chatBuddyAction(
         status: 'sent' as const,
     };
     
+    // Add new user message for optimistic UI update
     const newMessages: Message[] = [...prevMessages, newUserMessage];
 
-    const chatHistoryForAI = newMessages
-        .filter(m => m.role === 'user' || m.role === 'model')
-        .map(m => ({role: m.role, content: m.content}));
-
-    const input: ChatWithBuddyInput = {
-        message,
-        buddyPersona,
-        chatHistory: chatHistoryForAI,
-        userData,
-    };
-    
     try {
+        const buddyPersona = JSON.parse(parsedData.data.buddyPersona);
+        const userData = JSON.parse(parsedData.data.userData);
+        
+        const chatHistoryForAI = newMessages
+            .filter(m => m.role === 'user' || m.role === 'model')
+            .map(m => ({role: m.role, content: m.content}));
+
+        const input: ChatWithBuddyInput = {
+            message,
+            buddyPersona,
+            chatHistory: chatHistoryForAI,
+            userData,
+        };
+
         const result = await chatWithBuddy(input, process.env.GEMINI_API_KEY);
         
         const updatedUserMessage: Message = { ...newUserMessage, status: 'delivered' };
@@ -94,20 +96,23 @@ export async function chatBuddyAction(
             timestamp: new Date().toISOString(),
         };
         
+        // Find the index of the optimistic user message to replace it
+        const userMessageIndex = newMessages.findIndex(m => m.id === newUserMessage.id);
+        if (userMessageIndex !== -1) {
+            newMessages[userMessageIndex] = updatedUserMessage;
+        }
+        
         return {
-            messages: [
-                ...prevMessages.slice(0, -1), // All previous messages
-                updatedUserMessage, // The user message with 'delivered' status
-                modelMessage // The new model message
-            ],
+            messages: [...newMessages, modelMessage],
             error: null
         };
     } catch (error) {
         console.error(error);
+        // Return the state with the optimistic user message still present, plus an error
         return { 
             ...prevState,
             messages: newMessages,
-            error: 'Failed to get response from your buddy. Please try again.' 
+            error: 'Failed to get response from your buddy. Please check your API key and try again.' 
         };
     }
 }
