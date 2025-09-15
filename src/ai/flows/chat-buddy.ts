@@ -6,6 +6,7 @@
  */
 
 import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 import {
   ChatWithBuddyInputSchema,
   ChatWithBuddyOutputSchema,
@@ -14,11 +15,11 @@ import {
 } from './chat-buddy.types';
 
 
-export async function chatWithBuddy(input: ChatWithBuddyInput): Promise<ChatWithBuddyOutput> {
+export async function chatWithBuddy(input: ChatWithBuddyInput, apiKey: string): Promise<ChatWithBuddyOutput> {
   // Pass apiKey to the flow. In this case, we are just using it to ensure
   // the flow doesn't run if the key is missing, but it could be used
   // to initialize a new Genkit instance if needed.
-  if (!process.env.GEMINI_API_KEY) {
+  if (!apiKey) {
     throw new Error('GEMINI_API_KEY is not set.');
   }
   return chatWithBuddyFlow(input);
