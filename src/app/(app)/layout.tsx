@@ -2,14 +2,12 @@ import React from 'react';
 import {
   SidebarProvider,
   Sidebar,
-  SidebarInset,
   SidebarTrigger,
   SidebarHeader,
 } from '@/components/ui/sidebar';
 import { MainNav } from '@/components/main-nav';
 import { UserNav } from '@/components/user-nav';
 import { Icons } from '@/components/icons';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -24,10 +22,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </SidebarHeader>
           <MainNav />
         </Sidebar>
-        <div className="flex flex-col">
+        <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
             <div className="flex items-center gap-2">
-              <SidebarTrigger />
+              <SidebarTrigger className="md:hidden" />
               <div className="hidden items-center gap-2 md:flex">
                 <Icons.logo className="h-6 w-6" />
                 <span className="font-semibold">HealthZen</span>
