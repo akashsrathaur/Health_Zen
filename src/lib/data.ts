@@ -15,7 +15,8 @@ import {
 import type { LucideIcon } from 'lucide-react';
 
 export const userData = {
-  name: 'Alex Doe',
+  name: 'Akash Rathaur',
+  age: 20,
   avatarUrl: 'https://picsum.photos/seed/avatar1/100/100',
   streak: 12,
   level: 5,
