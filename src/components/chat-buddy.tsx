@@ -17,7 +17,7 @@ import { ScrollArea } from './ui/scroll-area';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
-import { format } from 'date-fns';
+import { format, isToday, isYesterday, formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
@@ -62,7 +62,7 @@ export function ChatBuddy() {
     const initialMessages: Message[] = [{ 
         id: nanoid(), 
         role: 'system' as const, 
-        content: `You are now chatting with ${persona.name}.`,
+        content: `Occasionally roast you, but only out of love.`,
         timestamp: new Date().toISOString(),
     }];
 
@@ -187,12 +187,28 @@ export function ChatBuddy() {
                                 <ScrollArea className="h-full" viewportRef={scrollAreaViewportRef}>
                                     <div className="space-y-4 pr-4">
                                     {messages.map((msg, index) => {
-                                        const showDate = index === 0 || new Date(msg.timestamp).toDateString() !== new Date(messages[index - 1].timestamp).toDateString();
+                                        const msgDate = new Date(msg.timestamp);
+                                        const prevMsgDate = index > 0 ? new Date(messages[index - 1].timestamp) : null;
+                                        const showDate = !prevMsgDate || msgDate.toDateString() !== prevMsgDate.toDateString();
+                                        
+                                        let dateLabel = '';
+                                        if (showDate) {
+                                            if (isToday(msgDate)) {
+                                                dateLabel = 'Today';
+                                            } else if (isYesterday(msgDate)) {
+                                                dateLabel = 'Yesterday';
+                                            } else {
+                                                dateLabel = format(msgDate, 'MMMM d, yyyy');
+                                            }
+                                        }
+
                                         return(
                                         <div key={msg.id}>
                                             {showDate && msg.role !== 'system' && (
-                                                <div className="text-center text-xs text-muted-foreground my-4">
-                                                    {format(new Date(msg.timestamp), 'MMMM d, yyyy')}
+                                                <div className="my-4 flex justify-center">
+                                                    <div className="text-xs text-muted-foreground rounded-full bg-secondary px-3 py-1">
+                                                        {dateLabel}
+                                                    </div>
                                                 </div>
                                             )}
                                             <div className={cn("flex items-end gap-2", msg.role === 'user' ? 'justify-end' : 'justify-start')}>
@@ -211,12 +227,12 @@ export function ChatBuddy() {
                                                          <div className={cn("absolute bottom-1 right-2 flex items-center gap-1 text-xs",
                                                             msg.role === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground/70'
                                                         )}>
-                                                            <span>{format(new Date(msg.timestamp), 'h:mm a')}</span>
+                                                            <span>{format(new Date(msg.timestamp), 'HH:mm')}</span>
                                                             {msg.role === 'user' && <MessageStatus status={msg.status} />}
                                                         </div>
                                                     </motion.div>
                                                 ) : (
-                                                    <div className="w-full text-center text-xs text-muted-foreground italic">{msg.content}</div>
+                                                    <div className="w-full text-center text-xs text-muted-foreground italic rounded-full bg-secondary px-3 py-1 my-2 max-w-xs mx-auto">{msg.content}</div>
                                                 )}
                                                 {msg.role === 'user' && (
                                                     <Avatar className='h-8 w-8'>
@@ -386,5 +402,3 @@ function BuddySettingsDialog({ isOpen, setIsOpen, persona, setPersona }: { isOpe
         </Dialog>
     );
 }
-
-    
