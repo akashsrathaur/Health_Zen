@@ -35,9 +35,11 @@ const prompt = ai.definePrompt({
 
 Symptoms: {{{symptoms}}}
 
-Provide your output in JSON format with the following keys:
-- modernAdvice: Modern medical advice for the symptoms.
-- ayurvedicAdvice: Ayurvedic advice for the symptoms.`,
+Provide your output in JSON format with the following keys and structure:
+{
+  "modernAdvice": "...",
+  "ayurvedicAdvice": "..."
+}`,
 });
 
 const symptomCheckFlow = ai.defineFlow(
