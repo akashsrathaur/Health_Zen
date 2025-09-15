@@ -39,38 +39,48 @@
   }
 
   .dark {
-    --background: 240 5% 5%;
-    --foreground: 0 0% 98%;
-    --card: 240 4% 10%;
+    --background: 210 40% 4%; /* #121212 */
+    --foreground: 0 0% 98%; /* #FAFAFA */
+    
+    --card: 210 40% 8%; /* Slightly lighter than bg */
     --card-foreground: 0 0% 98%;
-    --popover: 240 4% 10%;
+    
+    --popover: 210 40% 5%;
     --popover-foreground: 0 0% 98%;
-    --primary: 265 80% 65%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4% 15%;
+    
+    --primary: 165 72% 58%; /* #3DDAB4 */
+    --primary-foreground: 210 40% 5%;
+    
+    --secondary: 255 70% 65%; /* #7C4DFF */
     --secondary-foreground: 0 0% 98%;
-    --muted: 240 4% 12%;
+    
+    --muted: 210 40% 12%;
     --muted-foreground: 0 0% 63.9%;
-    --accent: 330 85% 60%;
-    --accent-foreground: 0 0% 98%;
+    
+    --accent: 5 100% 70%; /* #FF6F61 */
+    --accent-foreground: 210 40% 5%;
+    
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 4% 15%;
-    --input: 240 4% 12%;
-    --ring: 265 80% 65%;
-    --chart-1: 265 80% 65%;
-    --chart-2: 330 85% 60%;
-    --chart-3: 280 80% 65%;
-    --chart-4: 200 70% 60%;
-    --chart-5: 340 75% 65%;
+    
+    --border: 210 40% 15%;
+    --input: 210 40% 10%;
+    --ring: 165 72% 58%; /* #3DDAB4 */
+    
+    --chart-1: 165 72% 58%; /* Sage Green */
+    --chart-2: 255 70% 65%; /* Purple */
+    --chart-3: 5 100% 70%; /* Coral Peach */
+    --chart-4: 51 98% 63%;  /* Gold #FEE440 */
+    --chart-5: 200 70% 60%;
+
     --radius: 0.8rem;
 
-    --sidebar-background: 240 4% 8%;
+    --sidebar-background: 210 40% 6%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-border: 240 4% 15%;
-    --sidebar-accent: 240 4% 18%;
-    --sidebar-accent-foreground: 265 80% 70%;
-    --sidebar-ring: 265 80% 65%;
+    --sidebar-border: 210 40% 15%;
+    --sidebar-accent: 210 40% 18%;
+    --sidebar-accent-foreground: 165 72% 65%;
+    --sidebar-ring: 165 72% 58%;
   }
 }
 
@@ -90,6 +100,10 @@
 
   .button-glow {
       box-shadow: 0 0 10px hsl(var(--primary)), 0 0 20px hsl(var(--primary) / 0.7);
+  }
+
+  .text-glow-purple {
+    text-shadow: 0 0 8px hsl(var(--secondary) / 0.8), 0 0 20px hsl(var(--secondary) / 0.5);
   }
 
   @keyframes-glow {

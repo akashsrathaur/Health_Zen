@@ -15,9 +15,9 @@ export default function LoginPage() {
         router.push('/dashboard');
     }
   return (
-    <>
+    <div className="w-full max-w-md space-y-8 rounded-2xl bg-white/5 p-8 backdrop-blur-lg border border-white/10">
       <div className="flex flex-col items-center space-y-4 text-center">
-        <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground text-glow">
+        <h1 className="font-headline text-4xl font-bold tracking-tight text-secondary text-glow-purple">
           Welcome Back
         </h1>
         <p className="text-lg text-muted-foreground">
@@ -36,7 +36,7 @@ export default function LoginPage() {
         <div className="grid gap-2">
             <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link href="#" className="text-sm text-primary hover:underline">Forgot Password?</Link>
+                <Link href="#" className="text-sm text-accent hover:text-yellow-400 transition-colors">Forgot Password?</Link>
             </div>
             <div className="relative">
                 <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -52,11 +52,11 @@ export default function LoginPage() {
         Don't have an account?{' '}
         <Link
           href="/signup"
-          className="font-semibold text-primary underline-offset-4 hover:underline"
+          className="font-semibold text-accent underline-offset-4 hover:underline hover:text-yellow-400"
         >
           Sign Up
         </Link>
       </p>
-    </>
+    </div>
   );
 }

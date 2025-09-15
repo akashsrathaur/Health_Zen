@@ -10,13 +10,14 @@ export default function AuthLayout({
   return (
     <div className="flex min-h-screen">
       <div className="relative flex-1 flex flex-col items-center justify-center bg-background p-4 md:p-8">
-        <div className="absolute top-8 left-8">
+         <div className="absolute inset-0 bg-gradient-to-br from-background via-background/80 to-background/50 dark:from-[#121212] dark:to-[#1E1E1E]"></div>
+        <div className="absolute top-8 left-8 z-10">
             <Link href="/dashboard" className="flex items-center gap-2 text-foreground">
                 <Icons.logo className="h-8 w-8" />
                 <span className="font-semibold text-lg">HealthZen</span>
             </Link>
         </div>
-        <div className="w-full max-w-md space-y-8 py-16">
+        <div className="relative z-10 w-full max-w-md space-y-8 py-16">
             {children}
         </div>
       </div>

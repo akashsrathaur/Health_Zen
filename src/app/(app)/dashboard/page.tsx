@@ -39,7 +39,7 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="font-headline text-3xl font-bold tracking-tight text-glow">
+        <h1 className="font-headline text-3xl font-bold tracking-tight text-secondary text-glow-purple">
           Welcome back, {userData.name.split(' ')[0]}!
         </h1>
         <p className="text-muted-foreground">
@@ -60,7 +60,7 @@ export default function DashboardPage() {
                     {quickActions.map((action) => (
                     <motion.div key={action.title} variants={itemVariants}>
                       <Link href={action.href} >
-                          <Card className="group h-full transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-primary/50 hover:bg-secondary/50">
+                          <Card className="group h-full transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-primary/50 hover:bg-secondary/10">
                           <CardHeader>
                               <div className="mb-2 flex items-center gap-3">
                               <div className="rounded-lg bg-secondary/20 p-3 group-hover:bg-primary/10 transition-colors">
@@ -88,7 +88,7 @@ export default function DashboardPage() {
                 >
                     {dailyVibes.map((vibe) => (
                       <motion.div key={vibe.title} variants={itemVariants}>
-                        <Card className="flex items-center p-4 transition-all duration-200 hover:bg-secondary/50">
+                        <Card className="flex items-center p-4 transition-all duration-200 hover:bg-secondary/10">
                             <vibe.icon className="mr-4 h-8 w-8 text-primary" />
                             <div className="flex-1">
                             <p className="font-medium">{vibe.title}</p>
