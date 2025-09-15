@@ -56,7 +56,7 @@ export default function SettingsPage() {
                     </div>
                      <div className="grid gap-2">
                         <Label htmlFor="mobile">Mobile Number</Label>
-                        <Input id="mobile" type="tel" defaultValue="(123) 456-7890" />
+                        <Input id="mobile" type="tel" defaultValue="1234567890" maxLength={10} />
                     </div>
                 </CardContent>
             </Card>
