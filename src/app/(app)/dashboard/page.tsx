@@ -22,7 +22,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid gap-6">
+      <div className="grid grid-cols-1 gap-6">
         <section>
           <h2 className="mb-4 text-xl font-semibold">Daily Vibe</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -44,7 +44,7 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {quickActions.map((action) => (
               <Link href={action.href} key={action.title}>
-                <Card className="group transform transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg h-full">
+                <Card className="group h-full transform transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg">
                   <CardHeader>
                     <div className="mb-2 flex items-center gap-3">
                       <div className="rounded-lg bg-secondary p-3">

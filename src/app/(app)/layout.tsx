@@ -4,6 +4,7 @@ import {
   Sidebar,
   SidebarTrigger,
   SidebarHeader,
+  SidebarContent,
 } from '@/components/ui/sidebar';
 import { MainNav } from '@/components/main-nav';
 import { UserNav } from '@/components/user-nav';
@@ -13,14 +14,16 @@ import Link from 'next/link';
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <div className="min-h-screen">
-        <Sidebar collapsible="icon" className="border-r">
+      <div className="min-h-screen md:flex">
+        <Sidebar collapsible="icon" className="border-r hidden md:block">
           <SidebarHeader className="h-16 justify-center p-4">
             <Link href="/dashboard" className="flex items-center gap-2">
                 <Icons.logo className="h-8 w-8" />
             </Link>
           </SidebarHeader>
-          <MainNav />
+          <SidebarContent>
+            <MainNav />
+          </SidebarContent>
         </Sidebar>
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
