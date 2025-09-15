@@ -35,10 +35,10 @@ export default function SignupPage() {
             </div>
         </div>
         <div className="grid gap-2">
-            <Label htmlFor="email">Email Address</Label>
+            <Label htmlFor="email">Email Address (Optional)</Label>
             <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="email" type="email" placeholder="e.g., name@example.com" required className="pl-10" />
+                <Input id="email" type="email" placeholder="e.g., name@example.com" className="pl-10" />
             </div>
         </div>
         <div className="grid gap-2">
@@ -53,6 +53,13 @@ export default function SignupPage() {
             <div className="relative">
                 <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input id="password" type="password" placeholder="••••••••" required className="pl-10" />
+            </div>
+        </div>
+        <div className="grid gap-2">
+            <Label htmlFor="confirm-password">Confirm Password</Label>
+            <div className="relative">
+                <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input id="confirm-password" type="password" placeholder="••••••••" required className="pl-10" />
             </div>
         </div>
 
