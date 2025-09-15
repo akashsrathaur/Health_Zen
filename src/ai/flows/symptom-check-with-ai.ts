@@ -31,15 +31,12 @@ const prompt = ai.definePrompt({
   name: 'symptomCheckPrompt',
   input: {schema: SymptomCheckInputSchema},
   output: {schema: SymptomCheckOutputSchema},
-  prompt: `You are HealthSnap, an empathetic wellness assistant. A user will describe their symptoms, and you will provide modern and Ayurvedic advice.
+  prompt: `You are HealthSnap, an empathetic wellness assistant. A user will describe their symptoms, and you will provide modern and Ayurvedic advice. Do NOT provide a diagnosis. If the symptoms sound serious, advise the user to see a doctor.
+
+Your response must be a valid JSON object and nothing else.
 
 Symptoms: {{{symptoms}}}
-
-Provide your output in JSON format with the following keys and structure:
-{
-  "modernAdvice": "...",
-  "ayurvedicAdvice": "..."
-}`,
+`,
 });
 
 const symptomCheckFlow = ai.defineFlow(
