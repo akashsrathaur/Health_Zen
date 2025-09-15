@@ -14,8 +14,8 @@ import Link from 'next/link';
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <div className="min-h-screen md:flex">
-        <Sidebar collapsible="icon" className="border-r hidden md:block">
+      <div className="min-h-screen">
+        <Sidebar className="border-r">
           <SidebarHeader className="h-16 justify-center p-4">
             <Link href="/dashboard" className="flex items-center gap-2">
                 <Icons.logo className="h-8 w-8" />
@@ -25,10 +25,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <MainNav />
           </SidebarContent>
         </Sidebar>
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col md:ml-[var(--sidebar-width-icon)]">
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
             <div className="flex items-center gap-2">
-              <SidebarTrigger />
+              <SidebarTrigger className="md:hidden" />
               <div className="hidden items-center gap-2 md:flex">
                 <Link href="/dashboard" className='flex items-center gap-2'>
                   <Icons.logo className="h-6 w-6" />
