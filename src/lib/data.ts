@@ -30,7 +30,7 @@ export const quickActions = [
     icon: HeartPulse,
   },
   {
-    title: 'Symptom Check',
+    title: 'Dr. Cure',
     description: 'AI-powered advice',
     href: '/symptom-check',
     icon: Bot,

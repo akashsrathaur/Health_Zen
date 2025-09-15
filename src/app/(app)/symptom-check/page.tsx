@@ -84,7 +84,7 @@ export default function SymptomCheckPage() {
       <div className="text-center mb-8">
         <Bot className="mx-auto h-12 w-12 text-primary" />
         <h1 className="mt-4 font-headline text-3xl font-bold tracking-tight">
-          AI Symptom Check
+          AI Dr. Cure
         </h1>
         <p className="mt-2 text-muted-foreground">
           Describe your symptoms to receive modern and Ayurvedic advice.
