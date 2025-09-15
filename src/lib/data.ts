@@ -166,7 +166,7 @@ export const communityPosts = [
   {
     id: 'post-1',
     user: {
-      name: 'WellnessWarrior',
+      name: 'Akash Singh Rathaur',
       avatarUrl: 'https://picsum.photos/seed/avatar2/100/100',
     },
     timestamp: '2h ago',
@@ -178,7 +178,7 @@ export const communityPosts = [
   {
     id: 'post-2',
     user: {
-      name: 'GreenEats',
+      name: 'Saumyaa SHree',
       avatarUrl: 'https://picsum.photos/seed/avatar3/100/100',
     },
     timestamp: '5h ago',
@@ -190,7 +190,7 @@ export const communityPosts = [
   {
     id: 'post-3',
     user: {
-      name: 'MindfulExplorer',
+      name: 'Jaanvi',
       avatarUrl: 'https://picsum.photos/seed/avatar4/100/100',
     },
     timestamp: '1d ago',
