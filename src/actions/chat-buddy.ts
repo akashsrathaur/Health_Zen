@@ -1,6 +1,7 @@
 'use server';
 
-import { chatWithBuddy, type ChatWithBuddyInput, type ChatWithBuddyOutput } from "@/ai/flows/chat-buddy";
+import { chatWithBuddy } from "@/ai/flows/chat-buddy";
+import { type ChatWithBuddyInput } from "@/ai/flows/chat-buddy.types";
 import { z } from "zod";
 
 const ChatBuddyActionInputSchema = z.object({
