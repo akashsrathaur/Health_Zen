@@ -24,7 +24,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </SidebarHeader>
           <MainNav />
         </Sidebar>
-        <SidebarInset>
+        <div className="flex flex-col">
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
             <div className="flex items-center gap-2">
               <SidebarTrigger />
@@ -40,7 +40,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <main className="flex-1 p-4 sm:p-6">
             {children}
           </main>
-        </SidebarInset>
+        </div>
       </div>
     </SidebarProvider>
   );

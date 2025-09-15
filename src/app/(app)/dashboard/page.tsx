@@ -25,7 +25,7 @@ export default function DashboardPage() {
       <div className="grid gap-6">
         <section>
           <h2 className="mb-4 text-xl font-semibold">Daily Vibe</h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {dailyVibes.map((vibe) => (
               <Card key={vibe.title} className="flex items-center p-4">
                 <vibe.icon className="mr-4 h-8 w-8 text-primary" />
