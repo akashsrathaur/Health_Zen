@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useRef, useState, useTransition } from 'react';
@@ -131,14 +132,14 @@ export function ChatBuddy() {
                         timestamp: new Date().toISOString(),
                     };
                     setMessages(currentMessages => [...currentMessages.map(msg => 
-                        msg.id === newUserMessage.id ? { ...msg, status: 'read' } : msg
+                        msg.id === newUserMessage.id ? { ...msg, status: 'read' as const } : msg
                     ), modelMessage]);
                 }
             } catch (error: any) {
                 console.error("Error in chat action:", error);
                 setError(error.message || 'An unexpected error occurred.');
                 setMessages(currentMessages => currentMessages.map(msg => 
-                    msg.id === newUserMessage.id ? { ...msg, status: 'sent' } : msg
+                    msg.id === newUserMessage.id ? { ...msg, status: 'sent' as const } : msg
                 ));
             }
         });
@@ -406,3 +407,5 @@ function BuddySettingsDialog({ isOpen, setIsOpen, persona, setPersona }: { isOpe
         </Dialog>
     );
 }
+
+    
