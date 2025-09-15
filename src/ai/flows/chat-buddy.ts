@@ -14,11 +14,11 @@ import {
 } from './chat-buddy.types';
 
 
-export async function chatWithBuddy(input: ChatWithBuddyInput, apiKey: string): Promise<ChatWithBuddyOutput> {
+export async function chatWithBuddy(input: ChatWithBuddyInput): Promise<ChatWithBuddyOutput> {
   // Pass apiKey to the flow. In this case, we are just using it to ensure
   // the flow doesn't run if the key is missing, but it could be used
   // to initialize a new Genkit instance if needed.
-  if (!apiKey) {
+  if (!process.env.GEMINI_API_KEY) {
     throw new Error('GEMINI_API_KEY is not set.');
   }
   return chatWithBuddyFlow(input);
@@ -26,7 +26,12 @@ export async function chatWithBuddy(input: ChatWithBuddyInput, apiKey: string): 
 
 const chatWithBuddyPrompt = ai.definePrompt({
   name: 'chatWithBuddyPrompt',
-  input: { schema: ChatWithBuddyInputSchema },
+  input: { schema: z.object({
+    message: z.string(),
+    chatHistory: z.string(),
+    buddyPersona: ChatWithBuddyInputSchema.shape.buddyPersona,
+    userData: ChatWithBuddyInputSchema.shape.userData,
+  }) },
   output: { schema: ChatWithBuddyOutputSchema },
   prompt: `You are a personalized chat buddy for a wellness app. Your personality and responses should be shaped by the persona defined below.
 
@@ -52,10 +57,7 @@ Your main goals are to be positive, supportive, and encouraging. You should help
 7.  **Keep responses concise (2-3 sentences max).**
 
 **Conversation History:**
-{{#each chatHistory}}
-{{#if (eq role 'user')}}User: {{content}}{{/if}}
-{{#if (eq role 'model')}}Buddy: {{content}}{{/if}}
-{{/each}}
+{{{chatHistory}}}
 
 **Current User Message:**
 User: {{{message}}}
@@ -71,7 +73,16 @@ const chatWithBuddyFlow = ai.defineFlow(
     outputSchema: ChatWithBuddyOutputSchema,
   },
   async (input) => {
-    const { output } = await chatWithBuddyPrompt(input);
+    
+    const formattedHistory = input.chatHistory.map(m => {
+        if (m.role === 'user') return `User: ${m.content}`;
+        return `Buddy: ${m.content}`;
+    }).join('\n');
+
+    const { output } = await chatWithBuddyPrompt({
+      ...input,
+      chatHistory: formattedHistory,
+    });
     return output!;
   }
 );
