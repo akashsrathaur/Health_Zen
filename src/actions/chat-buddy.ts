@@ -3,8 +3,10 @@
 import { chatWithBuddy } from "@/ai/flows/chat-buddy";
 import { type ChatWithBuddyInput } from "@/ai/flows/chat-buddy.types";
 import { z } from "zod";
+import { nanoid } from 'nanoid';
 
 const ChatBuddyActionInputSchema = z.object({
+  id: z.string(),
   message: z.string(),
   buddyPersona: z.object({
     name: z.string(),
@@ -38,6 +40,7 @@ export async function chatBuddyAction(
 ): Promise<ChatState> {
     
     const parsedData = ChatBuddyActionInputSchema.safeParse({
+        id: formData.get('id'),
         message: formData.get('message'),
         buddyPersona: JSON.parse(formData.get('buddyPersona') as string),
         chatHistory: JSON.parse(formData.get('chatHistory') as string),
@@ -51,7 +54,15 @@ export async function chatBuddyAction(
         };
     }
 
-    const { message, buddyPersona, chatHistory, userData } = parsedData.data;
+    const { id, message, buddyPersona, chatHistory, userData } = parsedData.data;
+
+    const optimisticState: ChatState = {
+      ...prevState,
+      messages: [
+        ...prevState.messages,
+        { id: id, role: 'user', content: message }
+      ]
+    }
 
     const input: ChatWithBuddyInput = {
         message,
@@ -64,8 +75,8 @@ export async function chatBuddyAction(
         const result = await chatWithBuddy(input);
         return {
             messages: [
-                ...prevState.messages,
-                { id: formData.get('id') as string, role: 'model', content: result.response }
+                ...optimisticState.messages,
+                { id: nanoid(), role: 'model', content: result.response }
             ],
             error: null
         };
@@ -77,3 +88,5 @@ export async function chatBuddyAction(
         };
     }
 }
+
+    

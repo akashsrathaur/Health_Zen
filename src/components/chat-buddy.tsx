@@ -43,7 +43,7 @@ export function ChatBuddy() {
     const scrollAreaRef = useRef<HTMLDivElement>(null);
 
     const initialMessages = [{ id: nanoid(), role: 'system', content: `You are now chatting with ${persona.name}.` }] as ChatState['messages'];
-    const [state, formAction] = useActionState<ChatState, FormData>(chatBuddyAction, { messages: initialMessages });
+    const [state, formAction, isFormPending] = useActionState<ChatState, FormData>(chatBuddyAction, { messages: initialMessages });
 
     const scrollToBottom = () => {
         if (scrollAreaRef.current) {
@@ -65,24 +65,16 @@ export function ChatBuddy() {
         if(!messageContent.trim()) return;
 
         const messageId = nanoid();
-        const userMessage = { id: messageId, role: 'user', content: messageContent };
-
-        const extendedFormData = new FormData(event.currentTarget);
-        extendedFormData.set('id', messageId);
-        extendedFormData.set('buddyPersona', JSON.stringify(persona));
-        extendedFormData.set('userData', JSON.stringify({ name: userData.name, streak: userData.streak }));
+        
+        formData.set('id', messageId);
+        formData.set('buddyPersona', JSON.stringify(persona));
+        formData.set('userData', JSON.stringify({ name: userData.name, streak: userData.streak }));
         const chatHistory = state.messages.filter(m => m.role === 'user' || m.role === 'model').map(m => ({role: m.role, content: m.content}));
-        extendedFormData.set('chatHistory', JSON.stringify(chatHistory));
+        formData.set('chatHistory', JSON.stringify(chatHistory));
 
-        startTransition(() => {
-            // Optimistically update the UI
-            (formAction as any)({
-                messages: [...state.messages, userMessage],
-                error: null,
-            }, extendedFormData);
-            formRef.current?.reset();
-            inputRef.current?.focus();
-        });
+        formAction(formData);
+        formRef.current?.reset();
+        inputRef.current?.focus();
     };
 
     return (
@@ -134,7 +126,7 @@ export function ChatBuddy() {
                                             )}
                                         </div>
                                     ))}
-                                    {pending && (
+                                    {isFormPending && (
                                          <div className="flex items-end gap-2 justify-start">
                                             <Avatar className='h-8 w-8'>
                                                 <AvatarFallback>{persona.name.charAt(0)}</AvatarFallback>
@@ -150,8 +142,8 @@ export function ChatBuddy() {
                             </CardContent>
                             <CardFooter className="p-4 pt-0">
                                 <form ref={formRef} onSubmit={handleSubmit} className="flex w-full items-center gap-2">
-                                    <Input ref={inputRef} name="message" placeholder="Type your message..." className="flex-1" autoComplete="off" disabled={pending} />
-                                    <Button type="submit" size="icon" disabled={pending}>
+                                    <Input ref={inputRef} name="message" placeholder="Type your message..." className="flex-1" autoComplete="off" disabled={isFormPending} />
+                                    <Button type="submit" size="icon" disabled={isFormPending}>
                                         <Send className="h-4 w-4" />
                                     </Button>
                                 </form>
@@ -287,3 +279,5 @@ function BuddySettingsDialog({ isOpen, setIsOpen, persona, setPersona }: { isOpe
         </Dialog>
     );
 }
+
+    
