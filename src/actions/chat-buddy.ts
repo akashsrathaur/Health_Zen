@@ -1,7 +1,6 @@
 'use server';
 
 import { chatWithBuddy } from "@/ai/flows/chat-buddy";
-import { type ChatWithBuddyInput } from "@/ai/flows/chat-buddy.types";
 import { nanoid } from "nanoid";
 import { z } from "zod";
 
@@ -74,14 +73,15 @@ export async function chatBuddyAction(
             .filter(m => m.role === 'user' || m.role === 'model')
             .map(m => ({role: m.role, content: m.content}));
 
-        const input: ChatWithBuddyInput = {
-            message,
-            buddyPersona,
-            chatHistory: chatHistoryForAI,
-            userData,
-        };
-
-        const result = await chatWithBuddy(input, process.env.GEMINI_API_KEY);
+        const result = await chatWithBuddy(
+            {
+                message,
+                buddyPersona,
+                chatHistory: chatHistoryForAI,
+                userData,
+            }, 
+            process.env.GEMINI_API_KEY
+        );
         
         const updatedUserMessage: Message = { ...newUserMessage, status: 'delivered' };
 
