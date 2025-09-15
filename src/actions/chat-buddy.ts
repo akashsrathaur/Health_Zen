@@ -31,20 +31,12 @@ export async function chatBuddyAction(
   prevState: ChatState,
   formData: FormData
 ): Promise<ChatState> {
-    if (!process.env.GEMINI_API_KEY) {
-        return { 
-            ...prevState,
-            error: "The GEMINI_API_KEY environment variable is not set. Please add it to your hosting provider's environment variables and redeploy." 
-        };
-    }
-    
     const parsedData = ChatActionInputSchema.safeParse({
         message: formData.get('message'),
         buddyPersona: formData.get('buddyPersona'),
         chatHistory: formData.get('chatHistory'),
         userData: formData.get('userData')
     });
-
 
     if (!parsedData.success) {
         return { 
@@ -54,7 +46,8 @@ export async function chatBuddyAction(
     }
 
     const { message } = parsedData.data;
-
+    
+    // Find the latest user message to update its status
     const prevMessages = prevState.messages.map(m => (
         m.role === 'user' ? { ...m, status: 'read' as const } : m
     ));
@@ -67,10 +60,13 @@ export async function chatBuddyAction(
         status: 'sent' as const,
     };
     
-    // Add new user message for optimistic UI update
     const newMessages: Message[] = [...prevMessages, newUserMessage];
 
     try {
+        if (!process.env.GEMINI_API_KEY) {
+            throw new Error("The GEMINI_API_KEY environment variable is not set. Please add it to your hosting provider's environment variables and redeploy.");
+        }
+
         const buddyPersona = JSON.parse(parsedData.data.buddyPersona);
         const userData = JSON.parse(parsedData.data.userData);
         
@@ -96,7 +92,6 @@ export async function chatBuddyAction(
             timestamp: new Date().toISOString(),
         };
         
-        // Find the index of the optimistic user message to replace it
         const userMessageIndex = newMessages.findIndex(m => m.id === newUserMessage.id);
         if (userMessageIndex !== -1) {
             newMessages[userMessageIndex] = updatedUserMessage;
@@ -107,12 +102,13 @@ export async function chatBuddyAction(
             error: null
         };
     } catch (error) {
-        console.error(error);
-        // Return the state with the optimistic user message still present, plus an error
+        console.error("Error in chatBuddyAction:", error);
+        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.';
+        
+        // IMPORTANT: Return newMessages here, not prevState.messages
         return { 
-            ...prevState,
             messages: newMessages,
-            error: 'Failed to get response from your buddy. Please check your API key and try again.' 
+            error: errorMessage,
         };
     }
 }
