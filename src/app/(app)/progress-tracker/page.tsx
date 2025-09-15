@@ -104,14 +104,14 @@ export default function ProgressTrackerPage() {
             </ChartContainer>
           </CardContent>
         </Card>
-        <Card className="flex flex-col items-center justify-center bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/50 dark:to-amber-900/50">
+        <Card className="flex flex-col items-center justify-center bg-gradient-to-br from-[#F15BB5] to-[#FEE440] dark:from-[#F15BB5] dark:to-[#FEE440]">
           <CardHeader className="items-center text-center">
-            <CardTitle>Current Streak</CardTitle>
-            <Flame className="h-16 w-16 text-orange-500" />
+            <CardTitle className='text-card'>Current Streak</CardTitle>
+            <Flame className="h-16 w-16 text-white" />
           </CardHeader>
           <CardContent>
-            <p className="text-6xl font-bold text-orange-600 animate-bounce-in">{progressData.streak}</p>
-            <p className="text-center font-medium text-muted-foreground">days</p>
+            <p className="text-6xl font-bold text-white animate-bounce-in">{progressData.streak}</p>
+            <p className="text-center font-medium text-white/80">days</p>
           </CardContent>
         </Card>
       </div>
