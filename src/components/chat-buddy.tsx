@@ -20,6 +20,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/t
 import { format, isToday, isYesterday, formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import React from 'react';
 
 
 type BuddyPersona = {
@@ -203,7 +204,7 @@ export function ChatBuddy() {
                                         }
 
                                         return(
-                                        <div key={msg.id}>
+                                        <React.Fragment key={msg.id}>
                                             {showDate && msg.role !== 'system' && (
                                                 <div className="my-4 flex justify-center">
                                                     <div className="text-xs text-muted-foreground rounded-full bg-secondary px-3 py-1">
@@ -243,7 +244,7 @@ export function ChatBuddy() {
                                                     </Avatar>
                                                 )}
                                             </div>
-                                        </div>
+                                        </React.Fragment>
                                     )})}
                                     {isPending && (
                                          <div className="flex items-end gap-2 justify-start">
