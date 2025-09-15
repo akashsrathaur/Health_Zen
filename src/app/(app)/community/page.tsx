@@ -12,10 +12,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { communityPosts as initialCommunityPosts, userData } from '@/lib/data';
 import { Textarea } from '@/components/ui/textarea';
-import { Camera, Send } from 'lucide-react';
+import { Camera, Send, CircleUser, Video, RefreshCcw, CheckCircle, XCircle } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { nanoid } from 'nanoid';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 type CommunityPost = (typeof initialCommunityPosts)[0];
 
@@ -57,50 +60,186 @@ function PostCard({ post }: { post: CommunityPost }) {
   );
 }
 
-function CreatePost({ onAddPost }: { onAddPost: (content: string) => void }) {
+function CreatePost({ onAddPost }: { onAddPost: (content: string, imageUrl?: string, imageHint?: string) => void }) {
     const [content, setContent] = useState('');
+    const [image, setImage] = useState<string | null>(null);
+    const [isCameraOpen, setIsCameraOpen] = useState(false);
 
     const handlePost = () => {
-        if (content.trim()) {
-            onAddPost(content);
+        if (content.trim() || image) {
+            onAddPost(content, image || undefined, 'custom post');
             setContent('');
+            setImage(null);
         }
     };
 
+    const handleImageCaptured = (imageDataUrl: string) => {
+        setImage(imageDataUrl);
+        setIsCameraOpen(false);
+    }
+
     return (
-        <Card>
-            <CardContent className="p-4">
-                <div className="flex gap-4">
-                    <Avatar>
-                        <AvatarImage src={userData.avatarUrl} />
-                        <AvatarFallback>{userData.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="w-full space-y-2">
-                        <Textarea 
-                            placeholder="Share a wellness tip or a story..." 
-                            className="border-none focus-visible:ring-0 shadow-none px-0" 
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                        />
-                        <div className="flex justify-between items-center">
-                            <Button variant="ghost" size="icon">
-                                <Camera className="h-5 w-5 text-muted-foreground" />
-                            </Button>
-                            <Button size="sm" onClick={handlePost} disabled={!content.trim()}>
-                                Post <Send className="ml-2 h-4 w-4" />
-                            </Button>
+        <>
+            <Card>
+                <CardContent className="p-4">
+                    <div className="flex gap-4">
+                        <Avatar>
+                            <AvatarImage src={userData.avatarUrl} />
+                            <AvatarFallback>{userData.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="w-full space-y-2">
+                            <Textarea 
+                                placeholder="Share a wellness tip or a story..." 
+                                className="border-none focus-visible:ring-0 shadow-none px-0" 
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
+                            />
+                            {image && (
+                                <div className='relative w-32 h-24'>
+                                    <Image src={image} alt="Preview" layout='fill' className='rounded-lg object-cover' />
+                                    <Button variant='destructive' size='icon' className='absolute -top-2 -right-2 h-6 w-6 rounded-full' onClick={() => setImage(null)}>
+                                        <XCircle className='h-4 w-4' />
+                                    </Button>
+                                </div>
+                            )}
+                            <div className="flex justify-between items-center">
+                                <Button variant="ghost" size="icon" onClick={() => setIsCameraOpen(true)}>
+                                    <Camera className="h-5 w-5 text-muted-foreground" />
+                                </Button>
+                                <Button size="sm" onClick={handlePost} disabled={!content.trim() && !image}>
+                                    Post <Send className="ml-2 h-4 w-4" />
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+            <CameraDialog 
+                isOpen={isCameraOpen} 
+                onClose={() => setIsCameraOpen(false)} 
+                onImageCaptured={handleImageCaptured}
+            />
+        </>
     )
+}
+
+function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, onClose: () => void, onImageCaptured: (imageDataUrl: string) => void}) {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+    const [capturedImage, setCapturedImage] = useState<string | null>(null);
+    const { toast } = useToast();
+
+    useEffect(() => {
+        let stream: MediaStream | null = null;
+        
+        const getCameraPermission = async () => {
+            if (!isOpen) return;
+
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+                setHasCameraPermission(true);
+
+                if (videoRef.current) {
+                    videoRef.current.srcObject = stream;
+                }
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+                setHasCameraPermission(false);
+                toast({
+                    variant: 'destructive',
+                    title: 'Camera Access Denied',
+                    description: 'Please enable camera permissions in your browser settings.',
+                });
+            }
+        };
+
+        getCameraPermission();
+
+        return () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+             if (videoRef.current) {
+                videoRef.current.srcObject = null;
+            }
+            setCapturedImage(null);
+        }
+    }, [isOpen, toast]);
+
+    const handleCapture = () => {
+        if (videoRef.current && canvasRef.current) {
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            if (context) {
+                context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+                setCapturedImage(canvas.toDataURL('image/jpeg'));
+            }
+        }
+    }
+
+    const handleRetake = () => {
+        setCapturedImage(null);
+    }
+    
+    const handleUsePhoto = () => {
+        if (capturedImage) {
+            onImageCaptured(capturedImage);
+        }
+    }
+
+    return (
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+            <DialogContent className="sm:max-w-[625px]">
+                <DialogHeader>
+                    <DialogTitle>Take a Photo</DialogTitle>
+                </DialogHeader>
+                <div className="relative aspect-video w-full bg-black rounded-md overflow-hidden flex items-center justify-center">
+                    {hasCameraPermission === null && <p>Requesting camera...</p>}
+                    {hasCameraPermission === false && (
+                        <Alert variant="destructive" className="m-4">
+                            <AlertTitle>Camera Access Required</AlertTitle>
+                            <AlertDescription>
+                                Please allow camera access in your browser to use this feature.
+                            </AlertDescription>
+                        </Alert>
+                    )}
+
+                    {capturedImage ? (
+                        <Image src={capturedImage} alt="Captured photo" layout="fill" objectFit="contain" />
+                    ) : (
+                        <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline muted />
+                    )}
+                    <canvas ref={canvasRef} className="hidden" />
+                </div>
+                <DialogFooter>
+                    {capturedImage ? (
+                        <div className="w-full flex justify-between">
+                            <Button variant="outline" onClick={handleRetake}>
+                                <RefreshCcw className="mr-2 h-4 w-4" /> Retake
+                            </Button>
+                            <Button onClick={handleUsePhoto}>
+                                <CheckCircle className="mr-2 h-4 w-4" /> Use this photo
+                            </Button>
+                        </div>
+                    ) : (
+                        <Button className="w-full" onClick={handleCapture} disabled={!hasCameraPermission}>
+                            <Video className="mr-2 h-4 w-4" /> Capture
+                        </Button>
+                    )}
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
 }
 
 export default function CommunityPage() {
   const [posts, setPosts] = useState<CommunityPost[]>(initialCommunityPosts);
   
-  const handleAddPost = (content: string) => {
+  const handleAddPost = (content: string, imageUrl?: string, imageHint?: string) => {
     const newPost: CommunityPost = {
       id: nanoid(),
       user: {
@@ -109,6 +248,8 @@ export default function CommunityPage() {
       },
       timestamp: 'Just now',
       content: content,
+      imageUrl: imageUrl,
+      imageHint: imageHint,
       reactions: {},
     };
     setPosts(prevPosts => [newPost, ...prevPosts]);
@@ -137,3 +278,5 @@ export default function CommunityPage() {
     </div>
   );
 }
+
+    
