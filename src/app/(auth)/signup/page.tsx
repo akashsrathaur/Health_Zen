@@ -19,8 +19,8 @@ export default function SignupPage() {
     const validatePassword = (password: string) => {
         const hasNumber = /\d/;
         const hasLetter = /[a-zA-Z]/;
-        if (password.length < 8) {
-            return "Password must be at least 8 characters long.";
+        if (password.length < 6) {
+            return "Password must be at least 6 characters long.";
         }
         if (!hasLetter.test(password) || !hasNumber.test(password)) {
             return "Password must contain at least one letter and one number.";
