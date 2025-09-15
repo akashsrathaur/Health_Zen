@@ -28,10 +28,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
             <div className="flex items-center gap-2">
-              <SidebarTrigger className="md:hidden" />
+              <SidebarTrigger />
               <div className="hidden items-center gap-2 md:flex">
-                <Icons.logo className="h-6 w-6" />
-                <span className="font-semibold">HealthZen</span>
+                <Link href="/dashboard" className='flex items-center gap-2'>
+                  <Icons.logo className="h-6 w-6" />
+                  <span className="font-semibold">HealthZen</span>
+                </Link>
               </div>
             </div>
             <div className="flex items-center gap-4">
