@@ -34,6 +34,10 @@ export async function chatBuddyAction(
     }
 
     const { message, buddyPersona, chatHistory, userData } = parsedData.data;
+    
+    const newUserMessage = { id: nanoid(), role: 'user' as const, content: message };
+    const newMessages = [...prevState.messages, newUserMessage];
+
 
     const input: ChatWithBuddyInput = {
         message,
@@ -48,7 +52,7 @@ export async function chatBuddyAction(
         
         return {
             messages: [
-                ...prevState.messages,
+                ...newMessages,
                 modelMessage
             ],
             error: null
@@ -57,6 +61,7 @@ export async function chatBuddyAction(
         console.error(error);
         return { 
             ...prevState,
+            messages: newMessages,
             error: 'Failed to get response from your buddy. Please try again.' 
         };
     }

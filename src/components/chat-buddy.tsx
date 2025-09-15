@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useRef, useState } from 'react';
+import { useActionState, useEffect, useRef, useState, useTransition } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
@@ -40,27 +40,13 @@ export function ChatBuddy() {
     const formRef = useRef<HTMLFormElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
+    const [isPending, startTransition] = useTransition();
 
-    const initialMessages = [{ id: nanoid(), role: 'system', content: `You are now chatting with ${persona.name}.` }] as ChatState['messages'];
+    const initialMessages = [{ id: nanoid(), role: 'system' as const, content: `You are now chatting with ${persona.name}.` }];
     
     // We pass a function to useActionState to update messages optimistically
-    const [state, formAction, isPending] = useActionState<ChatState, FormData>(
-        async (prevState, formData) => {
-            const messageContent = formData.get('message') as string;
-            
-            // Add user message to state immediately for optimistic update
-            const optimisticState: ChatState = {
-                ...prevState,
-                messages: [
-                    ...prevState.messages,
-                    { id: nanoid(), role: 'user', content: messageContent }
-                ]
-            };
-
-            // Call the actual server action
-            const newState = await chatBuddyAction(optimisticState, formData);
-            return newState;
-        },
+    const [state, formAction] = useActionState<ChatState, FormData>(
+        chatBuddyAction,
         { messages: initialMessages, error: null }
     );
 
@@ -90,8 +76,11 @@ export function ChatBuddy() {
         formData.set('userData', JSON.stringify({ name: userData.name, streak: userData.streak }));
         const chatHistory = state.messages.filter(m => m.role === 'user' || m.role === 'model').map(m => ({role: m.role, content: m.content}));
         formData.set('chatHistory', JSON.stringify(chatHistory));
+        
+        startTransition(() => {
+            formAction(formData);
+        });
 
-        formAction(formData);
         formRef.current?.reset();
         inputRef.current?.focus();
     };
