@@ -62,7 +62,7 @@ export function ChatBuddy() {
     const initialMessages: Message[] = [{ 
         id: nanoid(), 
         role: 'system' as const, 
-        content: `Messages are just between us! I'm an AI, so let's keep it fun and not share personal secrets. I might occasionally roast you, but only out of love.`,
+        content: `Messages are just between us! I'm an AI, so let's keep it fun and not share personal secrets.`,
         timestamp: new Date().toISOString(),
     }];
 
