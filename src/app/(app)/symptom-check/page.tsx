@@ -1,5 +1,5 @@
 'use client';
-import { useActionState, useFormStatus } from 'react';
+import { useActionState } from 'react';
 import { symptomCheckAction } from '@/actions/symptom-check';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,6 +15,7 @@ import { Bot, Lightbulb, Heart, Loader2, Sparkles } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useEffect, useRef } from 'react';
 import { Label } from '@/components/ui/label';
+import { useFormStatus } from 'react-dom';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
