@@ -82,7 +82,7 @@ export function ChatBuddy() {
     
     useEffect(() => {
         scrollToBottom();
-    }, [messages]);
+    }, [messages, isPending]);
     
     const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -98,37 +98,47 @@ export function ChatBuddy() {
             status: 'sent',
         };
 
-        const newMessages = [...messages, newUserMessage];
-        setMessages(newMessages);
+        setMessages(currentMessages => [...currentMessages, newUserMessage]);
         setError(null);
         formRef.current?.reset();
         inputRef.current?.focus();
 
         startTransition(async () => {
+            
             formData.set('buddyPersona', JSON.stringify(persona));
             formData.set('userData', JSON.stringify({ name: userData.name, streak: userData.streak }));
-            const chatHistoryForAI = newMessages
+            const chatHistoryForAI = [...messages, newUserMessage]
                 .filter(m => m.role === 'user' || m.role === 'model')
                 .map(m => ({role: m.role, content: m.content}));
             formData.set('chatHistory', JSON.stringify(chatHistoryForAI));
             
-            const result = await chatBuddyAction(formData);
+            try {
+                // Add a 1-second delay for a more human-like feel
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const result = await chatBuddyAction(formData);
 
-            if(result.error) {
-                setError(result.error);
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+
+                if (result.response) {
+                    const modelMessage: Message = {
+                        id: nanoid(),
+                        role: 'model',
+                        content: result.response,
+                        timestamp: new Date().toISOString(),
+                    };
+                    setMessages(currentMessages => [...currentMessages.map(msg => 
+                        msg.id === newUserMessage.id ? { ...msg, status: 'read' } : msg
+                    ), modelMessage]);
+                }
+            } catch (error: any) {
+                console.error("Error in chat action:", error);
+                setError(error.message || 'An unexpected error occurred.');
                 setMessages(currentMessages => currentMessages.map(msg => 
                     msg.id === newUserMessage.id ? { ...msg, status: 'sent' } : msg
                 ));
-            } else if (result.response) {
-                const modelMessage: Message = {
-                    id: nanoid(),
-                    role: 'model',
-                    content: result.response,
-                    timestamp: new Date().toISOString(),
-                };
-                setMessages(currentMessages => [...currentMessages.map(msg => 
-                    msg.id === newUserMessage.id ? { ...msg, status: 'read' } : msg
-                ), modelMessage]);
             }
         });
     };
@@ -196,15 +206,14 @@ export function ChatBuddy() {
                                                         initial={{ opacity: 0, y: 10 }}
                                                         animate={{ opacity: 1, y: 0 }}
                                                         transition={{ duration: 0.3 }}
-                                                        className={cn("group relative max-w-[75%] rounded-lg px-3 py-2 text-sm", msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary')}>
-                                                        {msg.content}
-                                                         <div className={cn("absolute bottom-1 flex items-center gap-1 text-xs",
-                                                            msg.role === 'user' ? 'right-2 text-primary-foreground/70' : 'right-2 text-muted-foreground/70'
+                                                        className={cn("group relative max-w-[75%] rounded-lg px-3 py-2 pb-4 text-sm", msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary')}>
+                                                        <p style={{whiteSpace: 'pre-wrap'}}>{msg.content}</p>
+                                                         <div className={cn("absolute bottom-1 right-2 flex items-center gap-1 text-xs",
+                                                            msg.role === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground/70'
                                                         )}>
-                                                            <span className="opacity-0 group-hover:opacity-100 transition-opacity">{format(new Date(msg.timestamp), 'h:mm a')}</span>
+                                                            <span>{format(new Date(msg.timestamp), 'h:mm a')}</span>
                                                             {msg.role === 'user' && <MessageStatus status={msg.status} />}
                                                         </div>
-                                                        <div className={cn("w-16", { 'w-12': msg.status })}></div>
                                                     </motion.div>
                                                 ) : (
                                                     <div className="w-full text-center text-xs text-muted-foreground italic">{msg.content}</div>
@@ -223,8 +232,7 @@ export function ChatBuddy() {
                                                 <AvatarFallback>{persona.name.charAt(0)}</AvatarFallback>
                                             </Avatar>
                                             <div className="max-w-[75%] rounded-lg px-3 py-2 text-sm bg-secondary flex items-center gap-2">
-                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                <span>{persona.name} is typing...</span>
+                                                <span className="text-muted-foreground">{persona.name} is typing...</span>
                                             </div>
                                         </div>
                                     )}
@@ -378,3 +386,5 @@ function BuddySettingsDialog({ isOpen, setIsOpen, persona, setPersona }: { isOpe
         </Dialog>
     );
 }
+
+    
