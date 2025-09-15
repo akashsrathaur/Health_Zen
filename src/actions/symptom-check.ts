@@ -17,6 +17,16 @@ type State = {
 }
 
 export async function symptomCheckAction(prevState: State, formData: FormData): Promise<State> {
+  if (!process.env.GEMINI_API_KEY) {
+    return {
+        data: null,
+        error: "The GEMINI_API_KEY environment variable is not set. Please add it to your hosting provider's environment variables and redeploy.",
+        form: {
+            symptoms: formData.get('symptoms')?.toString() ?? ''
+        }
+    };
+  }
+
   const validatedFields = SymptomCheckActionInputSchema.safeParse({
     symptoms: formData.get('symptoms'),
   });
@@ -32,7 +42,10 @@ export async function symptomCheckAction(prevState: State, formData: FormData): 
   }
 
   try {
-    const result = await symptomCheck(validatedFields.data);
+    const input: SymptomCheckInput = {
+        symptoms: validatedFields.data.symptoms,
+    };
+    const result = await symptomCheck(input);
     return {
       data: result,
       error: null,
@@ -44,7 +57,7 @@ export async function symptomCheckAction(prevState: State, formData: FormData): 
     console.error(error);
     return {
       data: null,
-      error: "An unexpected error occurred. Please try again.",
+      error: "An unexpected error occurred. Please check your API key and try again.",
       form: {
         symptoms: validatedFields.data.symptoms
       }

@@ -24,11 +24,6 @@ const SymptomCheckOutputSchema = z.object({
 export type SymptomCheckOutput = z.infer<typeof SymptomCheckOutputSchema>;
 
 export async function symptomCheck(input: SymptomCheckInput): Promise<SymptomCheckOutput> {
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error(
-      'The GEMINI_API_KEY environment variable is not set. Please add it to your hosting provider\'s environment variables.'
-    );
-  }
   return symptomCheckFlow(input);
 }
 
@@ -36,13 +31,19 @@ const prompt = ai.definePrompt({
   name: 'symptomCheckPrompt',
   input: {schema: SymptomCheckInputSchema},
   output: {schema: SymptomCheckOutputSchema},
-  prompt: `You are HealthSnap, an empathetic wellness assistant. A user will describe their symptoms, and you will provide modern and Ayurvedic advice. Do NOT provide a diagnosis. If the symptoms sound serious, advise the user to see a doctor.
+  prompt: `You are HealthSnap, an empathetic wellness assistant. A user will describe their symptoms, and you will provide modern and Ayurvedic advice.
 
-Your response must be a valid JSON object and nothing else.
+Your entire response must be a valid JSON object and nothing else. Do NOT wrap it in markdown.
+
+If the symptoms sound serious (e.g., chest pain, difficulty breathing, severe bleeding), your first priority is to advise the user to see a doctor or seek emergency medical help immediately in the 'modernAdvice' field.
 
 Symptoms: {{{symptoms}}}
 
 Your JSON response:
+{
+    "modernAdvice": "...",
+    "ayurvedicAdvice": "..."
+}
 `,
 });
 
