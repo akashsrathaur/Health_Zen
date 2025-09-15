@@ -60,10 +60,10 @@ export default function DashboardPage() {
                     {quickActions.map((action) => (
                     <motion.div key={action.title} variants={itemVariants}>
                       <Link href={action.href} >
-                          <Card className="group h-full transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:bg-white/5">
+                          <Card className="group h-full transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-primary/50 hover:bg-secondary/50">
                           <CardHeader>
                               <div className="mb-2 flex items-center gap-3">
-                              <div className="rounded-lg bg-secondary/20 p-3 group-hover:bg-secondary/30 transition-colors">
+                              <div className="rounded-lg bg-secondary/20 p-3 group-hover:bg-primary/10 transition-colors">
                                   <action.icon className="h-6 w-6 text-primary" />
                               </div>
                               <CardTitle className="text-lg">{action.title}</CardTitle>
@@ -88,7 +88,7 @@ export default function DashboardPage() {
                 >
                     {dailyVibes.map((vibe) => (
                       <motion.div key={vibe.title} variants={itemVariants}>
-                        <Card className="flex items-center p-4 transition-all duration-200 hover:bg-white/5">
+                        <Card className="flex items-center p-4 transition-all duration-200 hover:bg-secondary/50">
                             <vibe.icon className="mr-4 h-8 w-8 text-primary" />
                             <div className="flex-1">
                             <p className="font-medium">{vibe.title}</p>

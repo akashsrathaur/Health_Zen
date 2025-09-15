@@ -17,7 +17,7 @@ export default function LoginPage() {
   return (
     <>
       <div className="flex flex-col items-center space-y-4 text-center">
-        <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground">
+        <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground text-glow">
           Welcome Back
         </h1>
         <p className="text-lg text-muted-foreground">
