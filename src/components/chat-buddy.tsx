@@ -43,12 +43,36 @@ export function ChatBuddy() {
     const scrollAreaRef = useRef<HTMLDivElement>(null);
 
     const initialMessages = [{ id: nanoid(), role: 'system', content: `You are now chatting with ${persona.name}.` }] as ChatState['messages'];
-    const [state, formAction, isFormPending] = useActionState<ChatState, FormData>(chatBuddyAction, { messages: initialMessages });
+    
+    // We pass a function to useActionState to update messages optimistically
+    const [state, formAction, isPending] = useActionState<ChatState, FormData>(
+        async (prevState, formData) => {
+            const messageId = formData.get('id') as string;
+            const messageContent = formData.get('message') as string;
+            
+            // Add user message to state immediately for optimistic update
+            const optimisticState: ChatState = {
+                ...prevState,
+                messages: [
+                    ...prevState.messages,
+                    { id: messageId, role: 'user', content: messageContent }
+                ]
+            };
+
+            // Call the actual server action
+            const newState = await chatBuddyAction(optimisticState, formData);
+            return newState;
+        },
+        { messages: initialMessages }
+    );
+
+
+    const scrollAreaViewportRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
-        if (scrollAreaRef.current) {
-            scrollAreaRef.current.scrollTo({
-                top: scrollAreaRef.current.scrollHeight,
+        if (scrollAreaViewportRef.current) {
+            scrollAreaViewportRef.current.scrollTo({
+                top: scrollAreaViewportRef.current.scrollHeight,
                 behavior: 'smooth'
             });
         }
@@ -57,15 +81,15 @@ export function ChatBuddy() {
     useEffect(() => {
         scrollToBottom();
     }, [state.messages]);
-
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    
+    const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
         const messageContent = formData.get('message') as string;
         if(!messageContent.trim()) return;
 
         const messageId = nanoid();
-        
+
         formData.set('id', messageId);
         formData.set('buddyPersona', JSON.stringify(persona));
         formData.set('userData', JSON.stringify({ name: userData.name, streak: userData.streak }));
@@ -103,9 +127,9 @@ export function ChatBuddy() {
                                 </div>
                             </CardHeader>
                             <CardContent className="flex-1 overflow-hidden p-4">
-                                <ScrollArea className="h-full" ref={scrollAreaRef}>
+                                <ScrollArea className="h-full" viewportRef={scrollAreaViewportRef}>
                                     <div className="space-y-4 pr-4">
-                                    {state.messages.map((msg, index) => (
+                                    {state.messages.map((msg) => (
                                         <div key={msg.id} className={cn("flex items-end gap-2", msg.role === 'user' ? 'justify-end' : 'justify-start')}>
                                             {msg.role === 'model' && (
                                                 <Avatar className='h-8 w-8'>
@@ -113,9 +137,13 @@ export function ChatBuddy() {
                                                 </Avatar>
                                             )}
                                             {msg.role !== 'system' ? (
-                                                <div className={cn("max-w-[75%] rounded-lg px-3 py-2 text-sm", msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary')}>
+                                                <motion.div 
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ duration: 0.3 }}
+                                                    className={cn("max-w-[75%] rounded-lg px-3 py-2 text-sm", msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary')}>
                                                     {msg.content}
-                                                </div>
+                                                </motion.div>
                                             ) : (
                                                 <div className="w-full text-center text-xs text-muted-foreground italic">{msg.content}</div>
                                             )}
@@ -126,7 +154,7 @@ export function ChatBuddy() {
                                             )}
                                         </div>
                                     ))}
-                                    {isFormPending && (
+                                    {isPending && (
                                          <div className="flex items-end gap-2 justify-start">
                                             <Avatar className='h-8 w-8'>
                                                 <AvatarFallback>{persona.name.charAt(0)}</AvatarFallback>
@@ -141,9 +169,9 @@ export function ChatBuddy() {
                                 </ScrollArea>
                             </CardContent>
                             <CardFooter className="p-4 pt-0">
-                                <form ref={formRef} onSubmit={handleSubmit} className="flex w-full items-center gap-2">
-                                    <Input ref={inputRef} name="message" placeholder="Type your message..." className="flex-1" autoComplete="off" disabled={isFormPending} />
-                                    <Button type="submit" size="icon" disabled={isFormPending}>
+                                <form ref={formRef} onSubmit={handleFormSubmit} className="flex w-full items-center gap-2">
+                                    <Input ref={inputRef} name="message" placeholder="Type your message..." className="flex-1" autoComplete="off" disabled={isPending} />
+                                    <Button type="submit" size="icon" disabled={isPending}>
                                         <Send className="h-4 w-4" />
                                     </Button>
                                 </form>
@@ -279,5 +307,3 @@ function BuddySettingsDialog({ isOpen, setIsOpen, persona, setPersona }: { isOpe
         </Dialog>
     );
 }
-
-    

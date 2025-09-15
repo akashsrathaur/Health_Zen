@@ -1,28 +1,8 @@
 'use server';
 
 import { chatWithBuddy } from "@/ai/flows/chat-buddy";
-import { type ChatWithBuddyInput } from "@/ai/flows/chat-buddy.types";
+import { ChatWithBuddyInputSchema, type ChatWithBuddyInput } from "@/ai/flows/chat-buddy.types";
 import { z } from "zod";
-import { nanoid } from 'nanoid';
-
-const ChatBuddyActionInputSchema = z.object({
-  id: z.string(),
-  message: z.string(),
-  buddyPersona: z.object({
-    name: z.string(),
-    age: z.number(),
-    gender: z.string(),
-    relationship: z.string(),
-  }),
-  chatHistory: z.array(z.object({
-    role: z.enum(['user', 'model']),
-    content: z.string(),
-  })),
-  userData: z.object({
-    name: z.string(),
-    streak: z.number(),
-  }),
-});
 
 
 export type ChatState = {
@@ -39,8 +19,7 @@ export async function chatBuddyAction(
   formData: FormData
 ): Promise<ChatState> {
     
-    const parsedData = ChatBuddyActionInputSchema.safeParse({
-        id: formData.get('id'),
+    const parsedData = ChatWithBuddyInputSchema.safeParse({
         message: formData.get('message'),
         buddyPersona: JSON.parse(formData.get('buddyPersona') as string),
         chatHistory: JSON.parse(formData.get('chatHistory') as string),
@@ -54,15 +33,7 @@ export async function chatBuddyAction(
         };
     }
 
-    const { id, message, buddyPersona, chatHistory, userData } = parsedData.data;
-
-    const optimisticState: ChatState = {
-      ...prevState,
-      messages: [
-        ...prevState.messages,
-        { id: id, role: 'user', content: message }
-      ]
-    }
+    const { message, buddyPersona, chatHistory, userData } = parsedData.data;
 
     const input: ChatWithBuddyInput = {
         message,
@@ -73,10 +44,12 @@ export async function chatBuddyAction(
     
     try {
         const result = await chatWithBuddy(input);
+        const modelMessage = { id: nanoid(), role: 'model', content: result.response };
+        
         return {
             messages: [
-                ...optimisticState.messages,
-                { id: nanoid(), role: 'model', content: result.response }
+                ...prevState.messages,
+                modelMessage
             ],
             error: null
         };
@@ -88,5 +61,3 @@ export async function chatBuddyAction(
         };
     }
 }
-
-    
