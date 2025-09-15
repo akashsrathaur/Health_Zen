@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useRef, useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { chatBuddyAction, type ChatState, type Message } from '@/actions/chat-buddy';
+import { chatBuddyAction, type Message } from '@/actions/chat-buddy';
 import { userData } from '@/lib/data';
 import { nanoid } from 'nanoid';
 import { ScrollArea } from './ui/scroll-area';
@@ -18,6 +18,8 @@ import { Avatar, AvatarFallback } from './ui/avatar';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
 
 type BuddyPersona = {
@@ -63,13 +65,10 @@ export function ChatBuddy() {
         content: `You are now chatting with ${persona.name}.`,
         timestamp: new Date().toISOString(),
     }];
+
+    const [messages, setMessages] = useState<Message[]>(initialMessages);
+    const [error, setError] = useState<string | null>(null);
     
-    const [state, formAction] = useActionState<ChatState, FormData>(
-        chatBuddyAction,
-        { messages: initialMessages, error: null }
-    );
-
-
     const scrollAreaViewportRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -83,25 +82,55 @@ export function ChatBuddy() {
     
     useEffect(() => {
         scrollToBottom();
-    }, [state.messages]);
+    }, [messages]);
     
-    const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
         const messageContent = formData.get('message') as string;
         if(!messageContent.trim()) return;
-        
-        formData.set('buddyPersona', JSON.stringify(persona));
-        formData.set('userData', JSON.stringify({ name: userData.name, streak: userData.streak }));
-        const chatHistory = state.messages.filter(m => m.role === 'user' || m.role === 'model').map(m => ({role: m.role, content: m.content}));
-        formData.set('chatHistory', JSON.stringify(chatHistory));
-        
-        startTransition(() => {
-            formAction(formData);
-        });
 
+        const newUserMessage: Message = {
+            id: nanoid(),
+            role: 'user',
+            content: messageContent,
+            timestamp: new Date().toISOString(),
+            status: 'sent',
+        };
+
+        const newMessages = [...messages, newUserMessage];
+        setMessages(newMessages);
+        setError(null);
         formRef.current?.reset();
         inputRef.current?.focus();
+
+        startTransition(async () => {
+            formData.set('buddyPersona', JSON.stringify(persona));
+            formData.set('userData', JSON.stringify({ name: userData.name, streak: userData.streak }));
+            const chatHistoryForAI = newMessages
+                .filter(m => m.role === 'user' || m.role === 'model')
+                .map(m => ({role: m.role, content: m.content}));
+            formData.set('chatHistory', JSON.stringify(chatHistoryForAI));
+            
+            const result = await chatBuddyAction(formData);
+
+            if(result.error) {
+                setError(result.error);
+                setMessages(currentMessages => currentMessages.map(msg => 
+                    msg.id === newUserMessage.id ? { ...msg, status: 'sent' } : msg
+                ));
+            } else if (result.response) {
+                const modelMessage: Message = {
+                    id: nanoid(),
+                    role: 'model',
+                    content: result.response,
+                    timestamp: new Date().toISOString(),
+                };
+                setMessages(currentMessages => [...currentMessages.map(msg => 
+                    msg.id === newUserMessage.id ? { ...msg, status: 'read' } : msg
+                ), modelMessage]);
+            }
+        });
     };
 
     const cardVariants = {
@@ -147,8 +176,8 @@ export function ChatBuddy() {
                             <CardContent className="flex-1 overflow-hidden p-4">
                                 <ScrollArea className="h-full" viewportRef={scrollAreaViewportRef}>
                                     <div className="space-y-4 pr-4">
-                                    {state.messages.map((msg, index) => {
-                                        const showDate = index === 0 || new Date(msg.timestamp).toDateString() !== new Date(state.messages[index - 1].timestamp).toDateString();
+                                    {messages.map((msg, index) => {
+                                        const showDate = index === 0 || new Date(msg.timestamp).toDateString() !== new Date(messages[index - 1].timestamp).toDateString();
                                         return(
                                         <div key={msg.id}>
                                             {showDate && msg.role !== 'system' && (
@@ -200,6 +229,12 @@ export function ChatBuddy() {
                                         </div>
                                     )}
                                     </div>
+                                    {error && (
+                                        <Alert variant="destructive" className="mt-4">
+                                            <AlertTitle>Error</AlertTitle>
+                                            <AlertDescription>{error}</AlertDescription>
+                                        </Alert>
+                                    )}
                                 </ScrollArea>
                             </CardContent>
                             <CardFooter className="p-4 pt-0">
