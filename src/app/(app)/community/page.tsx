@@ -1,3 +1,5 @@
+
+'use client';
 import Image from 'next/image';
 import { Balancer } from 'react-wrap-balancer';
 import {
@@ -8,12 +10,16 @@ import {
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { communityPosts } from '@/lib/data';
+import { communityPosts as initialCommunityPosts, userData } from '@/lib/data';
 import { Textarea } from '@/components/ui/textarea';
 import { Camera, Send } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { useState } from 'react';
+import { nanoid } from 'nanoid';
 
-function PostCard({ post }: { post: (typeof communityPosts)[0] }) {
+type CommunityPost = (typeof initialCommunityPosts)[0];
+
+function PostCard({ post }: { post: CommunityPost }) {
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex flex-row items-center gap-3">
@@ -51,22 +57,36 @@ function PostCard({ post }: { post: (typeof communityPosts)[0] }) {
   );
 }
 
-function CreatePost() {
+function CreatePost({ onAddPost }: { onAddPost: (content: string) => void }) {
+    const [content, setContent] = useState('');
+
+    const handlePost = () => {
+        if (content.trim()) {
+            onAddPost(content);
+            setContent('');
+        }
+    };
+
     return (
         <Card>
             <CardContent className="p-4">
                 <div className="flex gap-4">
                     <Avatar>
-                        <AvatarImage src={communityPosts[0].user.avatarUrl} />
-                        <AvatarFallback>A</AvatarFallback>
+                        <AvatarImage src={userData.avatarUrl} />
+                        <AvatarFallback>{userData.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="w-full space-y-2">
-                        <Textarea placeholder="Share a wellness tip or a story..." className="border-none focus-visible:ring-0 shadow-none px-0" />
+                        <Textarea 
+                            placeholder="Share a wellness tip or a story..." 
+                            className="border-none focus-visible:ring-0 shadow-none px-0" 
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                        />
                         <div className="flex justify-between items-center">
                             <Button variant="ghost" size="icon">
                                 <Camera className="h-5 w-5 text-muted-foreground" />
                             </Button>
-                            <Button size="sm">
+                            <Button size="sm" onClick={handlePost} disabled={!content.trim()}>
                                 Post <Send className="ml-2 h-4 w-4" />
                             </Button>
                         </div>
@@ -78,6 +98,22 @@ function CreatePost() {
 }
 
 export default function CommunityPage() {
+  const [posts, setPosts] = useState<CommunityPost[]>(initialCommunityPosts);
+  
+  const handleAddPost = (content: string) => {
+    const newPost: CommunityPost = {
+      id: nanoid(),
+      user: {
+        name: userData.name,
+        avatarUrl: userData.avatarUrl,
+      },
+      timestamp: 'Just now',
+      content: content,
+      reactions: {},
+    };
+    setPosts(prevPosts => [newPost, ...prevPosts]);
+  };
+
   return (
     <div className="mx-auto max-w-2xl">
       <div className="mb-8">
@@ -92,9 +128,9 @@ export default function CommunityPage() {
       </div>
 
       <div className="space-y-6">
-        <CreatePost />
+        <CreatePost onAddPost={handleAddPost} />
         <Separator />
-        {communityPosts.map((post) => (
+        {posts.map((post) => (
           <PostCard key={post.id} post={post} />
         ))}
       </div>
