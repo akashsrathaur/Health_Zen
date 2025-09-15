@@ -12,28 +12,39 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { userData } from '@/lib/data';
-import { Flame, Bell, User, LogOut, Settings, CheckCircle } from 'lucide-react';
+import { Flame, Bell, User, LogOut, Settings } from 'lucide-react';
 import { Badge } from './ui/badge';
 import Link from 'next/link';
 import { ThemeSwitcher } from './theme-switcher';
+import { useState } from 'react';
 
 export function UserNav() {
+  const [unreadCount, setUnreadCount] = useState(2);
+
+  const handleNotificationToggle = (open: boolean) => {
+    if (open) {
+      setUnreadCount(0);
+    }
+  };
+
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
         <Flame className="h-5 w-5 text-orange-500 animate-bounce-in" />
         <span className="font-semibold text-orange-500">{userData.streak}</span>
       </div>
-      <DropdownMenu>
+      <DropdownMenu onOpenChange={handleNotificationToggle}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="relative rounded-full">
             <Bell className="h-5 w-5" />
-            <Badge
-              variant="destructive"
-              className="absolute -right-1 -top-1 h-4 w-4 justify-center rounded-full p-0 text-[10px]"
-            >
-              2
-            </Badge>
+            {unreadCount > 0 && (
+              <Badge
+                variant="destructive"
+                className="absolute -right-1 -top-1 h-4 w-4 justify-center rounded-full p-0 text-[10px]"
+              >
+                {unreadCount}
+              </Badge>
+            )}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-80" align="end">
@@ -55,11 +66,6 @@ export function UserNav() {
               </p>
             </DropdownMenuItem>
           </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="justify-center text-sm text-muted-foreground">
-            <CheckCircle className="mr-2 h-4 w-4" />
-            Mark all as read
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
