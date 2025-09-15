@@ -24,6 +24,11 @@ const SymptomCheckOutputSchema = z.object({
 export type SymptomCheckOutput = z.infer<typeof SymptomCheckOutputSchema>;
 
 export async function symptomCheck(input: SymptomCheckInput): Promise<SymptomCheckOutput> {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error(
+      'The GEMINI_API_KEY environment variable is not set. Please add it to your hosting provider\'s environment variables.'
+    );
+  }
   return symptomCheckFlow(input);
 }
 
@@ -36,6 +41,8 @@ const prompt = ai.definePrompt({
 Your response must be a valid JSON object and nothing else.
 
 Symptoms: {{{symptoms}}}
+
+Your JSON response:
 `,
 });
 
