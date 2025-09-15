@@ -1,3 +1,77 @@
+
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "avatar-1",
+      "description": "User avatar 1",
+      "imageUrl": "https://picsum.photos/seed/avatar1/100/100",
+      "imageHint": "person face"
+    },
+    {
+      "id": "avatar-2",
+      "description": "User avatar 2",
+      "imageUrl": "https://picsum.photos/seed/avatar2/100/100",
+      "imageHint": "person face"
+    },
+    {
+      "id": "avatar-3",
+      "description": "User avatar 3",
+      "imageUrl": "https://picsum.photos/seed/avatar3/100/100",
+      "imageHint": "person face"
+    },
+    {
+      "id": "avatar-4",
+      "description": "User avatar 4",
+      "imageUrl": "https://picsum.photos/seed/avatar4/100/100",
+      "imageHint": "person face"
+    },
+    {
+      "id": "remedy-turmeric-milk",
+      "description": "Golden turmeric milk in a mug",
+      "imageUrl": "https://picsum.photos/seed/remedy1/600/400",
+      "imageHint": "turmeric milk"
+    },
+    {
+      "id": "remedy-ginger-tea",
+      "description": "Hot ginger tea with lemon",
+      "imageUrl": "https://picsum.photos/seed/remedy2/600/400",
+      "imageHint": "ginger tea"
+    },
+    {
+      "id": "remedy-ashwagandha",
+      "description": "Ashwagandha powder and roots",
+      "imageUrl": "https://picsum.photos/seed/remedy3/600/400",
+      "imageHint": "ashwagandha root"
+    },
+    {
+      "id": "remedy-aloe-vera",
+      "description": "Aloe vera plant leaves",
+      "imageUrl": "https://picsum.photos/seed/remedy4/600/400",
+      "imageHint": "aloe vera"
+    },
+    {
+      "id": "community-post-1",
+      "description": "Yoga pose at sunrise",
+      "imageUrl": "https://picsum.photos/seed/comm1/800/600",
+      "imageHint": "yoga sunrise"
+    },
+    {
+      "id": "community-post-2",
+      "description": "Healthy salad bowl",
+      "imageUrl": "https://picsum.photos/seed/comm2/800/600",
+      "imageHint": "salad bowl"
+    },
+    {
+      "id": "community-post-3",
+      "description": "Person meditating in nature",
+      "imageUrl": "https://picsum.photos/seed/comm3/800/600",
+      "imageHint": "meditation nature"
+    },
+    {
+      "id": "login-hero",
+      "description": "Calm zen garden with stacked stones",
+      "imageUrl": "https://picsum.photos/seed/loginhero/1200/800",
+      "imageHint": "zen garden"
+    }
+  ]
 }
