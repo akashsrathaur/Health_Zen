@@ -5,18 +5,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Loader2, MessageCircle, Send, Settings, Trash2, Upload, Share, X, Bot, User, Save } from 'lucide-react';
+import { Loader2, MessageCircle, Send, Settings, Trash2, Upload, Share, X, Bot, User, Save, Check, CheckCheck, Maximize2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { chatBuddyAction, type ChatState } from '@/actions/chat-buddy';
+import { chatBuddyAction, type ChatState, type Message } from '@/actions/chat-buddy';
 import { userData } from '@/lib/data';
 import { nanoid } from 'nanoid';
 import { ScrollArea } from './ui/scroll-area';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { format } from 'date-fns';
 
 
 type BuddyPersona = {
@@ -33,15 +34,35 @@ const initialPersona: BuddyPersona = {
     relationship: 'Friend',
 };
 
+const MessageStatus = ({ status }: { status: Message['status'] }) => {
+    if (status === 'read') {
+        return <CheckCheck className="h-4 w-4 text-blue-500" />;
+    }
+    if (status === 'delivered') {
+        return <CheckCheck className="h-4 w-4 text-muted-foreground" />;
+    }
+    if (status === 'sent') {
+        return <Check className="h-4 w-4 text-muted-foreground" />;
+    }
+    return null;
+}
+
 export function ChatBuddy() {
     const [isOpen, setIsOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [persona, setPersona] = useState<BuddyPersona>(initialPersona);
+    const [isMaximized, setIsMaximized] = useState(false);
+    
     const formRef = useRef<HTMLFormElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const [isPending, startTransition] = useTransition();
 
-    const initialMessages = [{ id: nanoid(), role: 'system' as const, content: `You are now chatting with ${persona.name}.` }];
+    const initialMessages: Message[] = [{ 
+        id: nanoid(), 
+        role: 'system' as const, 
+        content: `You are now chatting with ${persona.name}.`,
+        timestamp: new Date().toISOString(),
+    }];
     
     const [state, formAction] = useActionState<ChatState, FormData>(
         chatBuddyAction,
@@ -83,18 +104,32 @@ export function ChatBuddy() {
         inputRef.current?.focus();
     };
 
+    const cardVariants = {
+        closed: { opacity: 0, y: 50, scale: 0.9 },
+        open: { opacity: 1, y: 0, scale: 1 },
+    }
+
     return (
         <>
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 50, scale: 0.9 }}
+                        variants={cardVariants}
+                        initial="closed"
+                        animate="open"
+                        exit="closed"
                         transition={{ type: 'spring', stiffness: 200, damping: 25 }}
-                        className="fixed bottom-24 right-4 z-50 w-full max-w-sm"
+                        className={cn(
+                            "fixed z-50",
+                            isMaximized 
+                                ? "inset-0" 
+                                : "bottom-24 right-4 w-full max-w-sm"
+                        )}
                     >
-                        <Card className="flex h-[60vh] flex-col shadow-2xl">
+                        <Card className={cn(
+                            "flex flex-col shadow-2xl",
+                            isMaximized ? "h-full w-full rounded-none" : "h-[60vh]"
+                        )}>
                             <CardHeader className="flex flex-row items-center justify-between p-4">
                                 <div className="flex items-center gap-3">
                                     <Bot className="h-6 w-6 text-primary" />
@@ -104,6 +139,7 @@ export function ChatBuddy() {
                                     </div>
                                 </div>
                                 <div className='flex items-center gap-1'>
+                                    <Button variant="ghost" size="icon" onClick={() => setIsMaximized(p => !p)}><Maximize2 className="h-4 w-4" /></Button>
                                     <Button variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)}><Settings className="h-4 w-4" /></Button>
                                     <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}><X className="h-4 w-4" /></Button>
                                 </div>
@@ -111,31 +147,47 @@ export function ChatBuddy() {
                             <CardContent className="flex-1 overflow-hidden p-4">
                                 <ScrollArea className="h-full" viewportRef={scrollAreaViewportRef}>
                                     <div className="space-y-4 pr-4">
-                                    {state.messages.map((msg) => (
-                                        <div key={msg.id} className={cn("flex items-end gap-2", msg.role === 'user' ? 'justify-end' : 'justify-start')}>
-                                            {msg.role === 'model' && (
-                                                <Avatar className='h-8 w-8'>
-                                                    <AvatarFallback>{persona.name.charAt(0)}</AvatarFallback>
-                                                </Avatar>
+                                    {state.messages.map((msg, index) => {
+                                        const showDate = index === 0 || new Date(msg.timestamp).toDateString() !== new Date(state.messages[index - 1].timestamp).toDateString();
+                                        return(
+                                        <div key={msg.id}>
+                                            {showDate && msg.role !== 'system' && (
+                                                <div className="text-center text-xs text-muted-foreground my-4">
+                                                    {format(new Date(msg.timestamp), 'MMMM d, yyyy')}
+                                                </div>
                                             )}
-                                            {msg.role !== 'system' ? (
-                                                <motion.div 
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ duration: 0.3 }}
-                                                    className={cn("max-w-[75%] rounded-lg px-3 py-2 text-sm", msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary')}>
-                                                    {msg.content}
-                                                </motion.div>
-                                            ) : (
-                                                <div className="w-full text-center text-xs text-muted-foreground italic">{msg.content}</div>
-                                            )}
-                                             {msg.role === 'user' && (
-                                                <Avatar className='h-8 w-8'>
-                                                    <AvatarFallback><User className='h-4 w-4'/></AvatarFallback>
-                                                </Avatar>
-                                            )}
+                                            <div className={cn("flex items-end gap-2", msg.role === 'user' ? 'justify-end' : 'justify-start')}>
+                                                {msg.role === 'model' && (
+                                                    <Avatar className='h-8 w-8'>
+                                                        <AvatarFallback>{persona.name.charAt(0)}</AvatarFallback>
+                                                    </Avatar>
+                                                )}
+                                                {msg.role !== 'system' ? (
+                                                    <motion.div 
+                                                        initial={{ opacity: 0, y: 10 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        transition={{ duration: 0.3 }}
+                                                        className={cn("group relative max-w-[75%] rounded-lg px-3 py-2 text-sm", msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary')}>
+                                                        {msg.content}
+                                                         <div className={cn("absolute bottom-1 flex items-center gap-1 text-xs",
+                                                            msg.role === 'user' ? 'right-2 text-primary-foreground/70' : 'right-2 text-muted-foreground/70'
+                                                        )}>
+                                                            <span className="opacity-0 group-hover:opacity-100 transition-opacity">{format(new Date(msg.timestamp), 'h:mm a')}</span>
+                                                            {msg.role === 'user' && <MessageStatus status={msg.status} />}
+                                                        </div>
+                                                        <div className={cn("w-16", { 'w-12': msg.status })}></div>
+                                                    </motion.div>
+                                                ) : (
+                                                    <div className="w-full text-center text-xs text-muted-foreground italic">{msg.content}</div>
+                                                )}
+                                                {msg.role === 'user' && (
+                                                    <Avatar className='h-8 w-8'>
+                                                        <AvatarFallback><User className='h-4 w-4'/></AvatarFallback>
+                                                    </Avatar>
+                                                )}
+                                            </div>
                                         </div>
-                                    ))}
+                                    )})}
                                     {isPending && (
                                          <div className="flex items-end gap-2 justify-start">
                                             <Avatar className='h-8 w-8'>
@@ -163,37 +215,39 @@ export function ChatBuddy() {
                 )}
             </AnimatePresence>
 
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.5, type: 'spring', stiffness: 260, damping: 20 }}
-                        className="fixed bottom-4 right-4 z-40"
-                    >
-                        <Button
-                            size="lg"
-                            className="h-14 w-14 rounded-full shadow-lg"
-                            onClick={() => setIsOpen(p => !p)}
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.5, type: 'spring', stiffness: 260, damping: 20 }}
+                            className="fixed bottom-4 right-4 z-40"
                         >
-                            <AnimatePresence mode="wait">
-                                {isOpen ? (
-                                    <motion.div key="close" initial={{ rotate: 45, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -45, opacity: 0 }}>
-                                        <X className="h-6 w-6" />
-                                    </motion.div>
-                                ) : (
-                                    <motion.div key="open" initial={{ rotate: 45, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -45, opacity: 0 }}>
-                                        <MessageCircle className="h-6 w-6" />
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </Button>
-                    </motion.div>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                    {isOpen ? 'Close Chat' : 'Open Chat Buddy'}
-                </TooltipContent>
-            </Tooltip>
+                            <Button
+                                size="lg"
+                                className="h-14 w-14 rounded-full shadow-lg"
+                                onClick={() => setIsOpen(p => !p)}
+                            >
+                                <AnimatePresence mode="wait">
+                                    {isOpen ? (
+                                        <motion.div key="close" initial={{ rotate: 45, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -45, opacity: 0 }}>
+                                            <X className="h-6 w-6" />
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div key="open" initial={{ rotate: 45, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -45, opacity: 0 }}>
+                                            <MessageCircle className="h-6 w-6" />
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </Button>
+                        </motion.div>
+                    </TooltipTrigger>
+                    <TooltipContent side="left">
+                        {isOpen ? 'Close Chat' : 'Open Chat Buddy'}
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
 
 
             <BuddySettingsDialog

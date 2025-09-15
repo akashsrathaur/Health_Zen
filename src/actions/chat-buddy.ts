@@ -1,16 +1,29 @@
 'use server';
 
 import { chatWithBuddy } from "@/ai/flows/chat-buddy";
-import { ChatWithBuddyInputSchema, type ChatWithBuddyInput } from "@/ai/flows/chat-buddy.types";
+import { type ChatWithBuddyInput } from "@/ai/flows/chat-buddy.types";
 import { nanoid } from "nanoid";
+import { z } from "zod";
 
+
+const ChatActionInputSchema = z.object({
+    message: z.string(),
+    buddyPersona: z.string(),
+    chatHistory: z.string(),
+    userData: z.string()
+});
+
+
+export type Message = {
+  id: string;
+  role: 'user' | 'model' | 'system';
+  content: string;
+  timestamp: string;
+  status?: 'sent' | 'delivered' | 'read';
+}
 
 export type ChatState = {
-  messages: {
-    id: string;
-    role: 'user' | 'model' | 'system';
-    content: string;
-  }[];
+  messages: Message[];
   error?: string | null;
 }
 
@@ -19,41 +32,67 @@ export async function chatBuddyAction(
   formData: FormData
 ): Promise<ChatState> {
     
-    const parsedData = ChatWithBuddyInputSchema.safeParse({
+    const parsedData = ChatActionInputSchema.safeParse({
         message: formData.get('message'),
-        buddyPersona: JSON.parse(formData.get('buddyPersona') as string),
-        chatHistory: JSON.parse(formData.get('chatHistory') as string),
-        userData: JSON.parse(formData.get('userData') as string)
+        buddyPersona: formData.get('buddyPersona'),
+        chatHistory: formData.get('chatHistory'),
+        userData: formData.get('userData')
     });
+
 
     if (!parsedData.success) {
         return { 
             ...prevState,
-            error: parsedData.error.flatten().fieldErrors.message?.[0] ?? "Invalid input." 
+            error: "Invalid input." 
         };
     }
 
-    const { message, buddyPersona, chatHistory, userData } = parsedData.data;
+    const { message } = parsedData.data;
+    const buddyPersona = JSON.parse(parsedData.data.buddyPersona);
+    const userData = JSON.parse(parsedData.data.userData);
     
-    const newUserMessage = { id: nanoid(), role: 'user' as const, content: message };
-    const newMessages = [...prevState.messages, newUserMessage];
+    const prevMessages = prevState.messages.map(m => (
+        m.role === 'user' ? { ...m, status: 'read' as const } : m
+    ));
 
+    const newUserMessage: Message = { 
+        id: nanoid(), 
+        role: 'user' as const, 
+        content: message,
+        timestamp: new Date().toISOString(),
+        status: 'sent' as const,
+    };
+    
+    const newMessages: Message[] = [...prevMessages, newUserMessage];
+
+    const chatHistoryForAI = newMessages
+        .filter(m => m.role === 'user' || m.role === 'model')
+        .map(m => ({role: m.role, content: m.content}));
 
     const input: ChatWithBuddyInput = {
         message,
         buddyPersona,
-        chatHistory,
+        chatHistory: chatHistoryForAI,
         userData,
     };
     
     try {
         const result = await chatWithBuddy(input);
-        const modelMessage = { id: nanoid(), role: 'model' as const, content: result.response };
+        
+        const updatedUserMessage: Message = { ...newUserMessage, status: 'delivered' };
+
+        const modelMessage: Message = { 
+            id: nanoid(), 
+            role: 'model' as const, 
+            content: result.response,
+            timestamp: new Date().toISOString(),
+        };
         
         return {
             messages: [
-                ...newMessages,
-                modelMessage
+                ...prevMessages.slice(0, -1), // All previous messages
+                updatedUserMessage, // The user message with 'delivered' status
+                modelMessage // The new model message
             ],
             error: null
         };
