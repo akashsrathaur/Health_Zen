@@ -22,8 +22,8 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <section className="lg:col-span-3">
+      <div className="grid gap-6">
+        <section>
           <h2 className="mb-4 text-xl font-semibold">Daily Vibe</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {dailyVibes.map((vibe) => (
@@ -39,7 +39,7 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        <section className="lg:col-span-3">
+        <section>
           <h2 className="mb-4 text-xl font-semibold">Quick Actions</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {quickActions.map((action) => (
