@@ -65,6 +65,25 @@ function LoadingState() {
     );
   }
 
+  function AdvicePoints({ text }: { text: string }) {
+    const points = text.split('\\n').map(p => p.trim()).filter(p => p.startsWith('-')).map(p => p.substring(1).trim());
+    
+    if (points.length === 0 && text) {
+        return <p className="text-muted-foreground">{text}</p>
+    }
+  
+    return (
+      <ul className="list-none space-y-2 text-muted-foreground">
+        {points.map((point, index) => (
+          <li key={index} className="flex items-start">
+             <span className="mr-2 mt-1.5 h-1.5 w-1.5 rounded-full bg-primary" />
+            <span>{point}</span>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
 export default function SymptomCheckPage() {
   const [state, formAction] = useActionState(symptomCheckAction, {
     data: null,
@@ -87,7 +106,7 @@ export default function SymptomCheckPage() {
           AI Dr. Cure
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Describe your symptoms to receive modern and Ayurvedic advice.
+          Describe your symptoms to receive Homeopathy and Ayurvedic advice.
         </p>
       </div>
 
@@ -127,11 +146,11 @@ export default function SymptomCheckPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Lightbulb className="text-primary" /> Modern Advice
+                <Lightbulb className="text-primary" /> Homeopathy Advice
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">{state.data.modernAdvice}</p>
+              <AdvicePoints text={state.data.homeopathyAdvice} />
             </CardContent>
           </Card>
 
@@ -142,7 +161,7 @@ export default function SymptomCheckPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">{state.data.ayurvedicAdvice}</p>
+               <AdvicePoints text={state.data.ayurvedicAdvice} />
             </CardContent>
           </Card>
 

@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview A symptom check AI agent that provides modern and Ayurvedic advice.
+ * @fileOverview A symptom check AI agent that provides Homeopathy and Ayurvedic advice.
  *
  * - symptomCheck - A function that handles the symptom check process.
  * - SymptomCheckInput - The input type for the symptomCheck function.
@@ -18,8 +18,8 @@ const SymptomCheckInputSchema = z.object({
 export type SymptomCheckInput = z.infer<typeof SymptomCheckInputSchema>;
 
 const SymptomCheckOutputSchema = z.object({
-  modernAdvice: z.string().describe('Modern medical advice for the symptoms.'),
-  ayurvedicAdvice: z.string().describe('Ayurvedic advice for the symptoms.'),
+  homeopathyAdvice: z.string().describe('Homeopathy advice for the symptoms in bullet points.'),
+  ayurvedicAdvice: z.string().describe('Ayurvedic advice for the symptoms in bullet points.'),
 });
 export type SymptomCheckOutput = z.infer<typeof SymptomCheckOutputSchema>;
 
@@ -31,18 +31,18 @@ const prompt = ai.definePrompt({
   name: 'symptomCheckPrompt',
   input: {schema: SymptomCheckInputSchema},
   output: {schema: SymptomCheckOutputSchema},
-  prompt: `You are HealthSnap, an empathetic wellness assistant. A user will describe their symptoms, and you will provide modern and Ayurvedic advice.
+  prompt: `You are HealthSnap, an empathetic wellness assistant. A user will describe their symptoms, and you will provide Homeopathy and Ayurvedic advice in point-wise format.
 
-Your entire response must be a valid JSON object and nothing else. Do NOT wrap it in markdown.
+Your entire response must be a valid JSON object and nothing else. Do NOT wrap it in markdown. Do not include any introductory text.
 
-If the symptoms sound serious (e.g., chest pain, difficulty breathing, severe bleeding), your first priority is to advise the user to see a doctor or seek emergency medical help immediately in the 'modernAdvice' field.
+If the symptoms sound serious (e.g., chest pain, difficulty breathing, severe bleeding), your first priority is to advise the user to see a doctor or seek emergency medical help immediately in both 'homeopathyAdvice' and 'ayurvedicAdvice' fields.
 
 Symptoms: {{{symptoms}}}
 
-Your JSON response:
+Your JSON response (use bullet points for advice):
 {
-    "modernAdvice": "...",
-    "ayurvedicAdvice": "..."
+    "homeopathyAdvice": "- Advice point 1\\n- Advice point 2",
+    "ayurvedicAdvice": "- Advice point 1\\n- Advice point 2"
 }
 `,
 });

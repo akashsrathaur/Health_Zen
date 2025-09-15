@@ -46,8 +46,14 @@ export async function symptomCheckAction(prevState: State, formData: FormData): 
         symptoms: validatedFields.data.symptoms,
     };
     const result = await symptomCheck(input);
+
+    const formattedResult: SymptomCheckOutput = {
+      homeopathyAdvice: result.homeopathyAdvice.replace(/•/g, '-'),
+      ayurvedicAdvice: result.ayurvedicAdvice.replace(/•/g, '-'),
+    }
+
     return {
-      data: result,
+      data: formattedResult,
       error: null,
       form: {
         symptoms: validatedFields.data.symptoms
