@@ -1,0 +1,289 @@
+'use client';
+
+import { useActionState, useEffect, useRef, useState, useTransition } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Loader2, MessageCircle, Send, Settings, Trash2, Upload, Share, X, Bot, User, Save } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { chatBuddyAction, type ChatState } from '@/actions/chat-buddy';
+import { userData } from '@/lib/data';
+import { nanoid } from 'nanoid';
+import { ScrollArea } from './ui/scroll-area';
+import { Avatar, AvatarFallback } from './ui/avatar';
+import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+
+
+type BuddyPersona = {
+    name: string;
+    age: number;
+    gender: string;
+    relationship: string;
+};
+
+const initialPersona: BuddyPersona = {
+    name: 'Zen',
+    age: 25,
+    gender: 'Non-binary',
+    relationship: 'Friend',
+};
+
+export function ChatBuddy() {
+    const [isOpen, setIsOpen] = useState(false);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [persona, setPersona] = useState<BuddyPersona>(initialPersona);
+    const [pending, startTransition] = useTransition();
+    const formRef = useRef<HTMLFormElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+    const initialMessages = [{ id: nanoid(), role: 'system', content: `You are now chatting with ${persona.name}.` }] as ChatState['messages'];
+    const [state, formAction] = useActionState<ChatState, FormData>(chatBuddyAction, { messages: initialMessages });
+
+    const scrollToBottom = () => {
+        if (scrollAreaRef.current) {
+            scrollAreaRef.current.scrollTo({
+                top: scrollAreaRef.current.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+    };
+    
+    useEffect(() => {
+        scrollToBottom();
+    }, [state.messages]);
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const messageContent = formData.get('message') as string;
+        if(!messageContent.trim()) return;
+
+        const messageId = nanoid();
+        const userMessage = { id: messageId, role: 'user', content: messageContent };
+
+        const extendedFormData = new FormData(event.currentTarget);
+        extendedFormData.set('id', messageId);
+        extendedFormData.set('buddyPersona', JSON.stringify(persona));
+        extendedFormData.set('userData', JSON.stringify({ name: userData.name, streak: userData.streak }));
+        const chatHistory = state.messages.filter(m => m.role === 'user' || m.role === 'model').map(m => ({role: m.role, content: m.content}));
+        extendedFormData.set('chatHistory', JSON.stringify(chatHistory));
+
+        startTransition(() => {
+            // Optimistically update the UI
+            (formAction as any)({
+                messages: [...state.messages, userMessage],
+                error: null,
+            }, extendedFormData);
+            formRef.current?.reset();
+            inputRef.current?.focus();
+        });
+    };
+
+    return (
+        <>
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 50, scale: 0.9 }}
+                        transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+                        className="fixed bottom-24 right-4 z-50 w-full max-w-sm"
+                    >
+                        <Card className="flex h-[60vh] flex-col shadow-2xl">
+                            <CardHeader className="flex flex-row items-center justify-between p-4">
+                                <div className="flex items-center gap-3">
+                                    <Bot className="h-6 w-6 text-primary" />
+                                    <div className='grid gap-0.5'>
+                                        <h3 className="font-semibold">{persona.name}</h3>
+                                        <p className="text-xs text-muted-foreground">{persona.relationship}</p>
+                                    </div>
+                                </div>
+                                <div className='flex items-center gap-1'>
+                                    <Button variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)}><Settings className="h-4 w-4" /></Button>
+                                    <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}><X className="h-4 w-4" /></Button>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="flex-1 overflow-hidden p-4">
+                                <ScrollArea className="h-full" ref={scrollAreaRef}>
+                                    <div className="space-y-4 pr-4">
+                                    {state.messages.map((msg, index) => (
+                                        <div key={msg.id} className={cn("flex items-end gap-2", msg.role === 'user' ? 'justify-end' : 'justify-start')}>
+                                            {msg.role === 'model' && (
+                                                <Avatar className='h-8 w-8'>
+                                                    <AvatarFallback>{persona.name.charAt(0)}</AvatarFallback>
+                                                </Avatar>
+                                            )}
+                                            {msg.role !== 'system' ? (
+                                                <div className={cn("max-w-[75%] rounded-lg px-3 py-2 text-sm", msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary')}>
+                                                    {msg.content}
+                                                </div>
+                                            ) : (
+                                                <div className="w-full text-center text-xs text-muted-foreground italic">{msg.content}</div>
+                                            )}
+                                             {msg.role === 'user' && (
+                                                <Avatar className='h-8 w-8'>
+                                                    <AvatarFallback><User className='h-4 w-4'/></AvatarFallback>
+                                                </Avatar>
+                                            )}
+                                        </div>
+                                    ))}
+                                    {pending && (
+                                         <div className="flex items-end gap-2 justify-start">
+                                            <Avatar className='h-8 w-8'>
+                                                <AvatarFallback>{persona.name.charAt(0)}</AvatarFallback>
+                                            </Avatar>
+                                            <div className="max-w-[75%] rounded-lg px-3 py-2 text-sm bg-secondary flex items-center gap-2">
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                <span>{persona.name} is typing...</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                    </div>
+                                </ScrollArea>
+                            </CardContent>
+                            <CardFooter className="p-4 pt-0">
+                                <form ref={formRef} onSubmit={handleSubmit} className="flex w-full items-center gap-2">
+                                    <Input ref={inputRef} name="message" placeholder="Type your message..." className="flex-1" autoComplete="off" disabled={pending} />
+                                    <Button type="submit" size="icon" disabled={pending}>
+                                        <Send className="h-4 w-4" />
+                                    </Button>
+                                </form>
+                            </CardFooter>
+                        </Card>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.5, type: 'spring', stiffness: 260, damping: 20 }}
+                        className="fixed bottom-4 right-4 z-40"
+                    >
+                        <Button
+                            size="lg"
+                            className="h-14 w-14 rounded-full shadow-lg"
+                            onClick={() => setIsOpen(p => !p)}
+                        >
+                            <AnimatePresence mode="wait">
+                                {isOpen ? (
+                                    <motion.div key="close" initial={{ rotate: 45, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -45, opacity: 0 }}>
+                                        <X className="h-6 w-6" />
+                                    </motion.div>
+                                ) : (
+                                    <motion.div key="open" initial={{ rotate: 45, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -45, opacity: 0 }}>
+                                        <MessageCircle className="h-6 w-6" />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </Button>
+                    </motion.div>
+                </TooltipTrigger>
+                <TooltipContent side="left">
+                    {isOpen ? 'Close Chat' : 'Open Chat Buddy'}
+                </TooltipContent>
+            </Tooltip>
+
+
+            <BuddySettingsDialog
+                isOpen={isSettingsOpen}
+                setIsOpen={setIsSettingsOpen}
+                persona={persona}
+                setPersona={setPersona}
+            />
+        </>
+    );
+}
+
+function BuddySettingsDialog({ isOpen, setIsOpen, persona, setPersona }: { isOpen: boolean, setIsOpen: (open: boolean) => void, persona: BuddyPersona, setPersona: (p: BuddyPersona) => void }) {
+    const [tempPersona, setTempPersona] = useState(persona);
+
+    useEffect(() => {
+        setTempPersona(persona);
+    }, [persona, isOpen]);
+
+    const handleSave = () => {
+        setPersona(tempPersona);
+        setIsOpen(false);
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Chat Buddy Settings</DialogTitle>
+                    <DialogDescription>
+                        Customize your buddy&apos;s personality to be the perfect companion for you.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="grid gap-2">
+                        <Label htmlFor="buddy-name">Buddy&apos;s Name</Label>
+                        <Input id="buddy-name" value={tempPersona.name} onChange={(e) => setTempPersona({ ...tempPersona, name: e.target.value })} />
+                    </div>
+                    <div className="grid gap-2">
+                        <Label htmlFor="buddy-relationship">Relationship</Label>
+                        <Select value={tempPersona.relationship} onValueChange={(value) => setTempPersona({ ...tempPersona, relationship: value })}>
+                            <SelectTrigger id="buddy-relationship">
+                                <SelectValue placeholder="Select relationship" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Friend">Friend</SelectItem>
+                                <SelectItem value="Girlfriend">Girlfriend</SelectItem>
+                                <SelectItem value="Boyfriend">Boyfriend</SelectItem>
+                                <SelectItem value="Mentor">Mentor</SelectItem>
+                                <SelectItem value="Granny">Granny</SelectItem>
+                                <SelectItem value="Grandpa">Grandpa</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="grid gap-2">
+                        <Label>Gender</Label>
+                        <Select value={tempPersona.gender} onValueChange={(value) => setTempPersona({ ...tempPersona, gender: value })}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select gender" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Male">Male</SelectItem>
+                                <SelectItem value="Female">Female</SelectItem>
+                                <SelectItem value="Non-binary">Non-binary</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="grid gap-2">
+                        <div className="flex justify-between">
+                            <Label htmlFor="buddy-age">Age: {tempPersona.age}</Label>
+                        </div>
+                        <Slider
+                            id="buddy-age"
+                            min={10}
+                            max={100}
+                            step={1}
+                            value={[tempPersona.age]}
+                            onValueChange={([value]) => setTempPersona({ ...tempPersona, age: value })}
+                        />
+                    </div>
+                </div>
+                <DialogFooter>
+                    <div className='w-full flex justify-between'>
+                        <div className='flex gap-2'>
+                            <Button variant="outline"><Trash2 className="mr-2 h-4 w-4"/>Clear Chat</Button>
+                            <Button variant="outline"><Share className="mr-2 h-4 w-4"/>Share</Button>
+                            <Button variant="outline"><Upload className="mr-2 h-4 w-4"/>Import</Button>
+                        </div>
+                        <Button onClick={handleSave}><Save className="mr-2 h-4 w-4"/>Save</Button>
+                    </div>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}

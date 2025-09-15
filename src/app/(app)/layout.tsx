@@ -12,6 +12,7 @@ import { MainNav } from '@/components/main-nav';
 import { UserNav } from '@/components/user-nav';
 import { Icons } from '@/components/icons';
 import Link from 'next/link';
+import { ChatBuddy } from '@/components/chat-buddy';
 
 function AppContent({ children }: { children: React.ReactNode }) {
   const { state, isMobile } = useSidebar();
@@ -40,6 +41,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
       <main className="flex-1 p-4 sm:p-6">
         {children}
       </main>
+      <ChatBuddy />
     </div>
   );
 }
