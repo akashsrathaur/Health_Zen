@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useRef, useState, useTransition } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
@@ -37,7 +37,6 @@ export function ChatBuddy() {
     const [isOpen, setIsOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [persona, setPersona] = useState<BuddyPersona>(initialPersona);
-    const [pending, startTransition] = useTransition();
     const formRef = useRef<HTMLFormElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -47,7 +46,6 @@ export function ChatBuddy() {
     // We pass a function to useActionState to update messages optimistically
     const [state, formAction, isPending] = useActionState<ChatState, FormData>(
         async (prevState, formData) => {
-            const messageId = formData.get('id') as string;
             const messageContent = formData.get('message') as string;
             
             // Add user message to state immediately for optimistic update
@@ -55,7 +53,7 @@ export function ChatBuddy() {
                 ...prevState,
                 messages: [
                     ...prevState.messages,
-                    { id: messageId, role: 'user', content: messageContent }
+                    { id: nanoid(), role: 'user', content: messageContent }
                 ]
             };
 
@@ -63,7 +61,7 @@ export function ChatBuddy() {
             const newState = await chatBuddyAction(optimisticState, formData);
             return newState;
         },
-        { messages: initialMessages }
+        { messages: initialMessages, error: null }
     );
 
 
@@ -87,10 +85,7 @@ export function ChatBuddy() {
         const formData = new FormData(event.currentTarget);
         const messageContent = formData.get('message') as string;
         if(!messageContent.trim()) return;
-
-        const messageId = nanoid();
-
-        formData.set('id', messageId);
+        
         formData.set('buddyPersona', JSON.stringify(persona));
         formData.set('userData', JSON.stringify({ name: userData.name, streak: userData.streak }));
         const chatHistory = state.messages.filter(m => m.role === 'user' || m.role === 'model').map(m => ({role: m.role, content: m.content}));

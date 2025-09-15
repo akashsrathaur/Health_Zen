@@ -2,7 +2,7 @@
 
 import { chatWithBuddy } from "@/ai/flows/chat-buddy";
 import { ChatWithBuddyInputSchema, type ChatWithBuddyInput } from "@/ai/flows/chat-buddy.types";
-import { z } from "zod";
+import { nanoid } from "nanoid";
 
 
 export type ChatState = {
@@ -44,7 +44,7 @@ export async function chatBuddyAction(
     
     try {
         const result = await chatWithBuddy(input);
-        const modelMessage = { id: nanoid(), role: 'model', content: result.response };
+        const modelMessage = { id: nanoid(), role: 'model' as const, content: result.response };
         
         return {
             messages: [
