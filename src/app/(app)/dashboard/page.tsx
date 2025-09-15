@@ -59,18 +59,20 @@ export default function DashboardPage() {
                 >
                     {quickActions.map((action) => (
                     <motion.div key={action.title} variants={itemVariants}>
-                      <Link href={action.href} >
-                          <Card className="group h-full transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-primary/50 hover:bg-secondary/10">
-                          <CardHeader>
-                              <div className="mb-2 flex items-center gap-3">
-                              <div className="rounded-lg bg-secondary/20 p-3 group-hover:bg-primary/10 transition-colors">
-                                  <action.icon className="h-6 w-6 text-primary" />
-                              </div>
-                              <CardTitle className="text-lg">{action.title}</CardTitle>
-                              </div>
-                              <CardDescription>{action.description}</CardDescription>
-                          </CardHeader>
-                          </Card>
+                      <Link href={action.href} className="group block h-full">
+                          <div className="h-full rounded-lg p-px bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20 transition-all duration-300 group-hover:from-primary/50 group-hover:via-secondary/50 group-hover:to-accent/50 group-hover:shadow-xl">
+                            <Card className="h-full transform transition-all duration-300 group-hover:-translate-y-1 bg-card/80 backdrop-blur-sm border-none">
+                              <CardHeader>
+                                  <div className="mb-2 flex items-center gap-3">
+                                  <div className="rounded-lg bg-white/5 p-3 transition-colors">
+                                      <action.icon className="h-6 w-6 text-primary transition-colors group-hover:text-primary/80" />
+                                  </div>
+                                  <CardTitle className="text-lg text-foreground/90 transition-colors group-hover:text-foreground">{action.title}</CardTitle>
+                                  </div>
+                                  <CardDescription>{action.description}</CardDescription>
+                              </CardHeader>
+                            </Card>
+                          </div>
                       </Link>
                     </motion.div>
                     ))}
