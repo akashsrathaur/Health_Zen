@@ -64,27 +64,31 @@ export default function LoginPage() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline">
-                <GoogleIcon className="mr-2 h-5 w-5" />
-                Google
-              </Button>
-              <Button variant="outline">
-                <LinkedInIcon className="mr-2 h-5 w-5" />
-                LinkedIn
-              </Button>
+              <Link href="/dashboard">
+                <Button variant="outline" className="w-full">
+                  <GoogleIcon className="mr-2 h-5 w-5" />
+                  Google
+                </Button>
+              </Link>
+              <Link href="/dashboard">
+                <Button variant="outline" className="w-full">
+                  <LinkedInIcon className="mr-2 h-5 w-5" />
+                  LinkedIn
+                </Button>
+              </Link>
             </div>
           </div>
           <p className="px-8 text-center text-sm text-muted-foreground animate-pop-in" style={{ animationDelay: '0.5s' }}>
             By clicking continue, you agree to our{' '}
             <Link
-              href="/terms"
+              href="/dashboard"
               className="underline underline-offset-4 hover:text-primary"
             >
               Terms of Service
             </Link>{' '}
             and{' '}
             <Link
-              href="/privacy"
+              href="/dashboard"
               className="underline underline-offset-4 hover:text-primary"
             >
               Privacy Policy
