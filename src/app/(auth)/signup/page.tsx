@@ -4,12 +4,14 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Mail, KeyRound, User, Smartphone } from 'lucide-react';
+import { Mail, KeyRound, User, Smartphone, CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 export default function SignupPage() {
     const router = useRouter();
+    const [fullName, setFullName] = useState('');
+    const [mobile, setMobile] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
@@ -26,18 +28,30 @@ export default function SignupPage() {
         return "";
     };
 
+    const passwordValidationError = useMemo(() => validatePassword(password), [password]);
+    
+    const isFullNameValid = fullName.trim().length > 0;
+    const isMobileValid = /^\d{10}$/.test(mobile);
+    const isPasswordValid = password.length > 0 && !passwordValidationError;
+    const isConfirmPasswordValid = confirmPassword.length > 0 && password === confirmPassword;
+
+
     const handleSignup = (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
-        const passwordError = validatePassword(password);
-        if (passwordError) {
-            setError(passwordError);
+        if (passwordValidationError) {
+            setError(passwordValidationError);
             return;
         }
 
         if (password !== confirmPassword) {
             setError("Passwords do not match.");
+            return;
+        }
+        
+        if (!isMobileValid) {
+            setError("Please enter a valid 10-digit mobile number.");
             return;
         }
 
@@ -60,8 +74,17 @@ export default function SignupPage() {
         <div className="grid gap-2">
             <Label htmlFor="fullname">Full Name</Label>
             <div className="relative">
-                <User className="absolute left-3 top-1/2 -translatey-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="fullname" type="text" placeholder="e.g., Akash Rathaur" required className="pl-10" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input 
+                    id="fullname" 
+                    type="text" 
+                    placeholder="e.g., Akash Rathaur" 
+                    required 
+                    className="pl-10 pr-10" 
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                />
+                {isFullNameValid && <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-green-500" />}
             </div>
         </div>
         <div className="grid gap-2">
@@ -75,7 +98,17 @@ export default function SignupPage() {
             <Label htmlFor="mobile">Mobile Number</Label>
             <div className="relative">
                 <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="mobile" type="tel" placeholder="e.g., 1234567890" maxLength={10} required className="pl-10" />
+                <Input 
+                    id="mobile" 
+                    type="tel" 
+                    placeholder="e.g., 1234567890" 
+                    maxLength={10} 
+                    required 
+                    className="pl-10 pr-10" 
+                    value={mobile}
+                    onChange={(e) => setMobile(e.target.value)}
+                />
+                {isMobileValid && <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-green-500" />}
             </div>
         </div>
         <div className="grid gap-2">
@@ -87,10 +120,11 @@ export default function SignupPage() {
                   type="password" 
                   placeholder="••••••••" 
                   required 
-                  className="pl-10" 
+                  className="pl-10 pr-10" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+                {isPasswordValid && <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-green-500" />}
             </div>
         </div>
         <div className="grid gap-2">
@@ -102,10 +136,11 @@ export default function SignupPage() {
                   type="password" 
                   placeholder="••••••••" 
                   required 
-                  className="pl-10" 
+                  className="pl-10 pr-10" 
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
+                {isConfirmPasswordValid && <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-green-500" />}
             </div>
         </div>
 
