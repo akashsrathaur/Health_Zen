@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { userData } from "@/lib/data";
 
@@ -56,6 +57,33 @@ export default function SettingsPage() {
                      <div className="grid gap-2">
                         <Label htmlFor="mobile">Mobile Number</Label>
                         <Input id="mobile" type="tel" defaultValue="1234567890" maxLength={10} />
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Notifications</CardTitle>
+                    <CardDescription>Choose how you want to be notified.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                            <Label htmlFor="email-notifications" className="text-base font-normal">Email Notifications</Label>
+                            <p className="text-sm text-muted-foreground">
+                                Receive challenge updates and motivational quotes in your inbox.
+                            </p>
+                        </div>
+                        <Switch id="email-notifications" defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                            <Label htmlFor="push-notifications" className="text-base font-normal">Push Notifications</Label>
+                            <p className="text-sm text-muted-foreground">
+                                Get real-time alerts for tasks and motivation on your device.
+                            </p>
+                        </div>
+                        <Switch id="push-notifications" />
                     </div>
                 </CardContent>
             </Card>
