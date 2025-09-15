@@ -1,5 +1,5 @@
 'use client';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useFormStatus } from 'react';
 import { symptomCheckAction } from '@/actions/symptom-check';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,7 +36,7 @@ function SubmitButton() {
 }
 
 export default function SymptomCheckPage() {
-  const [state, formAction] = useFormState(symptomCheckAction, {
+  const [state, formAction] = useActionState(symptomCheckAction, {
     data: null,
     error: null,
     form: { symptoms: '' }

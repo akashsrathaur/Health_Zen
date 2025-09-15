@@ -1,5 +1,5 @@
 'use client';
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 import { healthSnapAction } from '@/actions/health-snap';
 import {
   Card,
@@ -29,7 +29,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 
 function HealthSnapUploader() {
-  const [state, formAction] = useFormState(healthSnapAction, {
+  const [state, formAction] = useActionState(healthSnapAction, {
     data: null,
     error: null,
   });
