@@ -31,7 +31,7 @@ const prompt = ai.definePrompt({
   name: 'symptomCheckPrompt',
   input: {schema: SymptomCheckInputSchema},
   output: {schema: SymptomCheckOutputSchema},
-  prompt: `You are HealthSnap, an empathetic wellness assistant. A user will describe their symptoms, and you will provide Homeopathy and Ayurvedic advice in point-wise format.
+  prompt: `You are HealthSnap, an empathetic wellness assistant. A user will describe their symptoms in any language, and you will provide Homeopathy and Ayurvedic advice in point-wise format, in the same language as the user's input.
 
 Your entire response must be a valid JSON object and nothing else. Do NOT wrap it in markdown. Do not include any introductory text.
 
@@ -39,7 +39,7 @@ If the symptoms sound serious (e.g., chest pain, difficulty breathing, severe bl
 
 Symptoms: {{{symptoms}}}
 
-Your JSON response (use bullet points for advice):
+Your JSON response (use bullet points for advice, using \\n for new lines):
 {
     "homeopathyAdvice": "- Advice point 1\\n- Advice point 2",
     "ayurvedicAdvice": "- Advice point 1\\n- Advice point 2"

@@ -66,7 +66,7 @@ function LoadingState() {
   }
 
   function AdvicePoints({ text }: { text: string }) {
-    const points = text.split('\\n').map(p => p.trim()).filter(p => p.startsWith('-')).map(p => p.substring(1).trim());
+    const points = text.split('\n').map(p => p.trim()).filter(p => p.startsWith('-')).map(p => p.substring(1).trim());
     
     if (points.length === 0 && text) {
         return <p className="text-muted-foreground">{text}</p>
