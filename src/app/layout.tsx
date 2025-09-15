@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Provider as BalancerProvider } from 'react-wrap-balancer';
 import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
+import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
   title: 'HealthZen',
@@ -24,10 +25,17 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        <BalancerProvider>
-          {children}
-          <Toaster />
-        </BalancerProvider>
+         <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <BalancerProvider>
+              {children}
+              <Toaster />
+            </BalancerProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

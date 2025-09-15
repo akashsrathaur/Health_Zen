@@ -15,6 +15,7 @@ import { userData } from '@/lib/data';
 import { Flame, Bell, User, LogOut, Settings } from 'lucide-react';
 import { Badge } from './ui/badge';
 import Link from 'next/link';
+import { ThemeSwitcher } from './theme-switcher';
 
 export function UserNav() {
   return (
@@ -57,6 +58,8 @@ export function UserNav() {
               <span>Settings</span>
             </DropdownMenuItem>
           </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+           <ThemeSwitcher />
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link href="/">
