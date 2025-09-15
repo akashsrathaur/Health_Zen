@@ -31,7 +31,7 @@ export function UserNav() {
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
         <Flame className="h-5 w-5 text-orange-500" />
-        <span className="font-semibold text-orange-500 animate-bounce-in">{userData.streak}</span>
+        <span className="font-semibold text-orange-500">{userData.streak}</span>
       </div>
       <DropdownMenu onOpenChange={handleNotificationToggle}>
         <DropdownMenuTrigger asChild>

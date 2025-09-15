@@ -11,6 +11,7 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Responsive
 import { achievements, progressData, type Achievement } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Download, Flame } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const waterChartConfig = {
   glasses: {
@@ -34,9 +35,31 @@ const sleepChartConfig = {
   }
 } satisfies ChartConfig;
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: 'spring',
+      stiffness: 100,
+    },
+  },
+};
+
 function AchievementCard({ achievement }: { achievement: Achievement }) {
   return (
-    <Card className={`flex flex-col items-center justify-center p-4 text-center ${!achievement.unlocked ? 'opacity-50' : ''}`}>
+    <Card className={`flex flex-col items-center justify-center p-4 text-center transition-all duration-300 ${!achievement.unlocked ? 'opacity-50 grayscale' : 'hover:bg-secondary/80'}`}>
       <achievement.icon className={`h-8 w-8 mb-2 ${achievement.unlocked ? 'text-primary' : 'text-muted-foreground'}`} />
       <p className="text-sm font-semibold">{achievement.name}</p>
       {!achievement.unlocked && <p className="text-xs text-muted-foreground">Locked</p>}
@@ -118,11 +141,18 @@ export default function ProgressTrackerPage() {
           <CardDescription>Celebrate your achievements!</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+          <motion.div 
+            className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             {achievements.map((ach) => (
-              <AchievementCard key={ach.id} achievement={ach} />
+              <motion.div key={ach.id} variants={itemVariants}>
+                <AchievementCard achievement={ach} />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </CardContent>
       </Card>
     </div>

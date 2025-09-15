@@ -1,3 +1,4 @@
+'use client';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -67,18 +68,18 @@ export default function SettingsPage() {
                     <CardDescription>Choose how you want to be notified.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between rounded-lg border p-4">
+                    <div className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-secondary/50">
                         <div className="space-y-0.5">
-                            <Label htmlFor="email-notifications" className="text-base font-normal">Email Notifications</Label>
+                            <Label htmlFor="email-notifications" className="text-base font-normal cursor-pointer">Email Notifications</Label>
                             <p className="text-sm text-muted-foreground">
                                 Receive challenge updates and motivational quotes in your inbox.
                             </p>
                         </div>
                         <Switch id="email-notifications" defaultChecked />
                     </div>
-                    <div className="flex items-center justify-between rounded-lg border p-4">
+                    <div className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-secondary/50">
                         <div className="space-y-0.5">
-                            <Label htmlFor="push-notifications" className="text-base font-normal">Push Notifications</Label>
+                            <Label htmlFor="push-notifications" className="text-base font-normal cursor-pointer">Push Notifications</Label>
                             <p className="text-sm text-muted-foreground">
                                 Get real-time alerts for tasks and motivation on your device.
                             </p>
@@ -88,7 +89,8 @@ export default function SettingsPage() {
                 </CardContent>
             </Card>
 
-             <div className="flex justify-end">
+             <div className="flex justify-end gap-2">
+                <Button variant="outline">Cancel</Button>
                 <Button>Save Changes</Button>
             </div>
         </div>

@@ -1,3 +1,4 @@
+'use client';
 import Link from 'next/link';
 import { Balancer } from 'react-wrap-balancer';
 import {
@@ -9,6 +10,30 @@ import {
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { dailyVibes, quickActions, userData } from '@/lib/data';
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: 'spring',
+      stiffness: 100,
+    },
+  },
+};
+
 
 export default function DashboardPage() {
   return (
@@ -26,40 +51,54 @@ export default function DashboardPage() {
         <div className="lg:col-span-2">
             <section>
                 <h2 className="mb-4 text-xl font-semibold">Quick Actions</h2>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <motion.div 
+                  className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
                     {quickActions.map((action) => (
-                    <Link href={action.href} key={action.title}>
-                        <Card className="group h-full transform transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg">
-                        <CardHeader>
-                            <div className="mb-2 flex items-center gap-3">
-                            <div className="rounded-lg bg-secondary p-3">
-                                <action.icon className="h-6 w-6 text-primary" />
-                            </div>
-                            <CardTitle className="text-lg">{action.title}</CardTitle>
-                            </div>
-                            <CardDescription>{action.description}</CardDescription>
-                        </CardHeader>
-                        </Card>
-                    </Link>
+                    <motion.div key={action.title} variants={itemVariants}>
+                      <Link href={action.href} >
+                          <Card className="group h-full transform transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg">
+                          <CardHeader>
+                              <div className="mb-2 flex items-center gap-3">
+                              <div className="rounded-lg bg-secondary p-3">
+                                  <action.icon className="h-6 w-6 text-primary" />
+                              </div>
+                              <CardTitle className="text-lg">{action.title}</CardTitle>
+                              </div>
+                              <CardDescription>{action.description}</CardDescription>
+                          </CardHeader>
+                          </Card>
+                      </Link>
+                    </motion.div>
                     ))}
-                </div>
+                </motion.div>
             </section>
         </div>
         <div className='lg:col-span-1'>
             <section>
                 <h2 className="mb-4 text-xl font-semibold">Daily Vibe</h2>
-                <div className="grid grid-cols-1 gap-4">
+                <motion.div 
+                  className="grid grid-cols-1 gap-4"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
                     {dailyVibes.map((vibe) => (
-                    <Card key={vibe.title} className="flex items-center p-4">
-                        <vibe.icon className="mr-4 h-8 w-8 text-primary" />
-                        <div className="flex-1">
-                        <p className="font-medium">{vibe.title}</p>
-                        <p className="text-sm text-muted-foreground">{vibe.value}</p>
-                        </div>
-                        {vibe.progress !== undefined && <Progress value={vibe.progress} className="w-20" />}
-                    </Card>
+                      <motion.div key={vibe.title} variants={itemVariants}>
+                        <Card className="flex items-center p-4 transition-all duration-200 hover:bg-secondary/80">
+                            <vibe.icon className="mr-4 h-8 w-8 text-primary" />
+                            <div className="flex-1">
+                            <p className="font-medium">{vibe.title}</p>
+                            <p className="text-sm text-muted-foreground">{vibe.value}</p>
+                            </div>
+                            {vibe.progress !== undefined && <Progress value={vibe.progress} className="w-20" />}
+                        </Card>
+                      </motion.div>
                     ))}
-                </div>
+                </motion.div>
             </section>
         </div>
       </div>
