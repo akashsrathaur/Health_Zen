@@ -39,12 +39,10 @@ export function ChatBuddy() {
     const [persona, setPersona] = useState<BuddyPersona>(initialPersona);
     const formRef = useRef<HTMLFormElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-    const scrollAreaRef = useRef<HTMLDivElement>(null);
     const [isPending, startTransition] = useTransition();
 
     const initialMessages = [{ id: nanoid(), role: 'system' as const, content: `You are now chatting with ${persona.name}.` }];
     
-    // We pass a function to useActionState to update messages optimistically
     const [state, formAction] = useActionState<ChatState, FormData>(
         chatBuddyAction,
         { messages: initialMessages, error: null }
