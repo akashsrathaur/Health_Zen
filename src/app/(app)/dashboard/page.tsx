@@ -405,33 +405,8 @@ export default function DashboardPage() {
   const [vibeToEdit, setVibeToEdit] = useState<DailyVibe | null>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [activeChallengeId, setActiveChallengeId] = useState<string | null>(null);
+  const [activeVibeId, setActiveVibeId] = useState<string | null>(null);
   const { toast } = useToast();
-
-  const handleWaterChange = (amount: number) => {
-      setDailyVibes(prevVibes => prevVibes.map(vibe => {
-          if (vibe.id === 'water') {
-              const [current, goalWithUnit] = vibe.value.split('/');
-              const goal = parseInt(goalWithUnit.match(/\d+/)?.[0] || '1');
-              const newValue = Math.max(0, parseInt(current) + amount);
-              return { ...vibe, value: `${newValue}/${goalWithUnit}`, progress: (newValue / goal) * 100 };
-          }
-          return vibe;
-      }));
-  }
-
-    const handleMedicationToggle = () => {
-      setDailyVibes(prevVibes => prevVibes.map(vibe => {
-          if (vibe.id === 'medication') {
-              const isTaken = vibe.progress === 100;
-              return { ...vibe, value: isTaken ? 'Pending' : 'Taken', progress: isTaken ? 0 : 100 };
-          }
-          return vibe;
-      }));
-      toast({
-        title: "Medication Updated",
-        description: `You've marked your medication as ${dailyVibes.find(v => v.id === 'medication')?.progress !== 100 ? 'taken' : 'pending'}.`
-      })
-  }
 
   const handleEditVibe = (vibe: DailyVibe) => {
     setVibeToEdit(vibe);
@@ -466,10 +441,20 @@ export default function DashboardPage() {
     })
   }
 
-  const handleMarkAsDone = (challengeId: string) => {
+  const handleMarkChallengeAsDone = (challengeId: string) => {
     const challenge = challenges.find(c => c.id === challengeId);
     if (challenge && !challenge.isCompletedToday) {
       setActiveChallengeId(challengeId);
+      setActiveVibeId(null);
+      setIsCameraOpen(true);
+    }
+  };
+
+  const handleMarkVibeAsDone = (vibeId: string) => {
+    const vibe = dailyVibes.find(v => v.id === vibeId);
+    if (vibe && vibe.progress !== 100) {
+      setActiveVibeId(vibeId);
+      setActiveChallengeId(null);
       setIsCameraOpen(true);
     }
   };
@@ -490,9 +475,26 @@ export default function DashboardPage() {
           description: `You've completed '${challenge.title}' for today. Keep it up!`
         });
       }
+    } else if (activeVibeId) {
+        const vibe = dailyVibes.find(v => v.id === activeVibeId);
+        if (vibe) {
+            setDailyVibes(prevVibes =>
+                prevVibes.map(v =>
+                    v.id === activeVibeId
+                    ? { ...v, progress: 100, value: 'Completed' }
+                    : v
+                )
+            );
+            toast({
+                title: 'Task Completed!',
+                description: `You've successfully completed '${vibe.title}'.`
+            });
+        }
     }
+
     setIsCameraOpen(false);
     setActiveChallengeId(null);
+    setActiveVibeId(null);
   };
 
   return (
@@ -523,29 +525,29 @@ export default function DashboardPage() {
                 >
                     {dailyVibes.map((vibe) => {
                       const Icon = typeof vibe.icon === 'string' ? allVibeIcons[vibe.icon as keyof typeof allVibeIcons] : vibe.icon;
+                      const isTask = vibe.id !== 'streak';
                       return (
                         <motion.div key={vibe.id} variants={itemVariants}>
-                          <Card className="p-4 transition-all duration-200 hover:bg-secondary/10 cursor-pointer" onClick={() => handleEditVibe(vibe)}>
-                              <div className='flex items-center'>
+                          <Card className="p-4 transition-all duration-200 hover:bg-secondary/10">
+                              <div className='flex items-center' onClick={() => handleEditVibe(vibe)}>
                                   <Icon className="mr-4 h-8 w-8 text-primary" />
                                   <div className="flex-1">
                                       <p className="font-medium">{vibe.title}</p>
                                       <p className="text-sm text-muted-foreground">{vibe.value}</p>
                                   </div>
-                                  {vibe.id === 'water' && (
-                                      <div className="flex items-center gap-2">
-                                          <Button size="icon" variant="ghost" className='h-8 w-8 rounded-full' onClick={(e) => {e.stopPropagation(); handleWaterChange(-1)}}><Minus className='h-4 w-4'/></Button>
-                                          <Button size="icon" variant="ghost" className='h-8 w-8 rounded-full' onClick={(e) => {e.stopPropagation(); handleWaterChange(1)}}><Plus className='h-4 w-4'/></Button>
-                                      </div>
-                                  )}
-                                  {vibe.id === 'medication' && (
+                                  {isTask && (
                                     <Button 
-                                          size="sm" 
-                                          variant={vibe.progress === 100 ? 'secondary' : 'default'}
-                                          onClick={(e) => {e.stopPropagation(); handleMedicationToggle()}}
-                                      >
-                                          <CheckCircle className="mr-2 h-4 w-4" />
-                                          {vibe.progress === 100 ? 'Taken' : 'Take Now'}
+                                        size="sm" 
+                                        variant={vibe.progress === 100 ? 'secondary' : 'default'}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleMarkVibeAsDone(vibe.id)
+                                        }}
+                                        disabled={vibe.progress === 100}
+                                        className="ml-2"
+                                    >
+                                        <CheckCircle className="mr-2 h-4 w-4" />
+                                        {vibe.progress === 100 ? 'Done' : 'Mark Done'}
                                     </Button>
                                   )}
                               </div>
@@ -572,7 +574,7 @@ export default function DashboardPage() {
                   animate="visible"
                 >
                     {challenges.slice(0, 2).map((challenge) => (
-                      <ChallengeCard key={challenge.id} challenge={challenge} onMarkAsDone={handleMarkAsDone} />
+                      <ChallengeCard key={challenge.id} challenge={challenge} onMarkAsDone={handleMarkChallengeAsDone} />
                     ))}
                 </motion.div>
             </section>
@@ -598,5 +600,7 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
 
     
