@@ -17,7 +17,7 @@ Open [http://localhost:9002](http://localhost:9002) with your browser to see the
 
 ## Required Environment Variables
 
-For the application to connect to Firebase and use its AI features, you must have a `.env` file in the root of your project with the following keys. This file is created for you but the values need to be populated.
+For the application to function, you must have a `.env` file in the root of your project with the following keys. This file is created for you, but you need to fill in the values.
 
 ```
 # Firebase App Configuration
@@ -34,7 +34,7 @@ GEMINI_API_KEY=
 
 ### How to Get Your Keys
 
-1.  **Firebase Keys**: You can get these by creating a Firebase project and a Web App within that project. In the Firebase console, go to "Project Settings" > "General", and under "Your apps", you will find the Firebase SDK snippet with your configuration.
+1.  **Firebase Keys**: You can get these by creating a Firebase project and a Web App within that project. In the Firebase console, go to **Project Settings** > **General**, and under "Your apps", you will find the Firebase SDK snippet with your configuration.
 
 2.  **GEMINI_API_KEY**: You can get this for free from Google AI Studio.
     *   Go to [aistudio.google.com](https://aistudio.google.com/).
@@ -44,7 +44,7 @@ GEMINI_API_KEY=
 
 ## Deploying to Vercel
 
-When you deploy your application to a hosting provider like Vercel, you must add the environment variables from your `.env` file to your Vercel project settings.
+When you deploy your application to a hosting provider like Vercel, you must add the environment variables from your `.env` file to your Vercel project settings. **Your application will not build successfully without them.**
 
 1.  **Go to your Vercel Project**: Open your project in the Vercel dashboard.
 2.  **Navigate to Settings**: Click on the "Settings" tab.
