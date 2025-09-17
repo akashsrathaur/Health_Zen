@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A personalized chat buddy AI agent.
@@ -17,7 +18,7 @@ import {
 
 export async function chatWithBuddy(input: ChatWithBuddyInput): Promise<ChatWithBuddyOutput> {
   if (!process.env.GEMINI_API_KEY) {
-    throw new Error('GEMINI_API_KEY is not set.');
+    throw new Error("The GEMINI_API_KEY environment variable is not set. Please add it to your hosting provider's environment variables and redeploy.");
   }
   return chatWithBuddyFlow(input);
 }

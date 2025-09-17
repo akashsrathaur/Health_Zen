@@ -47,10 +47,13 @@ export async function symptomCheckAction(prevState: State, formData: FormData): 
     };
     const result = await symptomCheck(input);
 
+    // Standardize bullet points for consistent display
+    const formatAdvice = (text: string) => text.replace(/[•*]/g, '-');
+
     const formattedResult: SymptomCheckOutput = {
-      homeopathyAdvice: result.homeopathyAdvice.replace(/•/g, '-'),
-      ayurvedicAdvice: result.ayurvedicAdvice.replace(/•/g, '-'),
-      remedies: result.remedies.replace(/•/g, '-'),
+      homeopathyAdvice: formatAdvice(result.homeopathyAdvice),
+      ayurvedicAdvice: formatAdvice(result.ayurvedicAdvice),
+      remedies: formatAdvice(result.remedies),
     }
 
     return {
