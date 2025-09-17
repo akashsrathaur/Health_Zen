@@ -28,29 +28,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setFirebaseUser(fbUser);
       if (fbUser) {
+        // Fetch user profile from Firestore on the client side.
         try {
           const userProfile = await getUserFromFirestore(fbUser.uid);
           setUser(userProfile);
-        } catch (e: any) {
-          // This is the crucial fallback.
-          // If Firestore is inaccessible due to IAM permissions,
-          // we create a temporary local user object to prevent the app from crashing.
-          if (e.message.includes('Could not retrieve user profile')) {
-             console.warn(
-              'CRITICAL ERROR: Failed to fetch user profile from Firestore. This is due to missing IAM permissions in your Google Cloud project. The app is running in a limited, guest mode. PLEASE FOLLOW THE INSTRUCTIONS IN README.md TO FIX THIS.'
-            );
-            setUser({
-              uid: fbUser.uid,
-              name: 'Guest User',
-              age: 0,
-              gender: 'Prefer not to say',
-              avatarUrl: `https://picsum.photos/seed/${fbUser.uid}/100/100`,
-              streak: 0,
-            });
-          } else {
-             console.error("An unexpected error occurred while fetching user profile:", e);
-             setUser(null); // Log out the user on other unexpected errors
-          }
+        } catch (error) {
+          console.error("Failed to fetch user profile from Firestore on client:", error);
+          // If it fails even on the client, the user might not have a doc yet
+          // or there's a serious issue. Log them out to be safe.
+          setUser(null); 
         }
       } else {
         setUser(null);
