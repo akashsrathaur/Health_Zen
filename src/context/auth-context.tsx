@@ -35,14 +35,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const userProfile = await getUserFromFirestore(fbUser.uid);
         setUser(userProfile);
         // If they are on a public auth page, redirect to dashboard
-        if (pathname.startsWith('/login') || pathname.startsWith('/signup')) {
+        if (pathname === '/login' || pathname === '/signup') {
           router.replace('/dashboard');
         }
       } else {
         // User is logged out
         setUser(null);
         // If they are on a protected app page, redirect to login
-        if (!pathname.startsWith('/login') && !pathname.startsWith('/signup')) {
+        if (pathname !== '/login' && pathname !== '/signup') {
           router.replace('/login');
         }
       }
