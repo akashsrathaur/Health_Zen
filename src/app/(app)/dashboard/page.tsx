@@ -109,9 +109,9 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
     const handleWaterChange = (amount: number) => {
         setCurrentVibe(prev => {
             if (!prev || prev.id !== 'water') return prev;
-            const current = prev.value.split('/')[0];
+            const current = parseInt(prev.value.split('/')[0]);
             const goal = prev.value.split('/')[1];
-            const newValue = Math.max(0, parseInt(current) + amount);
+            const newValue = Math.max(0, current + amount);
             return { ...prev, value: `${newValue}/${goal.trim()}`, progress: (newValue / parseInt(goal.match(/\d+/)?.[0] || '1')) * 100 };
         });
     }
@@ -416,6 +416,7 @@ function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, o
 }
 
 const formatTime = (ms: number) => {
+    if (ms <= 0) return '00:00:00';
     const totalSeconds = Math.floor(ms / 1000);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -433,12 +434,13 @@ export default function DashboardPage() {
   const [activeChallengeId, setActiveChallengeId] = useState<string | null>(null);
   const [activeVibeId, setActiveVibeId] = useState<string | null>(null);
   const [isSleepLoggingActive, setIsSleepLoggingActive] = useState(false);
-  const [timeToUnlock, setTimeToUnlock] = useState(0);
+  const [timeToUnlockSleep, setTimeToUnlockSleep] = useState(0);
+  const [timeToUnlockWater, setTimeToUnlockWater] = useState(0);
 
   const { toast } = useToast();
 
    useEffect(() => {
-        const checkSleepTime = () => {
+        const sleepCheckInterval = setInterval(() => {
             const now = new Date();
             const currentHour = now.getHours();
             
@@ -447,7 +449,7 @@ export default function DashboardPage() {
 
             if (currentHour >= startHour && currentHour < endHour) {
                 setIsSleepLoggingActive(true);
-                setTimeToUnlock(0);
+                setTimeToUnlockSleep(0);
             } else {
                 setIsSleepLoggingActive(false);
                 let unlockTime = new Date();
@@ -457,15 +459,34 @@ export default function DashboardPage() {
                     unlockTime.setDate(unlockTime.getDate() + 1);
                 }
                 
-                setTimeToUnlock(unlockTime.getTime() - now.getTime());
+                setTimeToUnlockSleep(unlockTime.getTime() - now.getTime());
             }
-        };
+        }, 1000);
 
-        checkSleepTime();
-        const interval = setInterval(checkSleepTime, 1000);
-
-        return () => clearInterval(interval);
+        return () => clearInterval(sleepCheckInterval);
     }, []);
+
+    useEffect(() => {
+        const waterVibe = dailyVibes.find(vibe => vibe.id === 'water');
+        if (waterVibe && waterVibe.completedAt) {
+            const waterCheckInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const completedTime = new Date(waterVibe.completedAt!).getTime();
+                const unlockTime = completedTime + (90 * 60 * 1000); // 1.5 hours in ms
+                const remainingTime = unlockTime - now;
+                setTimeToUnlockWater(remainingTime);
+
+                if (remainingTime <= 0) {
+                     setDailyVibes(prev => prev.map(v => v.id === 'water' ? {...v, completedAt: undefined } : v));
+                     clearInterval(waterCheckInterval);
+                }
+            }, 1000);
+            return () => clearInterval(waterCheckInterval);
+        } else {
+            setTimeToUnlockWater(0);
+        }
+    }, [dailyVibes]);
+
 
   const handleEditVibe = (vibe: DailyVibe) => {
     if (vibe.id === 'sleep' && !isSleepLoggingActive) {
@@ -596,7 +617,12 @@ export default function DashboardPage() {
                       const Icon = typeof vibe.icon === 'string' ? allVibeIcons[vibe.icon as keyof typeof allVibeIcons] : vibe.icon;
                       const isTask = !nonSnapVibeIds.includes(vibe.id);
                       const isSleepCard = vibe.id === 'sleep';
+                      const isWaterCard = vibe.id === 'water';
                       const isCompleted = !!vibe.completedAt;
+                      
+                      const isWaterLocked = isWaterCard && timeToUnlockWater > 0;
+                      let isVibeDisabled = (isSleepCard && !isSleepLoggingActive) || (isWaterCard && isWaterLocked);
+                      if (isWaterCard && isCompleted && !isWaterLocked) isVibeDisabled = false;
 
                       let vibeValue = vibe.value;
                       if (isTask && isCompleted && vibe.completedAt) {
@@ -607,19 +633,24 @@ export default function DashboardPage() {
                         <motion.div key={vibe.id} variants={itemVariants}>
                           <Card 
                             className={cn("p-4 transition-all duration-200", 
-                                (isSleepCard && !isSleepLoggingActive) ? 'cursor-not-allowed bg-muted/50' : 'hover:bg-secondary/10 cursor-pointer',
-                                isCompleted && 'bg-green-500/10 border-green-500/20'
+                                isVibeDisabled ? 'cursor-not-allowed bg-muted/50' : 'hover:bg-secondary/10 cursor-pointer',
+                                isCompleted && !isWaterLocked && 'bg-green-500/10 border-green-500/20'
                             )}
-                            onClick={() => handleEditVibe(vibe)}
+                            onClick={() => !isVibeDisabled && handleEditVibe(vibe)}
                           >
                               <div className='flex items-center'>
-                                  <Icon className={cn("mr-4 h-8 w-8 text-primary", isCompleted && 'text-green-500')} />
+                                  <Icon className={cn("mr-4 h-8 w-8 text-primary", isCompleted && !isWaterLocked && 'text-green-500')} />
                                   <div className="flex-1">
-                                      <p className={cn("font-medium", isCompleted && 'text-green-600 dark:text-green-400')}>{vibe.title}</p>
+                                      <p className={cn("font-medium", isCompleted && !isWaterLocked && 'text-green-600 dark:text-green-400')}>{vibe.title}</p>
                                       {isSleepCard && !isSleepLoggingActive ? (
                                         <div className='flex items-center gap-2 text-xs text-muted-foreground'>
                                           <Clock className="h-3 w-3" />
-                                          <span>Unlocks in {formatTime(timeToUnlock)}</span>
+                                          <span>Unlocks in {formatTime(timeToUnlockSleep)}</span>
+                                        </div>
+                                      ) : isWaterLocked ? (
+                                        <div className='flex items-center gap-2 text-xs text-muted-foreground'>
+                                          <Clock className="h-3 w-3" />
+                                          <span>Next intake in {formatTime(timeToUnlockWater)}</span>
                                         </div>
                                       ) : (
                                         <p className="text-sm text-muted-foreground">{vibeValue}</p>
@@ -628,12 +659,12 @@ export default function DashboardPage() {
                                   {isTask && (
                                     <Button 
                                         size="sm" 
-                                        variant={isCompleted ? 'secondary' : 'default'}
+                                        variant={isCompleted && !isWaterLocked ? 'secondary' : 'default'}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleMarkVibeAsDone(vibe.id)
                                         }}
-                                        disabled={isCompleted}
+                                        disabled={isCompleted || isWaterLocked}
                                         className="ml-2"
                                     >
                                         <CheckCircle className="mr-2 h-4 w-4" />
@@ -641,7 +672,7 @@ export default function DashboardPage() {
                                     </Button>
                                   )}
                               </div>
-                              {vibe.progress !== undefined && vibe.id !== 'streak' && <Progress value={vibe.progress} className={cn("w-full mt-3", isCompleted && '[&>div]:bg-green-500')} />}
+                              {vibe.progress !== undefined && vibe.id !== 'streak' && <Progress value={vibe.progress} className={cn("w-full mt-3", isCompleted && !isWaterLocked && '[&>div]:bg-green-500')} />}
                           </Card>
                         </motion.div>
                       )
@@ -690,5 +721,7 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
 
     
