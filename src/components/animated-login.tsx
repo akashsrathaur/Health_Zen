@@ -97,7 +97,7 @@ const Robot = ({ state }: { state: RobotState }) => {
 export function AnimatedLogin() {
   const router = useRouter();
   const [robotState, setRobotState] = useState<RobotState>('idle');
-  const [email, setEmail] = useState('');
+  const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
@@ -114,8 +114,11 @@ export function AnimatedLogin() {
     e.preventDefault();
     setError('');
 
+    // If loginId does not contain '@', assume it's a phone number
+    const emailToLogin = loginId.includes('@') ? loginId : `${loginId}@healthzen.app`;
+
     try {
-        await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmailAndPassword(auth, emailToLogin, password);
         setRobotState('correct');
         // The AuthProvider will handle the redirect
     } catch (error: any) {
@@ -124,7 +127,7 @@ export function AnimatedLogin() {
             case 'auth/user-not-found':
             case 'auth/wrong-password':
             case 'auth/invalid-credential':
-                setError("Invalid email or password.");
+                setError("Invalid credentials. Please check your phone/email and password.");
                 break;
             default:
                 setError("An unexpected error occurred. Please try again.");
@@ -145,7 +148,7 @@ export function AnimatedLogin() {
     }
   };
 
-  const handleEmailFocus = () => {
+  const handleLoginIdFocus = () => {
     if (password.length === 0) {
       setRobotState('idle');
     }
@@ -159,15 +162,15 @@ export function AnimatedLogin() {
             <CardContent className="p-6">
                 <form onSubmit={handleLogin} className="space-y-4">
                      <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="loginId">Email or Phone</Label>
                         <Input 
-                            id="email" 
-                            type="email" 
-                            placeholder="you@example.com" 
+                            id="loginId" 
+                            type="text" 
+                            placeholder="Email or Phone Number" 
                             required 
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            onFocus={handleEmailFocus}
+                            value={loginId}
+                            onChange={(e) => setLoginId(e.target.value)}
+                            onFocus={handleLoginIdFocus}
                             onBlur={() => setRobotState(password.length > 0 ? 'peeking' : 'idle')}
                         />
                     </div>
