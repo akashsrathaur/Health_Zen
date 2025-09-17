@@ -1,3 +1,4 @@
+
 'use client';
 import { useActionState } from 'react';
 import { symptomCheckAction } from '@/actions/symptom-check';
@@ -131,6 +132,12 @@ Disclaimer: This advice is for informational purposes only.
         });
       } catch (error) {
         console.error('Error sharing:', error);
+        // Fallback to clipboard if share fails (e.g., user cancels)
+        navigator.clipboard.writeText(shareText);
+        toast({
+          title: "Copied to Clipboard",
+          description: "The advice has been copied to your clipboard.",
+        });
       }
     } else {
       navigator.clipboard.writeText(shareText);
