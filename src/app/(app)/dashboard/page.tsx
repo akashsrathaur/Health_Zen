@@ -11,14 +11,15 @@ import {
   CardFooter
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { initialDailyVibes, userData, challenges, type Challenge, type DailyVibe } from '@/lib/data';
+import { initialDailyVibes, userData, challenges as initialChallenges, type Challenge, type DailyVibe } from '@/lib/data';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, CheckCircle, Edit, Minus, Plus } from 'lucide-react';
+import { ArrowRight, CheckCircle, Edit, Minus, Plus, Upload } from 'lucide-react';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -42,7 +43,7 @@ const itemVariants = {
   },
 };
 
-function ChallengeCard({ challenge }: { challenge: Challenge }) {
+function ChallengeCard({ challenge, onMarkAsDone }: { challenge: Challenge, onMarkAsDone: (challengeId: string) => void }) {
   const progress = (challenge.currentDay / challenge.goalDays) * 100;
 
   return (
@@ -69,6 +70,21 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
                 <Progress value={progress} />
             </CardContent>
           </Link>
+           <CardFooter className="p-2 pt-0">
+                <Button 
+                    className="w-full"
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                        e.stopPropagation(); // Prevent link navigation
+                        onMarkAsDone(challenge.id);
+                    }}
+                    disabled={challenge.isCompletedToday}
+                >
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    {challenge.isCompletedToday ? 'Completed' : 'Done for today'}
+                </Button>
+            </CardFooter>
         </Card>
     </motion.div>
   );
@@ -128,7 +144,7 @@ function EditVibesDialog({ isOpen, onClose, dailyVibes, onSave }: { isOpen: bool
                                 id="sleep-hours" 
                                 type="number" 
                                 step="0.5" 
-                                value={parseFloat(sleepVibe.value)} 
+                                value={sleepVibe.value ? parseFloat(sleepVibe.value) : 0} 
                                 onChange={handleSleepChange} 
                                 className="w-40"
                             />
@@ -145,14 +161,32 @@ function EditVibesDialog({ isOpen, onClose, dailyVibes, onSave }: { isOpen: bool
 }
 
 export default function DashboardPage() {
-  const acceptedChallenges = challenges.slice(0, 3); // Show first 3 for brevity
+  const [challenges, setChallenges] = useState<Challenge[]>(initialChallenges);
   const [dailyVibes, setDailyVibes] = useState<DailyVibe[]>(initialDailyVibes);
   const [isEditVibesOpen, setIsEditVibesOpen] = useState(false);
+  const { toast } = useToast();
 
   const handleSaveVibes = (updatedVibes: DailyVibe[]) => {
     setDailyVibes(updatedVibes);
     setIsEditVibesOpen(false);
   }
+
+  const handleMarkAsDone = (challengeId: string) => {
+    setChallenges(prevChallenges => 
+      prevChallenges.map(c => 
+        c.id === challengeId && !c.isCompletedToday
+          ? { ...c, isCompletedToday: true, currentDay: c.currentDay + 1 } 
+          : c
+      )
+    );
+    const challenge = challenges.find(c => c.id === challengeId);
+    if (challenge && !challenge.isCompletedToday) {
+      toast({
+        title: "Streak Continued!",
+        description: `You've completed '${challenge.title}' for today. Keep it up!`
+      });
+    }
+  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -209,8 +243,8 @@ export default function DashboardPage() {
                   initial="hidden"
                   animate="visible"
                 >
-                    {acceptedChallenges.map((challenge) => (
-                      <ChallengeCard key={challenge.id} challenge={challenge} />
+                    {challenges.slice(0, 2).map((challenge) => (
+                      <ChallengeCard key={challenge.id} challenge={challenge} onMarkAsDone={handleMarkAsDone} />
                     ))}
                 </motion.div>
             </section>
