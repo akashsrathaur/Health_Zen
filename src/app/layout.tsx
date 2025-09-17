@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/context/auth-context';
+import { AuthGuard } from '@/components/auth-guard';
 
 export const metadata: Metadata = {
   title: 'HealthZen',
@@ -35,7 +36,9 @@ export default function RootLayout({
           >
             <BalancerProvider>
               <AuthProvider>
-                {children}
+                <AuthGuard>
+                  {children}
+                </AuthGuard>
                 <Toaster />
               </AuthProvider>
             </BalancerProvider>
