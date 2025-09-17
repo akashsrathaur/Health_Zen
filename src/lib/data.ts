@@ -296,6 +296,42 @@ export const achievements: Achievement[] = [
   { id: 'feedback-fanatic', name: 'Feedback Fanatic', icon: ThumbsUp, unlocked: false, description: 'Provide feedback or upvote 15 community posts.' },
 ];
 
+export const initialChallenges: Challenge[] = [
+    {
+      id: 'challenge-1',
+      title: '7-Day Meditation',
+      description: 'Commit to 7 days of mindfulness meditation for at least 10 minutes a day.',
+      icon: Brain,
+      currentDay: 3,
+      goalDays: 7,
+      imageUrl: 'https://picsum.photos/seed/challenge1/800/600',
+      imageHint: 'meditation calm',
+      isCompletedToday: false,
+    },
+    {
+      id: 'challenge-2',
+      title: '30-Day Yoga Journey',
+      description: 'Practice yoga every day for 30 days to improve flexibility and reduce stress.',
+      icon: Dumbbell,
+      currentDay: 12,
+      goalDays: 30,
+      imageUrl: 'https://picsum.photos/seed/challenge2/800/600',
+      imageHint: 'yoga pose',
+      isCompletedToday: true,
+    },
+    {
+      id: 'challenge-3',
+      title: 'Hydration Challenge',
+      description: 'Drink 8 glasses of water every day for 21 days for better skin and energy.',
+      icon: Droplets,
+      currentDay: 18,
+      goalDays: 21,
+      imageUrl: 'https://picsum.photos/seed/challenge3/800/600',
+      imageHint: 'glass water',
+      isCompletedToday: false,
+    },
+];
+
 export type CommunityPost = {
   id: string;
   user: {
