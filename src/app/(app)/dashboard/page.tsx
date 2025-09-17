@@ -149,7 +149,7 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
     }
 
     const isStreakVibe = currentVibe.id === 'streak';
-    const isCompleted = !!currentVibe.completedAt;
+    const isCompleted = currentVibe.id === 'medication' ? currentVibe.progress === 100 : !!currentVibe.completedAt;
     const isEditable = !isCompleted && !isStreakVibe;
 
     return (
@@ -202,7 +202,7 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
                         </div>
                         <Switch
                           id='medication-taken'
-                          checked={currentVibe.progress === 100}
+                          checked={isCompleted}
                           onCheckedChange={handleMedicationToggle}
                         />
                       </div>
@@ -541,10 +541,28 @@ export default function DashboardPage() {
 
   const handleMarkVibeAsDone = (vibeId: string) => {
     const vibe = dailyVibes.find(v => v.id === vibeId);
-    if (vibe && !vibe.completedAt) {
+    if (vibe && !vibe.completedAt && vibe.id !== 'medication') {
       setActiveVibeId(vibeId);
       setActiveChallengeId(null);
       setIsCameraOpen(true);
+    } else if (vibe && vibe.id === 'medication') {
+        // Handle medication without camera
+        const isCompleted = vibe.progress === 100;
+        setDailyVibes(prevVibes =>
+            prevVibes.map(v =>
+                v.id === vibeId
+                ? { ...v, 
+                    progress: isCompleted ? 0 : 100,
+                    value: isCompleted ? 'Pending' : 'Taken',
+                    completedAt: isCompleted ? undefined : new Date().toISOString()
+                  }
+                : v
+            )
+        );
+        toast({
+            title: isCompleted ? 'Medication reset' : 'Medication taken!',
+            description: isCompleted ? `Marked as pending.` : `You've logged your medication for this dose.`
+        });
     }
   };
 
@@ -586,7 +604,7 @@ export default function DashboardPage() {
     setActiveVibeId(null);
   };
 
-  const nonSnapVibeIds = ['sleep', 'streak', 'medication'];
+  const nonSnapVibeIds = ['sleep', 'streak'];
 
   return (
     <div className="flex flex-col gap-8">
@@ -629,8 +647,10 @@ export default function DashboardPage() {
 
 
                       let vibeValue = vibe.value;
-                      if (isTask && isCompleted && vibe.completedAt) {
+                      if (!isMedicationCard && isTask && isCompleted && vibe.completedAt) {
                           vibeValue = `Completed at ${format(new Date(vibe.completedAt), 'p')}`;
+                      } else if(isMedicationCard) {
+                          vibeValue = vibe.progress === 100 ? 'Taken' : 'Pending';
                       }
 
                       return (
@@ -668,7 +688,7 @@ export default function DashboardPage() {
                                             e.stopPropagation();
                                             handleMarkVibeAsDone(vibe.id)
                                         }}
-                                        disabled={isCompleted || isWaterLocked}
+                                        disabled={(isCompleted && !isMedicationCard) || isWaterLocked}
                                         className="ml-2"
                                     >
                                         <CheckCircle className="mr-2 h-4 w-4" />
@@ -725,7 +745,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
-
-    
