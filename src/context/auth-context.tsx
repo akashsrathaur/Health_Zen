@@ -31,22 +31,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setFirebaseUser(fbUser);
       if (fbUser) {
+        // User is logged in
         const userProfile = await getUserFromFirestore(fbUser.uid);
         setUser(userProfile);
-        if(pathname.startsWith('/login') || pathname.startsWith('/signup')) {
-             router.push('/dashboard');
+        // If they are on a public auth page, redirect to dashboard
+        if (pathname.startsWith('/login') || pathname.startsWith('/signup')) {
+          router.replace('/dashboard');
         }
       } else {
+        // User is logged out
         setUser(null);
-         if (!pathname.startsWith('/login') && !pathname.startsWith('/signup')) {
-            router.push('/login');
+        // If they are on a protected app page, redirect to login
+        if (!pathname.startsWith('/login') && !pathname.startsWith('/signup')) {
+          router.replace('/login');
         }
       }
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [router, pathname]);
+  // Using pathname in dependency array can cause loops if not handled carefully.
+  // We only want this effect to run on initial load and when auth state changes.
+  // The router object itself is stable.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, firebaseUser, loading }}>
