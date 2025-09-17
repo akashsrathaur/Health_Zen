@@ -112,7 +112,7 @@ export function AnimatedLogin() {
     // Simulate API call
     if (password !== 'password') {
         setRobotState('wrong');
-        setError('Wrong password. Please try again.');
+        setError("Wrong password. The correct password is 'password'.");
     } else {
         setRobotState('correct');
         setError('');
