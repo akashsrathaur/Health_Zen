@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { getUserFromFirestore } from '@/actions/user';
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
   
-  // State from old DataContext
+  // State for user data collections
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [dailyVibes, setDailyVibes] = useState<DailyVibe[]>([]);
   const [posts, setPosts] = useState<CommunityPost[]>([]);
@@ -56,11 +56,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, async (fbUser) => {
-      setLoading(true);
+      setLoading(true); // Always start loading when auth state changes
       if (fbUser) {
         setFirebaseUser(fbUser);
         const userProfile = await getUserFromFirestore(fbUser.uid);
         setUser(userProfile || { ...defaultUser, uid: fbUser.uid, name: "New User" });
+        // The data snapshot listener will handle the rest
       } else {
         setFirebaseUser(null);
         setUser(null);
@@ -69,7 +70,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setDailyVibes([]);
         setPosts([]);
         setUserProgress(null);
-        setLoading(false);
+        setLoading(false); // Stop loading on logout
       }
     });
 
@@ -77,11 +78,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
+    // If there's no user, we don't need a data listener.
+    // The loading state is handled by the auth listener.
     if (!user) {
-        if (!firebaseUser) { // Only stop loading if we know there is no logged in user
-            setLoading(false);
-        }
-        return;
+      if (!firebaseUser) { // Only stop loading if we know for sure there is no logged in user
+          setLoading(false);
+      }
+      return;
     }
 
     const userDataRef = doc(db, 'userData', user.uid);
@@ -108,17 +111,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             });
         } else {
             // Document doesn't exist, create it for the new user
-            await setDoc(userDataRef, {
-                dailyVibes: initialDailyVibes,
-                challenges: initialChallenges,
-                posts: []
-            });
-            // State will be updated by the next snapshot trigger after creation
+            try {
+              await setDoc(userDataRef, {
+                  dailyVibes: initialDailyVibes,
+                  challenges: initialChallenges,
+                  posts: []
+              });
+              // The state will be updated by the next snapshot trigger automatically after creation
+            } catch (error) {
+              console.error("Failed to create initial user data:", error);
+            }
         }
+        // We've successfully loaded or created the data. Stop loading.
         setLoading(false);
     }, (error) => {
-        console.error("Error listening to user data:", error);
-        setLoading(false);
+        console.error("Error listening to user data, possibly due to Firestore rules:", error);
+        setLoading(false); // Stop loading even if there's an error
     });
 
     return () => unsubscribeData();

@@ -12,7 +12,8 @@ export async function createUserInFirestore(uid: string, data: Omit<User, 'uid'>
         });
     } catch (error) {
         console.error('Error creating user in Firestore: ', error);
-        throw new Error('Could not create user profile.');
+        // We throw a more specific error to be handled by the caller
+        throw new Error('Failed to create user profile in database.');
     }
 }
 
@@ -22,13 +23,17 @@ export async function getUserFromFirestore(uid: string): Promise<User | null> {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
+            // Return the user data if the document is found
             return docSnap.data() as User;
         } else {
-            console.log('No such document!');
+            // This is not an error, it's a valid state (user document not created yet)
+            console.log(`No user document found for UID: ${uid}`);
             return null;
         }
     } catch (error) {
         console.error('Error getting user from Firestore: ', error);
-        throw new Error('Could not retrieve user profile.');
+        // This is a genuine error (e.g., network issue, permissions)
+        // We re-throw it to be handled by the application's error boundaries.
+        throw new Error('Could not retrieve user profile due to a server error.');
     }
 }
