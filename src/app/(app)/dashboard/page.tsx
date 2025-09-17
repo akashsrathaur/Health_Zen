@@ -234,6 +234,8 @@ function AddVibeDialog({ isOpen, onClose, onAdd }: { isOpen: boolean, onClose: (
         onClose();
     }
     
+    const SelectedIcon = allVibeIcons[iconName];
+
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
@@ -250,7 +252,12 @@ function AddVibeDialog({ isOpen, onClose, onAdd }: { isOpen: boolean, onClose: (
                         <Label htmlFor="new-vibe-icon">Icon</Label>
                         <Select value={iconName} onValueChange={(value) => setIconName(value as keyof typeof allVibeIcons)}>
                             <SelectTrigger id="new-vibe-icon">
-                                <SelectValue placeholder="Select an icon" />
+                                <SelectValue asChild>
+                                    <div className="flex items-center gap-2">
+                                        <SelectedIcon className="h-4 w-4" />
+                                        <span>{iconName}</span>
+                                    </div>
+                                </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
                                 {Object.keys(allVibeIcons).map(iconKey => {
@@ -258,7 +265,7 @@ function AddVibeDialog({ isOpen, onClose, onAdd }: { isOpen: boolean, onClose: (
                                     return (
                                         <SelectItem key={iconKey} value={iconKey}>
                                             <div className='flex items-center gap-2'>
-                                                <IconComponent />
+                                                <IconComponent className="h-4 w-4" />
                                                 <span>{iconKey}</span>
                                             </div>
                                         </SelectItem>
@@ -591,3 +598,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
