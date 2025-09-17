@@ -30,8 +30,8 @@ const Robot = ({ state }: { state: RobotState }) => {
             >
                 <defs>
                     <radialGradient id="robot-body-gradient" cx="50%" cy="40%" r="70%" fx="50%" fy="40%">
-                        <stop offset="0%" style={{stopColor: '#CFD8DC'}} />
-                        <stop offset="100%" style={{stopColor: '#90A4AE'}} />
+                        <stop offset="0%" style={{stopColor: '#B6D0E2'}} />
+                        <stop offset="100%" style={{stopColor: '#7B9BBD'}} />
                     </radialGradient>
                      <radialGradient id="robot-eye-gradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
                         <stop offset="0%" stopColor="white" />
@@ -44,13 +44,13 @@ const Robot = ({ state }: { state: RobotState }) => {
                     <ellipse cx="60" cy="115" rx="35" ry="4" fill="rgba(0,0,0,0.1)" />
 
                     {/* Body */}
-                    <rect x="25" y="40" width="70" height="70" rx="15" fill="url(#robot-body-gradient)" stroke="#546E7A" strokeWidth="1"/>
+                    <rect x="25" y="40" width="70" height="70" rx="15" fill="url(#robot-body-gradient)" stroke="#465A65" strokeWidth="1"/>
                     
                     {/* Head */}
-                    <rect x="35" y="15" width="50" height="40" rx="10" fill="url(#robot-body-gradient)" stroke="#546E7A" strokeWidth="1"/>
+                    <rect x="35" y="15" width="50" height="40" rx="10" fill="url(#robot-body-gradient)" stroke="#465A65" strokeWidth="1"/>
                     
                     {/* Antenna */}
-                    <line x1="60" y1="15" x2="60" y2="5" stroke="#546E7A" strokeWidth="2" />
+                    <line x1="60" y1="15" x2="60" y2="5" stroke="#465A65" strokeWidth="2" />
                      <motion.circle 
                         cx="60" cy="5" r="3" 
                         fill={state === 'correct' ? '#FFD700' : '#B0BEC5'}
@@ -76,7 +76,7 @@ const Robot = ({ state }: { state: RobotState }) => {
                             width="50"
                             height="25"
                             rx="5"
-                            fill="#455A64"
+                            fill="#3E5363"
                             initial={{ y: -30, opacity: 0 }}
                             animate={{ y: 22, opacity: 1 }}
                             exit={{ y: -30, opacity: 0 }}
