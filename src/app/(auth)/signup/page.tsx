@@ -124,10 +124,10 @@ export default function SignupPage() {
                 </div>
             </div>
             <div className="grid gap-2 text-left">
-                <Label htmlFor="email">E-mail (Optional)</Label>
+                <Label htmlFor="email">E-mail</Label>
                 <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="email" type="email" placeholder="akash.r@example.com" className="pl-10" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <Input id="email" type="email" placeholder="akash.r@example.com" required className="pl-10" value={email} onChange={(e) => setEmail(e.target.value)} />
                 </div>
             </div>
             <div className="grid gap-2 text-left">
