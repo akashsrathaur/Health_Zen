@@ -37,13 +37,11 @@ export default function SignupPage() {
             return;
         }
 
-        if (!email) {
-            setError("Please provide an email address.");
-            return;
-        }
+        // Email needs to be constructed for Firebase Auth, but can be based on phone
+        const firebaseEmail = email || `${phone}@healthzen.app`;
 
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, firebaseEmail, password);
             const firebaseUser = userCredential.user;
 
             await createUserInFirestore(firebaseUser.uid, {
@@ -61,13 +59,13 @@ export default function SignupPage() {
         } catch (error: any) {
             switch (error.code) {
                 case 'auth/email-already-in-use':
-                    setError('This email is already associated with an account.');
+                    setError('This phone number or email is already associated with an account.');
                     break;
                 case 'auth/weak-password':
                     setError('The password is too weak. It must be at least 6 characters long.');
                     break;
                 case 'auth/invalid-email':
-                    setError('Please enter a valid email address.');
+                    setError('Please enter a valid phone number.');
                     break;
                 default:
                     setError('An unexpected error occurred. Please try again.');
@@ -118,14 +116,14 @@ export default function SignupPage() {
                 <Label htmlFor="phone">Phone Number</Label>
                 <div className="relative">
                     <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="phone" type="tel" placeholder="123-456-7890" className="pl-10" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                    <Input id="phone" type="tel" placeholder="123-456-7890" required className="pl-10" value={phone} onChange={(e) => setPhone(e.target.value)} />
                 </div>
             </div>
              <div className="grid gap-2 text-left">
-                <Label htmlFor="email">E-mail</Label>
+                <Label htmlFor="email">E-mail (Optional)</Label>
                 <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="email" type="email" placeholder="akash.r@example.com" required className="pl-10" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <Input id="email" type="email" placeholder="akash.r@example.com" className="pl-10" value={email} onChange={(e) => setEmail(e.target.value)} />
                 </div>
             </div>
             <div className="grid gap-2 text-left">
@@ -190,5 +188,3 @@ export default function SignupPage() {
     </div>
   );
 }
-
-    
