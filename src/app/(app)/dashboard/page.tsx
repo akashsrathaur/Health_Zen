@@ -1,5 +1,7 @@
+
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Balancer } from 'react-wrap-balancer';
 import {
   Card,
@@ -7,10 +9,13 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
+  CardFooter
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { dailyVibes, quickActions, userData } from '@/lib/data';
+import { dailyVibes, userData, challenges, type Challenge } from '@/lib/data';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { ArrowRight, CheckCircle } from 'lucide-react';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -34,8 +39,54 @@ const itemVariants = {
   },
 };
 
+function ChallengeCard({ challenge }: { challenge: Challenge }) {
+  const progress = (challenge.currentDay / challenge.goalDays) * 100;
+
+  return (
+    <motion.div variants={itemVariants}>
+      <Card className="overflow-hidden flex flex-col h-full">
+        <div className="relative h-40 w-full">
+          <Image
+            src={challenge.imageUrl}
+            alt={challenge.title}
+            fill
+            className="object-cover"
+            data-ai-hint={challenge.imageHint}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+          <div className="absolute bottom-0 left-0 p-4">
+            <h3 className="text-lg font-bold text-white">{challenge.title}</h3>
+          </div>
+        </div>
+        <CardContent className="p-4 flex-grow">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-muted-foreground">Day {challenge.currentDay} of {challenge.goalDays}</span>
+            {challenge.isCompletedToday && (
+              <div className="flex items-center gap-1 text-sm text-green-500">
+                <CheckCircle className="h-4 w-4" />
+                <span>Done!</span>
+              </div>
+            )}
+          </div>
+          <Progress value={progress} />
+          <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{challenge.description}</p>
+        </CardContent>
+         <CardFooter className='p-4 pt-0'>
+            <Link href={`/challenges`} className='w-full'>
+                <Button variant='secondary' className='w-full'>
+                    View Challenge
+                </Button>
+            </Link>
+        </CardFooter>
+      </Card>
+    </motion.div>
+  );
+}
+
 
 export default function DashboardPage() {
+  const acceptedChallenges = challenges.slice(0, 3); // Show first 3 for brevity
+
   return (
     <div className="flex flex-col gap-8">
       <div>
@@ -47,34 +98,23 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
             <section>
-                <h2 className="mb-4 text-xl font-semibold">Quick Actions</h2>
+                <div className='flex items-center justify-between mb-4'>
+                    <h2 className="text-xl font-semibold">Accepted Challenges</h2>
+                    <Button variant="ghost" asChild>
+                        <Link href="/challenges">View All <ArrowRight className='ml-2 h-4 w-4'/></Link>
+                    </Button>
+                </div>
                 <motion.div 
                   className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
                 >
-                    {quickActions.map((action) => (
-                    <motion.div key={action.title} variants={itemVariants}>
-                      <Link href={action.href} className="group block h-full">
-                          <div className="h-full rounded-lg p-px bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20 transition-all duration-300 group-hover:from-primary/50 group-hover:via-secondary/50 group-hover:to-accent/50 group-hover:shadow-xl">
-                            <Card className="h-full transform transition-all duration-300 group-hover:-translate-y-1 bg-card/80 backdrop-blur-sm border-none">
-                              <CardHeader>
-                                  <div className="mb-2 flex items-center gap-3">
-                                  <div className="rounded-lg bg-white/5 p-3 transition-colors">
-                                      <action.icon className="h-6 w-6 text-primary transition-colors group-hover:text-primary/80" />
-                                  </div>
-                                  <CardTitle className="text-lg text-foreground/90 transition-colors group-hover:text-foreground">{action.title}</CardTitle>
-                                  </div>
-                                  <CardDescription>{action.description}</CardDescription>
-                              </CardHeader>
-                            </Card>
-                          </div>
-                      </Link>
-                    </motion.div>
+                    {acceptedChallenges.map((challenge) => (
+                      <ChallengeCard key={challenge.id} challenge={challenge} />
                     ))}
                 </motion.div>
             </section>
@@ -107,5 +147,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
