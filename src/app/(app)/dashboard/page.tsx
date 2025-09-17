@@ -129,7 +129,8 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
       setCurrentVibe(prev => {
         if (!prev || prev.id !== 'medication') return prev;
         const now = new Date().toISOString();
-        return { ...prev, value: checked ? 'Taken' : 'Pending', progress: checked ? 100 : 0, completedAt: checked ? now : undefined };
+        const progress = checked ? 100 : 0;
+        return { ...prev, value: checked ? 'Taken' : 'Pending', progress: progress, completedAt: checked ? now : undefined };
       });
     }
 
@@ -147,7 +148,7 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
     }
 
     const isStreakVibe = currentVibe.id === 'streak';
-    const isCompleted = currentVibe.progress === 100 && currentVibe.completedAt;
+    const isCompleted = !!currentVibe.completedAt;
     const isEditable = !isCompleted && !isStreakVibe;
 
     return (
@@ -518,7 +519,7 @@ export default function DashboardPage() {
 
   const handleMarkVibeAsDone = (vibeId: string) => {
     const vibe = dailyVibes.find(v => v.id === vibeId);
-    if (vibe && vibe.progress !== 100) {
+    if (vibe && !vibe.completedAt) {
       setActiveVibeId(vibeId);
       setActiveChallengeId(null);
       setIsCameraOpen(true);
@@ -547,7 +548,7 @@ export default function DashboardPage() {
             setDailyVibes(prevVibes =>
                 prevVibes.map(v =>
                     v.id === activeVibeId
-                    ? { ...v, progress: 100, completedAt: new Date().toISOString() }
+                    ? { ...v, completedAt: new Date().toISOString() }
                     : v
                 )
             );
@@ -595,7 +596,7 @@ export default function DashboardPage() {
                       const Icon = typeof vibe.icon === 'string' ? allVibeIcons[vibe.icon as keyof typeof allVibeIcons] : vibe.icon;
                       const isTask = !nonSnapVibeIds.includes(vibe.id);
                       const isSleepCard = vibe.id === 'sleep';
-                      const isCompleted = vibe.progress === 100;
+                      const isCompleted = !!vibe.completedAt;
 
                       let vibeValue = vibe.value;
                       if (isTask && isCompleted && vibe.completedAt) {
@@ -689,3 +690,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
