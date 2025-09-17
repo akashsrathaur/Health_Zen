@@ -20,6 +20,8 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
 });
 
+const publicRoutes = ['/login', '/signup'];
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
@@ -34,27 +36,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // User is logged in
         const userProfile = await getUserFromFirestore(fbUser.uid);
         setUser(userProfile);
-        // If they are on a public auth page, redirect to dashboard
-        if (pathname === '/login' || pathname === '/signup') {
-          router.replace('/dashboard');
-        }
       } else {
         // User is logged out
         setUser(null);
-        // If they are on a protected app page, redirect to login
-        if (pathname !== '/login' && pathname !== '/signup') {
-          router.replace('/login');
-        }
       }
       setLoading(false);
     });
 
     return () => unsubscribe();
-  // Using pathname in dependency array can cause loops if not handled carefully.
-  // We only want this effect to run on initial load and when auth state changes.
-  // The router object itself is stable.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (loading) return;
+
+    const isPublicRoute = publicRoutes.includes(pathname);
+
+    if (!firebaseUser && !isPublicRoute) {
+      // If user is not logged in and not on a public route, redirect to login
+      router.replace('/login');
+    } else if (firebaseUser && isPublicRoute) {
+      // If user is logged in and on a public route, redirect to dashboard
+      router.replace('/dashboard');
+    }
+
+  }, [loading, firebaseUser, pathname, router]);
 
   return (
     <AuthContext.Provider value={{ user, firebaseUser, loading }}>
