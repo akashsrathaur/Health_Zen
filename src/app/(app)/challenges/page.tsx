@@ -17,7 +17,6 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { nanoid } from 'nanoid';
-import { useData } from '@/context/data-context';
 import { addChallenge as addChallengeAction, updateChallenge as updateChallengeAction } from '@/actions/challenges';
 import { useAuth } from '@/context/auth-context';
 
@@ -287,8 +286,7 @@ function ShareDialog({ isOpen, onClose, challenge }: { isOpen: boolean, onClose:
 }
 
 export default function ChallengesPage() {
-  const { user } = useAuth();
-  const { challenges, setChallenges, loading } = useData();
+  const { user, challenges, setChallenges, loading } = useAuth();
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);

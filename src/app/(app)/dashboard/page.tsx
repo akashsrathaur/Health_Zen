@@ -30,7 +30,6 @@ import { format } from 'date-fns';
 import { useAuth } from '@/context/auth-context';
 import { defaultUser } from '@/lib/user-store';
 import { useNotifications } from '@/hooks/use-notifications.tsx';
-import { useData } from '@/context/data-context';
 import { updateDailyVibes as updateDailyVibesAction } from '@/actions/dashboard';
 import { updateChallenge as updateChallengeAction } from '@/actions/challenges';
 
@@ -432,9 +431,8 @@ const formatTime = (ms: number) => {
 };
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user, challenges, setChallenges, dailyVibes, setDailyVibes, loading, userProgress, setUserProgress } = useAuth();
   const userData = user || defaultUser;
-  const { challenges, setChallenges, dailyVibes, setDailyVibes, loading, userProgress, setUserProgress } = useData();
 
   const [isAddVibeOpen, setIsAddVibeOpen] = useState(false);
   const [isEditVibeOpen, setIsEditVibeOpen] = useState(false);
@@ -684,7 +682,7 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-8">
       <div>
         <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground text-glow-purple">
-          Welcome back, <span>{userData.name.split(' ')[0]}!</span>
+          Welcome back, <span>{(user && user.name) ? user.name.split(' ')[0] : 'friend'}!</span>
         </h1>
         <p className="text-muted-foreground">
           <Balancer>Here's your wellness summary for today. Keep up the great work!</Balancer>

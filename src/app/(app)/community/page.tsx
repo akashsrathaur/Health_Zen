@@ -22,7 +22,6 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/auth-context';
 import { defaultUser } from '@/lib/user-store';
-import { useData } from '@/context/data-context';
 import { addCommunityPost as addPostAction } from '@/actions/community';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -242,8 +241,7 @@ function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, o
 }
 
 export default function CommunityPage() {
-  const { user } = useAuth();
-  const { posts, setPosts, loading } = useData();
+  const { user, posts, setPosts, loading } = useAuth();
   const userData = user || { ...defaultUser, uid: '' };
   
   const handleAddPost = async (content: string, imageUrl?: string, imageHint?: string) => {

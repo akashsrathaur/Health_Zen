@@ -1,101 +1,147 @@
 
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { getUserFromFirestore, createUserInFirestore } from '@/actions/user';
+import { getUserFromFirestore } from '@/actions/user';
 import type { User } from '@/lib/user-store';
 import { defaultUser } from '@/lib/user-store';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { initialChallenges, initialDailyVibes } from '@/lib/data';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { initialChallenges, initialDailyVibes, type Challenge, type DailyVibe, type CommunityPost } from '@/lib/data';
+
+type ProgressState = {
+    streak: number;
+    completedTasks: number;
+};
 
 interface AuthContextType {
   user: User | null;
   firebaseUser: FirebaseUser | null;
   loading: boolean;
+  challenges: Challenge[];
+  setChallenges: React.Dispatch<React.SetStateAction<Challenge[]>>;
+  dailyVibes: DailyVibe[];
+  setDailyVibes: React.Dispatch<React.SetStateAction<DailyVibe[]>>;
+  posts: CommunityPost[];
+  setPosts: React.Dispatch<React.SetStateAction<CommunityPost[]>>;
+  userProgress: ProgressState | null;
+  setUserProgress: React.Dispatch<React.SetStateAction<ProgressState | null>>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   firebaseUser: null,
   loading: true,
+  challenges: [],
+  setChallenges: () => {},
+  dailyVibes: [],
+  setDailyVibes: () => {},
+  posts: [],
+  setPosts: () => {},
+  userProgress: null,
+  setUserProgress: () => {},
 });
-
-const retry = <T,>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> => {
-  return new Promise((resolve, reject) => {
-    const attempt = (n: number) => {
-      fn()
-        .then(resolve)
-        .catch(err => {
-          if (n === 1) {
-            reject(err);
-          } else {
-            console.log(`Retrying... attempts left: ${n - 1}`);
-            setTimeout(() => attempt(n - 1), delay * (Math.pow(2, retries - n)));
-          }
-        });
-    };
-    attempt(retries);
-  });
-};
-
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const fetchUserData = useCallback(async (uid: string) => {
-      try {
-        const userProfile = await retry(() => getUserFromFirestore(uid));
-        
-        if (userProfile) {
-          setUser(userProfile);
-          // Check if user has userData, if not, create it.
-          const userDataRef = doc(db, 'userData', uid);
-          const userDataSnap = await getDoc(userDataRef);
-          if (!userDataSnap.exists()) {
-              await setDoc(userDataRef, {
-                  dailyVibes: initialDailyVibes,
-                  challenges: initialChallenges,
-                  posts: []
-              });
-          }
-          return true;
-        } else {
-          // This case might happen if Firestore is slow to create the user document after signup.
-          console.warn(`User profile for ${uid} not found, using default. This can happen on first login.`);
-          setUser({ ...defaultUser, uid: uid, name: 'New User' });
-          return false;
-        }
-      } catch (error) {
-        console.error("Failed to fetch user profile from Firestore on client after retries:", error);
-        // Set a guest user so the UI doesn't break, but indicate an issue.
-        setUser({ ...defaultUser, uid: uid, name: 'Guest' });
-        return false;
-      }
-  }, []);
-
+  
+  // State from old DataContext
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [dailyVibes, setDailyVibes] = useState<DailyVibe[]>([]);
+  const [posts, setPosts] = useState<CommunityPost[]>([]);
+  const [userProgress, setUserProgress] = useState<ProgressState | null>(null);
+  
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, async (fbUser) => {
+      setLoading(true);
       if (fbUser) {
-        setLoading(true);
         setFirebaseUser(fbUser);
-        await fetchUserData(fbUser.uid);
-        setLoading(false);
+        const userProfile = await getUserFromFirestore(fbUser.uid);
+        setUser(userProfile || { ...defaultUser, uid: fbUser.uid, name: "New User" });
       } else {
         setFirebaseUser(null);
         setUser(null);
+        // Reset all data states on logout
+        setChallenges([]);
+        setDailyVibes([]);
+        setPosts([]);
+        setUserProgress(null);
         setLoading(false);
       }
     });
 
-    return () => unsubscribe();
-  }, [fetchUserData]);
+    return () => unsubscribeAuth();
+  }, []);
+
+  useEffect(() => {
+    if (!user) {
+        if (!firebaseUser) { // Only stop loading if we know there is no logged in user
+            setLoading(false);
+        }
+        return;
+    }
+
+    const userDataRef = doc(db, 'userData', user.uid);
+    const unsubscribeData = onSnapshot(userDataRef, async (docSnap) => {
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            const serverChallenges: Challenge[] = data.challenges || initialChallenges;
+            const serverDailyVibes: DailyVibe[] = data.dailyVibes || initialDailyVibes;
+
+            setChallenges(serverChallenges);
+            setDailyVibes(serverDailyVibes);
+            setPosts(data.posts?.sort((a: CommunityPost, b: CommunityPost) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()) || []);
+            
+            const completedTasks = serverDailyVibes.filter((v: DailyVibe) => {
+              if (v.id === 'medication') return v.progress === 100;
+              return !!v.completedAt;
+            }).length;
+            
+            const completedChallenges = serverChallenges.filter((c: Challenge) => c.isCompletedToday).length;
+
+            setUserProgress({
+                streak: user.streak, 
+                completedTasks: completedTasks + completedChallenges,
+            });
+        } else {
+            // Document doesn't exist, create it for the new user
+            await setDoc(userDataRef, {
+                dailyVibes: initialDailyVibes,
+                challenges: initialChallenges,
+                posts: []
+            });
+            // State will be updated by the next snapshot trigger after creation
+        }
+        setLoading(false);
+    }, (error) => {
+        console.error("Error listening to user data:", error);
+        setLoading(false);
+    });
+
+    return () => unsubscribeData();
+
+  }, [user, firebaseUser]);
+
+
+  const contextValue = {
+    user,
+    firebaseUser,
+    loading,
+    challenges,
+    setChallenges,
+    dailyVibes,
+    setDailyVibes,
+    posts,
+    setPosts,
+    userProgress,
+    setUserProgress
+  };
 
   return (
-    <AuthContext.Provider value={{ user, firebaseUser, loading }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
