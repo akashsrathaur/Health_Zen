@@ -9,7 +9,7 @@ import {
   ChartConfig,
 } from '@/components/ui/chart';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, ResponsiveContainer, ReferenceLine } from 'recharts';
-import { achievements, progressData, type Achievement } from '@/lib/data';
+import { getAchievements, progressData, type Achievement } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Download, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -91,6 +91,13 @@ export default function ProgressTrackerPage() {
   const waterChartData = progressData.water.labels.map((label, i) => ({ day: label, glasses: progressData.water.data[i] }));
   const sleepChartData = progressData.sleep.labels.map((label, i) => ({ day: label, hours: progressData.sleep.data[i] }));
 
+  // In a real app, this progress would come from user data
+  const userProgress = {
+      streak: 12,
+      completedTasks: 5, 
+  };
+  
+  const achievements = getAchievements(userProgress);
   const unlockedAchievements = achievements.filter(a => a.unlocked).length;
   const totalAchievements = achievements.length;
 
@@ -183,3 +190,5 @@ export default function ProgressTrackerPage() {
     </div>
   );
 }
+
+    

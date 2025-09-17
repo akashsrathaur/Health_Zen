@@ -6,6 +6,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/context/auth-context';
 import { AuthGuard } from '@/components/auth-guard';
+import { NotificationProvider } from '@/hooks/use-notifications';
 
 export const metadata: Metadata = {
   title: 'HealthZen',
@@ -35,12 +36,14 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <BalancerProvider>
-              <AuthProvider>
-                <AuthGuard>
-                  {children}
-                </AuthGuard>
-                <Toaster />
-              </AuthProvider>
+              <NotificationProvider>
+                <AuthProvider>
+                  <AuthGuard>
+                    {children}
+                  </AuthGuard>
+                  <Toaster />
+                </AuthProvider>
+              </NotificationProvider>
             </BalancerProvider>
         </ThemeProvider>
       </body>

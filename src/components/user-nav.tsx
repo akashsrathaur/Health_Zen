@@ -17,22 +17,24 @@ import { Flame, Bell, User, LogOut, Settings } from 'lucide-react';
 import { Badge } from './ui/badge';
 import Link from 'next/link';
 import { ThemeSwitcher } from './theme-switcher';
-import { useState } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
+import { useNotifications } from '@/hooks/use-notifications';
+import { formatDistanceToNow } from 'date-fns';
+import { ScrollArea } from './ui/scroll-area';
 
 export function UserNav() {
   const { user, loading } = useAuth();
+  const { notifications, unreadCount, markAsRead } = useNotifications();
   const router = useRouter();
-  const [unreadCount, setUnreadCount] = useState(2);
   
   const userData = user || { ...defaultUser, uid: ''};
 
   const handleNotificationToggle = (open: boolean) => {
     if (open) {
-      setUnreadCount(0);
+      markAsRead();
     }
   };
 
@@ -76,20 +78,27 @@ export function UserNav() {
             <p className="font-semibold">Notifications</p>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem className="flex-col items-start gap-1">
-              <p className="font-medium">New Challenge Available!</p>
-              <p className="text-xs text-muted-foreground">
-                Mindful Morning: Start a 7-day meditation challenge.
-              </p>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="flex-col items-start gap-1">
-              <p className="font-medium">Community Mention</p>
-              <p className="text-xs text-muted-foreground">
-                WellnessWarrior mentioned you in a post.
-              </p>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
+           <ScrollArea className='h-[300px]'>
+             <DropdownMenuGroup>
+                {notifications.length === 0 ? (
+                    <div className='px-2 py-4 text-center text-sm text-muted-foreground'>
+                        No new notifications.
+                    </div>
+                ) : (
+                    notifications.map(notif => (
+                        <DropdownMenuItem key={notif.id} className="flex-col items-start gap-1">
+                            <p className="font-medium">{notif.title}</p>
+                            <p className="text-xs text-muted-foreground">
+                                {notif.description}
+                            </p>
+                            <p className='text-xs text-muted-foreground/80 mt-1'>
+                                {formatDistanceToNow(new Date(notif.timestamp), { addSuffix: true })}
+                            </p>
+                        </DropdownMenuItem>
+                    ))
+                )}
+            </DropdownMenuGroup>
+           </ScrollArea>
         </DropdownMenuContent>
       </DropdownMenu>
 

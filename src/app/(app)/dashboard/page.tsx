@@ -11,7 +11,7 @@ import {
   CardFooter
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { initialDailyVibes, initialChallenges, type Challenge, type DailyVibe, allVibeIcons } from '@/lib/data';
+import { initialDailyVibes, initialChallenges, type Challenge, type DailyVibe, allVibeIcons, getAchievements, type Achievement } from '@/lib/data';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle, Edit, Minus, Plus, Camera, RefreshCcw, XCircle, Pill, PlusCircle, Trash2, Clock, Info } from 'lucide-react';
@@ -29,6 +29,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { format } from 'date-fns';
 import { useAuth } from '@/context/auth-context';
 import { defaultUser } from '@/lib/user-store';
+import { useNotifications } from '@/hooks/use-notifications';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -427,6 +428,13 @@ const formatTime = (ms: number) => {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 };
 
+// This is a simplified representation. In a real app, this would be part of a larger state management solution.
+type ProgressState = {
+    streak: number;
+    completedTasks: number;
+    // Add other relevant metrics here
+}
+
 export default function DashboardPage() {
   const { user } = useAuth();
   const userData = user || defaultUser;
@@ -441,8 +449,36 @@ export default function DashboardPage() {
   const [isSleepLoggingActive, setIsSleepLoggingActive] = useState(false);
   const [timeToUnlockSleep, setTimeToUnlockSleep] = useState(0);
   const [timeToUnlockWater, setTimeToUnlockWater] = useState(0);
+  const [userProgress, setUserProgress] = useState<ProgressState>({ streak: 0, completedTasks: 0 });
 
   const { toast } = useToast();
+  const { addNotification } = useNotifications();
+
+  // Achievement Check Logic
+  const checkAchievements = (newProgress: ProgressState) => {
+    const oldAchievements = getAchievements(userProgress);
+    const newAchievements = getAchievements(newProgress);
+
+    const newlyUnlocked = newAchievements.filter(
+        (newAch: Achievement) => newAch.unlocked && !oldAchievements.find((oldAch: Achievement) => oldAch.id === newAch.id && oldAch.unlocked)
+    );
+
+    newlyUnlocked.forEach((ach: Achievement) => {
+        toast({
+            title: "Badge Unlocked! 🎉",
+            description: `You've earned the "${ach.name}" badge. Keep it up!`,
+        });
+        addNotification({
+            id: `ach-${ach.id}-${Date.now()}`,
+            title: `You've unlocked the ${ach.name} badge!`,
+            description: 'Check your progress on the Tracker page.',
+            isRead: false,
+        });
+    });
+
+    setUserProgress(newProgress);
+  };
+
 
    useEffect(() => {
         const sleepCheckInterval = setInterval(() => {
@@ -567,13 +603,18 @@ export default function DashboardPage() {
             title: isCompleted ? 'Medication reset' : 'Medication taken!',
             description: isCompleted ? `Marked as pending.` : `You've logged your medication for this dose.`
         });
+        if(!isCompleted) {
+          checkAchievements({ ...userProgress, completedTasks: userProgress.completedTasks + 1 });
+        }
     }
   };
 
   const handleImageCaptured = (imageDataUrl: string) => {
+    let completedSomething = false;
     if (activeChallengeId) {
       const challenge = challenges.find(c => c.id === activeChallengeId);
       if (challenge) {
+        completedSomething = true;
         setChallenges(prevChallenges => 
           prevChallenges.map(c => 
             c.id === activeChallengeId 
@@ -589,6 +630,7 @@ export default function DashboardPage() {
     } else if (activeVibeId) {
         const vibe = dailyVibes.find(v => v.id === activeVibeId);
         if (vibe) {
+            completedSomething = true;
             setDailyVibes(prevVibes =>
                 prevVibes.map(v =>
                     v.id === activeVibeId
@@ -601,6 +643,10 @@ export default function DashboardPage() {
                 description: `You've successfully completed '${vibe.title}'.`
             });
         }
+    }
+
+    if (completedSomething) {
+      checkAchievements({ ...userProgress, completedTasks: userProgress.completedTasks + 1 });
     }
 
     setIsCameraOpen(false);

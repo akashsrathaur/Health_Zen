@@ -12,7 +12,7 @@ import { defaultUser } from "@/lib/user-store";
 import { Flame } from "lucide-react";
 
 export default function SettingsPage() {
-    const { user } = useAuth();
+    const { user, firebaseUser } = useAuth();
     const userData = user || defaultUser;
 
     return (
@@ -63,11 +63,11 @@ export default function SettingsPage() {
                 <CardContent className="space-y-4">
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email</Label>
-                        <Input id="email" type="email" defaultValue="akash.r@example.com" />
+                        <Input id="email" type="email" readOnly defaultValue={firebaseUser?.email || "No email provided"} />
                     </div>
                      <div className="grid gap-2">
                         <Label htmlFor="mobile">Mobile Number</Label>
-                        <Input id="mobile" type="tel" defaultValue="1234567890" maxLength={10} />
+                        <Input id="mobile" type="tel" readOnly defaultValue={firebaseUser?.phoneNumber || "No phone provided"} maxLength={10} />
                     </div>
                 </CardContent>
             </Card>
@@ -106,3 +106,5 @@ export default function SettingsPage() {
         </div>
     )
 }
+
+    
