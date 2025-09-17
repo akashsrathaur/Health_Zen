@@ -1,3 +1,4 @@
+
 'use client';
 import { Balancer } from 'react-wrap-balancer';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
@@ -12,6 +13,7 @@ import { achievements, progressData, type Achievement } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Download, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 const waterChartConfig = {
   glasses: {
@@ -58,9 +60,17 @@ const itemVariants = {
 };
 
 function AchievementCard({ achievement }: { achievement: Achievement }) {
+  const iconColor = achievement.unlocked ? 'text-yellow-400' : 'text-muted-foreground';
+  const iconGlow = achievement.unlocked ? 'drop-shadow-[0_2px_4px_rgba(250,204,21,0.5)]' : '';
+
   return (
-    <Card className={`flex flex-col items-center justify-center p-4 text-center transition-all duration-300 ${!achievement.unlocked ? 'opacity-50 grayscale' : 'hover:bg-white/5'}`}>
-      <achievement.icon className={`h-8 w-8 mb-2 ${achievement.unlocked ? 'text-primary' : 'text-muted-foreground'}`} />
+    <Card className={cn(
+      "flex flex-col items-center justify-center p-4 text-center transition-all duration-300 h-full",
+      achievement.unlocked
+        ? 'bg-gradient-to-br from-secondary to-background/50 border-secondary'
+        : 'opacity-60 grayscale'
+    )}>
+      <achievement.icon className={cn("h-8 w-8 mb-2", iconColor, iconGlow)} />
       <p className="text-sm font-semibold">{achievement.name}</p>
       {!achievement.unlocked && <p className="text-xs text-muted-foreground">Locked</p>}
     </Card>
@@ -70,6 +80,9 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
 export default function ProgressTrackerPage() {
   const waterChartData = progressData.water.labels.map((label, i) => ({ day: label, glasses: progressData.water.data[i] }));
   const sleepChartData = progressData.sleep.labels.map((label, i) => ({ day: label, hours: progressData.sleep.data[i] }));
+
+  const unlockedAchievements = achievements.filter(a => a.unlocked).length;
+  const totalAchievements = achievements.length;
 
   return (
     <div className="flex flex-col gap-8">
@@ -138,7 +151,9 @@ export default function ProgressTrackerPage() {
       <Card>
         <CardHeader>
           <CardTitle>Badges Unlocked</CardTitle>
-          <CardDescription>Celebrate your achievements!</CardDescription>
+          <CardDescription>
+            You've unlocked {unlockedAchievements} of {totalAchievements} badges. Keep going!
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <motion.div 
