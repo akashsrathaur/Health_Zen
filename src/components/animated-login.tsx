@@ -24,17 +24,31 @@ const Bear = ({ state }: { state: BearState }) => {
                 animate={state === 'wrong' ? { x: [-1, 1, -1, 1, 0] } : {}}
                 transition={state === 'wrong' ? { duration: 0.3, type: 'spring', stiffness: 500, damping: 15 } : {}}
             >
+                <defs>
+                    <radialGradient id="bear-body-gradient" cx="50%" cy="40%" r="70%" fx="50%" fy="40%">
+                        <stop offset="0%" style={{stopColor: '#FFFFFF'}} />
+                        <stop offset="100%" style={{stopColor: '#ECEFF1'}} />
+                    </radialGradient>
+                    <linearGradient id="scarf-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style={{stopColor: '#F44336'}} />
+                        <stop offset="100%" style={{stopColor: '#D32F2F'}} />
+                    </linearGradient>
+                </defs>
+
                 <motion.g animate={{ y: [0, -2, 0] }} transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}>
+                    {/* Shadow */}
+                    <ellipse cx="60" cy="110" rx="30" ry="5" fill="rgba(0,0,0,0.1)" />
+
                     {/* Scarf */}
-                    <path d="M15 80 Q30 70 60 80 T105 80 L100 95 Q60 105 20 95 Z" fill="#E53935" />
+                    <path d="M15 80 Q30 70 60 80 T105 80 L100 95 Q60 105 20 95 Z" fill="url(#scarf-gradient)" />
                     <path d="M15 80 L20 95 L25 80 L30 95 L35 80" fill="none" stroke="#C62828" strokeWidth="1" />
                     
                     {/* Body */}
-                    <path d="M20 90 Q10 50 60 20 T100 90 Z" fill="#ECEFF1" />
+                    <path d="M20 90 Q10 50 60 20 T100 90 Z" fill="url(#bear-body-gradient)" />
 
                     {/* Ears */}
-                    <circle cx="30" cy="35" r="10" fill="#ECEFF1" />
-                    <circle cx="90" cy="35" r="10" fill="#ECEFF1" />
+                    <circle cx="30" cy="35" r="10" fill="url(#bear-body-gradient)" />
+                    <circle cx="90" cy="35" r="10" fill="url(#bear-body-gradient)" />
                     <circle cx="32" cy="37" r="5" fill="#FFCDD2" />
                     <circle cx="88" cy="37" r="5" fill="#FFCDD2" />
                 </motion.g>
@@ -106,7 +120,7 @@ const Bear = ({ state }: { state: BearState }) => {
                         </motion.g>
                     )}
                 </AnimatePresence>
-            </svg>
+            </motion.svg>
         </motion.div>
     );
 };
@@ -211,3 +225,5 @@ export function AnimatedLogin() {
     </div>
   );
 }
+
+    
