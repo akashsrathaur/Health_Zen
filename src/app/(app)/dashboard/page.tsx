@@ -11,7 +11,7 @@ import {
   CardFooter
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { dailyVibes as initialDailyVibes, userData, challenges, type Challenge, type DailyVibe } from '@/lib/data';
+import { initialDailyVibes, userData, challenges, type Challenge, type DailyVibe } from '@/lib/data';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle, Edit, Minus, Plus } from 'lucide-react';
