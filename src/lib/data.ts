@@ -68,7 +68,7 @@ export const quickActions = [
     icon: HeartPulse,
   },
   {
-    title: 'Dr. Cure',
+    title: 'Symptom Check',
     description: 'AI-powered advice',
     href: '/symptom-check',
     icon: Bot,
@@ -375,3 +375,5 @@ export type DailyVibe = {
     isCustom?: boolean;
     completedAt?: string;
 };
+
+    
