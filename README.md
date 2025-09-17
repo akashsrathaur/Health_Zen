@@ -32,8 +32,15 @@ NEXT_PUBLIC_FIREBASE_APP_ID=
 GEMINI_API_KEY=
 ```
 
-- **Firebase Keys**: You can get these by creating a Firebase project and a Web App within that project.
-- **GEMINI_API_KEY**: You can get this from Google AI Studio.
+### How to Get Your Keys
+
+1.  **Firebase Keys**: You can get these by creating a Firebase project and a Web App within that project. In the Firebase console, go to "Project Settings" > "General", and under "Your apps", you will find the Firebase SDK snippet with your configuration.
+
+2.  **GEMINI_API_KEY**: You can get this for free from Google AI Studio.
+    *   Go to [aistudio.google.com](https://aistudio.google.com/).
+    *   Sign in and click **"Get API key"** in the top left.
+    *   Click **"Create API key in new project"**.
+    *   Copy the generated key.
 
 ## Deploying to Vercel
 
@@ -42,7 +49,7 @@ When you deploy your application to a hosting provider like Vercel, you must add
 1.  **Go to your Vercel Project**: Open your project in the Vercel dashboard.
 2.  **Navigate to Settings**: Click on the "Settings" tab.
 3.  **Go to Environment Variables**: In the left-hand menu, click on "Environment Variables".
-4.  **Add Your Keys**: For each variable in your `.env` file (e.g., `NEXT_PUBLIC_FIREBASE_API_KEY`), add it to Vercel.
+4.  **Add Your Keys**: For each variable in your `.env` file (e.g., `NEXT_PUBLIC_FIREBASE_API_KEY`, `GEMINI_API_KEY`), add it to Vercel.
     -   Copy the name (like `NEXT_PUBLIC_FIREBASE_API_KEY`).
     -   Copy the corresponding value.
     -   Click "Save".
