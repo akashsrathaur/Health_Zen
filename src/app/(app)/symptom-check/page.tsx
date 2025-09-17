@@ -108,7 +108,7 @@ export default function SymptomCheckPage() {
     if (!state.data) return;
 
     const shareText = `
-Dr. Cure Symptom Check Results:
+Symptom Check Results:
 Symptoms: ${state.form.symptoms}
 
 Homeopathy Advice:
@@ -126,7 +126,7 @@ Disclaimer: This advice is for informational purposes only.
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Dr. Cure - Wellness Advice',
+          title: 'HealthZen - Wellness Advice',
           text: shareText,
           url: window.location.href,
         });
@@ -159,7 +159,7 @@ Disclaimer: This advice is for informational purposes only.
       <div className="text-center mb-8">
         <Bot className="mx-auto h-12 w-12 text-primary" />
         <h1 className="mt-4 font-headline text-3xl font-bold tracking-tight">
-          Dr. Cure
+          Symptom Check
         </h1>
         <p className="mt-2 text-muted-foreground">
           Describe your symptoms to receive Homeopathy and Ayurvedic advice.

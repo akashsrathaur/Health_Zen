@@ -17,12 +17,14 @@ import {
   BarChart,
   Settings,
   Target,
+  Leaf,
 } from 'lucide-react';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/health-snap', label: 'HealthSnap', icon: HeartPulse },
-  { href: '/symptom-check', label: 'Dr. Cure', icon: Bot },
+  { href: '/symptom-check', label: 'Symptom Check', icon: Bot },
+  { href: '/remedies', label: 'Remedies', icon: Leaf },
   { href: '/community', label: 'Community', icon: Users },
   { href: '/progress-tracker', label: 'Tracker', icon: BarChart },
   { href: '/challenges', label: 'Challenges', icon: Target },
