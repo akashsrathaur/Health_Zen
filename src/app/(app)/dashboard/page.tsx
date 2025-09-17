@@ -144,6 +144,8 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
         if (currentVibe) onDelete(currentVibe.id);
     }
 
+    const isStreakVibe = currentVibe.id === 'streak';
+
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
@@ -204,7 +206,9 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
                     )}
                 </div>
                 <DialogFooter className='justify-between'>
-                    <Button variant="destructive" onClick={handleDelete} className="mr-auto"><Trash2 /> Delete</Button>
+                    { !isStreakVibe ? (
+                        <Button variant="destructive" onClick={handleDelete} className="mr-auto"><Trash2 /> Delete</Button>
+                    ) : <div /> }
                     <div className='flex gap-2'>
                         <Button variant="outline" onClick={onClose}>Cancel</Button>
                         <Button onClick={handleSaveChanges}>Save Changes</Button>
