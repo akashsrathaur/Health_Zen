@@ -37,11 +37,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // we create a temporary local user object to prevent the app from crashing.
           if (e.message.includes('Could not retrieve user profile')) {
              console.warn(
-              'WARNING: Failed to fetch user profile from Firestore. This is likely due to missing IAM permissions in your Google Cloud project. The app will use a temporary local profile. PLEASE FOLLOW THE INSTRUCTIONS IN README.md TO FIX THIS.'
+              'CRITICAL ERROR: Failed to fetch user profile from Firestore. This is due to missing IAM permissions in your Google Cloud project. The app is running in a limited, guest mode. PLEASE FOLLOW THE INSTRUCTIONS IN README.md TO FIX THIS.'
             );
             setUser({
               uid: fbUser.uid,
-              name: 'New User',
+              name: 'Guest User',
               age: 0,
               gender: 'Prefer not to say',
               avatarUrl: `https://picsum.photos/seed/${fbUser.uid}/100/100`,
@@ -75,5 +75,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-    
