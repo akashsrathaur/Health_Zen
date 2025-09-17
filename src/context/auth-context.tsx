@@ -49,11 +49,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (loading) return;
 
-    const isPublicRoute = publicRoutes.includes(pathname);
+    const isPublicRoute = publicRoutes.some(path => pathname.startsWith(path));
 
     if (firebaseUser && isPublicRoute) {
+        // Logged-in user tries to access login/signup, redirect to dashboard
         router.replace('/dashboard');
     } else if (!firebaseUser && !isPublicRoute) {
+        // Logged-out user tries to access a protected route, redirect to login
         router.replace('/login');
     }
 
