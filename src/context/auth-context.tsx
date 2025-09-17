@@ -51,12 +51,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const isPublicRoute = publicRoutes.includes(pathname);
 
-    if (!firebaseUser && !isPublicRoute) {
-      // If user is not logged in and not on a public route, redirect to login
-      router.replace('/login');
-    } else if (firebaseUser && isPublicRoute) {
-      // If user is logged in and on a public route, redirect to dashboard
-      router.replace('/dashboard');
+    if (firebaseUser && isPublicRoute) {
+        router.replace('/dashboard');
+    } else if (!firebaseUser && !isPublicRoute) {
+        router.replace('/login');
     }
 
   }, [loading, firebaseUser, pathname, router]);
