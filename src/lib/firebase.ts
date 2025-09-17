@@ -16,22 +16,36 @@ let app: FirebaseApp;
 let auth: Auth;
 let db: Firestore;
 
-// Check if all required environment variables are present
 const firebaseConfigValues = Object.values(firebaseConfig);
 const hasAllConfig = firebaseConfigValues.every(value => !!value);
 
 if (hasAllConfig) {
-  // Initialize Firebase
-  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  auth = getAuth(app);
-  db = getFirestore(app);
+  if (!getApps().length) {
+    try {
+      app = initializeApp(firebaseConfig);
+    } catch (e) {
+      console.error("Failed to initialize Firebase", e);
+      // Provide dummy objects to prevent app from crashing
+      app = {} as FirebaseApp;
+    }
+  } else {
+    app = getApp();
+  }
+
+  try {
+    auth = getAuth(app);
+    db = getFirestore(app);
+  } catch(e) {
+    console.error("Failed to get Firebase services", e);
+    auth = {} as Auth;
+    db = {} as Firestore;
+  }
 } else {
-  console.warn("Firebase configuration is incomplete. Firebase services will be disabled. Please check your environment variables.");
-  // Provide dummy objects to prevent app from crashing
+  console.warn("Firebase configuration is incomplete. Firebase services will be disabled.");
+  // Provide dummy objects to prevent app from crashing if config is missing
   app = {} as FirebaseApp;
   auth = {} as Auth;
   db = {} as Firestore;
 }
-
 
 export { app, auth, db };
