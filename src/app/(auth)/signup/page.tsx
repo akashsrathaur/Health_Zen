@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -46,6 +47,20 @@ export default function SignupPage() {
                 </div>
             </div>
             <div className="grid gap-2 text-left">
+                <Label htmlFor="phone">Phone</Label>
+                <div className="relative">
+                    <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input id="phone" type="tel" placeholder="123-456-7890" required className="pl-10" />
+                </div>
+            </div>
+            <div className="grid gap-2 text-left">
+                <Label htmlFor="email">E-mail (Optional)</Label>
+                <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input id="email" type="email" placeholder="akash.r@example.com" className="pl-10" />
+                </div>
+            </div>
+            <div className="grid gap-2 text-left">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
                     <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -61,17 +76,18 @@ export default function SignupPage() {
                 </div>
             </div>
             <div className="grid gap-2 text-left">
-                <Label htmlFor="email">E-mail</Label>
+                <Label htmlFor="confirm-password">Confirm Password</Label>
                 <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="email" type="email" placeholder="akash.r@example.com" required className="pl-10" />
-                </div>
-            </div>
-            <div className="grid gap-2 text-left">
-                <Label htmlFor="phone">Phone</Label>
-                <div className="relative">
-                    <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="phone" type="tel" placeholder="123-456-7890" required className="pl-10" />
+                    <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input 
+                        id="confirm-password" 
+                        type="password" 
+                        placeholder="••••••••" 
+                        required 
+                        className="pl-10" 
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
                 </div>
             </div>
 
