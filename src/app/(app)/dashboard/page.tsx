@@ -96,6 +96,10 @@ function ChallengeCard({ challenge, onMarkAsDone }: { challenge: Challenge, onMa
 function EditVibesDialog({ isOpen, onClose, dailyVibes, onSave }: { isOpen: boolean, onClose: () => void, dailyVibes: DailyVibe[], onSave: (vibes: DailyVibe[]) => void}) {
     const [vibes, setVibes] = useState(dailyVibes);
 
+    useEffect(() => {
+        setVibes(dailyVibes);
+    }, [dailyVibes, isOpen])
+
     const handleWaterChange = (amount: number) => {
         setVibes(prevVibes => prevVibes.map(vibe => {
             if (vibe.id === 'water') {
@@ -233,11 +237,11 @@ function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, o
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-[625px]">
+            <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Upload Proof</DialogTitle>
                 </DialogHeader>
-                <div className="relative aspect-video w-full bg-black rounded-md overflow-hidden flex items-center justify-center">
+                <div className="relative aspect-[9/16] w-full bg-black rounded-md overflow-hidden flex items-center justify-center">
                     {hasCameraPermission === null && <p className='text-white'>Requesting camera...</p>}
                     {hasCameraPermission === false && (
                         <Alert variant="destructive" className="m-4">
@@ -283,6 +287,18 @@ export default function DashboardPage() {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [activeChallengeId, setActiveChallengeId] = useState<string | null>(null);
   const { toast } = useToast();
+
+  const handleWaterChange = (amount: number) => {
+      setDailyVibes(prevVibes => prevVibes.map(vibe => {
+          if (vibe.id === 'water') {
+              const [current, goalWithUnit] = vibe.value.split('/');
+              const goal = parseInt(goalWithUnit.match(/\d+/)?.[0] || '1');
+              const newValue = Math.max(0, parseInt(current) + amount);
+              return { ...vibe, value: `${newValue}/${goalWithUnit}`, progress: (newValue / goal) * 100 };
+          }
+          return vibe;
+      }));
+  }
 
   const handleSaveVibes = (updatedVibes: DailyVibe[]) => {
     setDailyVibes(updatedVibes);
@@ -346,13 +362,21 @@ export default function DashboardPage() {
                 >
                     {dailyVibes.map((vibe) => (
                       <motion.div key={vibe.title} variants={itemVariants}>
-                        <Card className="flex items-center p-4 transition-all duration-200 hover:bg-secondary/10">
-                            <vibe.icon className="mr-4 h-8 w-8 text-primary" />
-                            <div className="flex-1">
-                            <p className="font-medium">{vibe.title}</p>
-                            <p className="text-sm text-muted-foreground">{vibe.value}</p>
+                        <Card className="p-4 transition-all duration-200 hover:bg-secondary/10">
+                            <div className='flex items-center'>
+                                <vibe.icon className="mr-4 h-8 w-8 text-primary" />
+                                <div className="flex-1">
+                                    <p className="font-medium">{vibe.title}</p>
+                                    <p className="text-sm text-muted-foreground">{vibe.value}</p>
+                                </div>
+                                {vibe.id === 'water' && (
+                                    <div className="flex items-center gap-2">
+                                        <Button size="icon" variant="ghost" className='h-8 w-8 rounded-full' onClick={() => handleWaterChange(-1)}><Minus className='h-4 w-4'/></Button>
+                                        <Button size="icon" variant="ghost" className='h-8 w-8 rounded-full' onClick={() => handleWaterChange(1)}><Plus className='h-4 w-4'/></Button>
+                                    </div>
+                                )}
                             </div>
-                            {vibe.progress !== undefined && <Progress value={vibe.progress} className="w-20" />}
+                            {vibe.progress !== undefined && <Progress value={vibe.progress} className="w-full mt-3" />}
                         </Card>
                       </motion.div>
                     ))}
@@ -394,5 +418,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    

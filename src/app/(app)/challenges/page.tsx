@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription }
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { challenges as initialChallenges, userData, type Challenge } from '@/lib/data';
-import { Upload, Camera, RefreshCcw, CheckCircle, Video, XCircle, PlusCircle, Share2, Copy } from 'lucide-react';
+import { Upload, Camera, RefreshCcw, CheckCircle, Video, XCircle, PlusCircle, Share2, Copy, Target } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -140,11 +140,11 @@ function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, o
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-[625px]">
+            <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Upload Proof</DialogTitle>
                 </DialogHeader>
-                <div className="relative aspect-video w-full bg-black rounded-md overflow-hidden flex items-center justify-center">
+                 <div className="relative aspect-[9/16] w-full bg-black rounded-md overflow-hidden flex items-center justify-center">
                     {hasCameraPermission === null && <p className='text-white'>Requesting camera...</p>}
                     {hasCameraPermission === false && (
                         <Alert variant="destructive" className="m-4">
@@ -380,5 +380,3 @@ export default function ChallengesPage() {
     </div>
   );
 }
-
-    

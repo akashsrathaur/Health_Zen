@@ -19,6 +19,7 @@ import { nanoid } from 'nanoid';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { cn } from '@/lib/utils';
 
 type CommunityPost = (typeof initialCommunityPosts)[0];
 
@@ -193,12 +194,12 @@ function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, o
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-[625px]">
+            <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Take a Photo</DialogTitle>
                 </DialogHeader>
-                <div className="relative aspect-video w-full bg-black rounded-md overflow-hidden flex items-center justify-center">
-                    {hasCameraPermission === null && <p>Requesting camera...</p>}
+                <div className="relative aspect-[9/16] w-full bg-black rounded-md overflow-hidden flex items-center justify-center">
+                    {hasCameraPermission === null && <p className='text-white'>Requesting camera...</p>}
                     {hasCameraPermission === false && (
                         <Alert variant="destructive" className="m-4">
                             <AlertTitle>Camera Access Required</AlertTitle>
@@ -211,7 +212,7 @@ function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, o
                     {capturedImage ? (
                         <Image src={capturedImage} alt="Captured photo" layout="fill" objectFit="contain" />
                     ) : (
-                        <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline muted />
+                         <video ref={videoRef} className={cn("w-full h-full object-cover", hasCameraPermission === false && 'hidden')} autoPlay playsInline muted />
                     )}
                     <canvas ref={canvasRef} className="hidden" />
                 </div>
@@ -227,7 +228,7 @@ function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, o
                         </div>
                     ) : (
                         <Button className="w-full" onClick={handleCapture} disabled={!hasCameraPermission}>
-                            <Video className="mr-2 h-4 w-4" /> Capture
+                            <Camera className="mr-2 h-4 w-4" /> Capture
                         </Button>
                     )}
                 </DialogFooter>
@@ -278,5 +279,3 @@ export default function CommunityPage() {
     </div>
   );
 }
-
-    
