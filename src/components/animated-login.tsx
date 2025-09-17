@@ -93,7 +93,7 @@ const Robot = ({ state }: { state: RobotState }) => {
 export function AnimatedLogin() {
   const router = useRouter();
   const [robotState, setRobotState] = useState<RobotState>('idle');
-  const [email, setEmail] = useState('amani@gmail.com');
+  const [email, setEmail] = useState('akash.r@example.com');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
@@ -153,7 +153,7 @@ export function AnimatedLogin() {
                         <Input 
                             id="email" 
                             type="email" 
-                            placeholder="amani@gmail.com" 
+                            placeholder="akash.r@example.com" 
                             required 
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -166,7 +166,7 @@ export function AnimatedLogin() {
                         <Input 
                             id="password" 
                             type="password" 
-                            placeholder="•••••• (Hint: password)" 
+                            placeholder="••••••••" 
                             required
                             value={password}
                             onChange={handlePasswordChange}

@@ -166,7 +166,7 @@ export const communityPosts = [
   {
     id: 'post-1',
     user: {
-      name: 'Akash Singh Rathaur',
+      name: 'Akash Rathaur',
       avatarUrl: 'https://picsum.photos/seed/avatar2/100/100',
     },
     timestamp: '2h ago',

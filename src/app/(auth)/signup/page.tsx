@@ -42,7 +42,7 @@ export default function SignupPage() {
                 <Label htmlFor="username">User Name</Label>
                 <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="username" type="text" placeholder="Choose a username" required className="pl-10" />
+                    <Input id="username" type="text" placeholder="Akash Rathaur" required className="pl-10" />
                 </div>
             </div>
             <div className="grid gap-2 text-left">
@@ -64,7 +64,7 @@ export default function SignupPage() {
                 <Label htmlFor="email">E-mail</Label>
                 <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="email" type="email" placeholder="name@example.com" required className="pl-10" />
+                    <Input id="email" type="email" placeholder="akash.r@example.com" required className="pl-10" />
                 </div>
             </div>
             <div className="grid gap-2 text-left">
