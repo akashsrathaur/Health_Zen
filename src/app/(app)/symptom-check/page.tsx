@@ -1,4 +1,3 @@
-
 'use client';
 import { useActionState } from 'react';
 import { symptomCheckAction } from '@/actions/symptom-check';
