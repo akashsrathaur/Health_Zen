@@ -8,6 +8,7 @@ import { User, KeyRound, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Icons } from '@/components/icons';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Card } from '@/components/ui/card';
 
 export default function LoginPage() {
     const router = useRouter();
