@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Download, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 const waterChartConfig = {
   glasses: {
@@ -42,7 +43,7 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15,
+      staggerChildren: 0.1,
     },
   },
 };
@@ -64,16 +65,25 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
   const iconGlow = achievement.unlocked ? 'drop-shadow-[0_2px_4px_rgba(250,204,21,0.5)]' : '';
 
   return (
-    <Card className={cn(
-      "flex flex-col items-center justify-center p-4 text-center transition-all duration-300 h-full",
-      achievement.unlocked
-        ? 'bg-gradient-to-br from-secondary to-background/50 border-secondary'
-        : 'opacity-60 grayscale'
-    )}>
-      <achievement.icon className={cn("h-8 w-8 mb-2", iconColor, iconGlow)} />
-      <p className="text-sm font-semibold">{achievement.name}</p>
-      {!achievement.unlocked && <p className="text-xs text-muted-foreground">Locked</p>}
-    </Card>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+            <Card className={cn(
+              "flex flex-col items-center justify-center p-4 text-center transition-all duration-300 h-full cursor-pointer",
+              achievement.unlocked
+                ? 'bg-gradient-to-br from-secondary to-background/50 border-primary/20'
+                : 'opacity-60 grayscale hover:opacity-80 hover:grayscale-0'
+            )}>
+              <achievement.icon className={cn("h-8 w-8 mb-2 transition-all duration-300", iconColor, iconGlow)} />
+              <p className="text-sm font-semibold">{achievement.name}</p>
+              {!achievement.unlocked && <p className="text-xs text-muted-foreground">Locked</p>}
+            </Card>
+        </TooltipTrigger>
+        <TooltipContent>
+            <p className='max-w-xs'>{achievement.description}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }
 
@@ -157,7 +167,7 @@ export default function ProgressTrackerPage() {
         </CardHeader>
         <CardContent>
           <motion.div 
-            className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5"
+            className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5"
             variants={containerVariants}
             initial="hidden"
             animate="visible"

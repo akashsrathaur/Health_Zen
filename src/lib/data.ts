@@ -21,6 +21,18 @@ import {
   Salad,
   GlassWater,
   Sunrise,
+  Sprout,
+  HeartHandshake,
+  BrainCircuit,
+  Bookmark,
+  UserPlus,
+  ThumbsUp,
+  Award,
+  Trophy,
+  Medal,
+  Star,
+  Map,
+  ShieldPlus,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -265,26 +277,32 @@ export const progressData = {
   },
 };
 
-export const achievements = [
-  { id: 'streak-1', name: '1-Day Streak', icon: Flame, unlocked: true },
-  { id: 'streak-3', name: '3-Day Streak', icon: Flame, unlocked: true },
-  { id: 'streak-7', name: '7-Day Streak', icon: Flame, unlocked: true },
-  { id: 'streak-15', name: '15-Day Streak', icon: Flame, unlocked: false },
-  { id: 'streak-30', name: '30-Day Streak', icon: Flame, unlocked: false },
-  { id: 'streak-75', name: '75-Day Streak', icon: Flame, unlocked: false },
-  { id: 'streak-100', name: '100-Day Streak', icon: Flame, unlocked: false },
-  { id: 'streak-150', name: '150-Day Streak', icon: Flame, unlocked: false },
-  { id: 'streak-225', name: '225-Day Streak', icon: Flame, unlocked: false },
-  { id: 'streak-365', name: '365-Day Streak', icon: Flame, unlocked: false },
-  { id: 'first-snap', name: 'First Snap', icon: HeartPulse, unlocked: true },
-  { id: 'remedy-master', name: 'Remedy Master', icon: Leaf, unlocked: true },
-  { id: 'community-star', name: 'Community Star', icon: Users, unlocked: true },
-  { id: 'hydration-hero', name: 'Hydration Hero', icon: Droplets, unlocked: true },
-  { id: 'sleep-champ', name: 'Sleep Champion', icon: Bed, unlocked: false },
-  { id: 'mindful-moment', name: 'Mindful Moment', icon: Brain, unlocked: false },
-  { id: 'immunity-boost', name: 'Immunity Boost', icon: ShieldCheck, unlocked: false },
-  { id: 'happy-gut', name: 'Happy Gut', icon: Smile, unlocked: false },
-  { id: 'energy-surge', name: 'Energy Surge', icon: Zap, unlocked: false },
+export const achievements: Achievement[] = [
+  { id: 'streak-1', name: '1-Day Streak', icon: Star, unlocked: true, description: "Complete your daily tasks for 1 day in a row." },
+  { id: 'streak-3', name: '3-Day Streak', icon: Medal, unlocked: true, description: "Keep the momentum going for 3 consecutive days." },
+  { id: 'streak-7', name: '7-Day Streak', icon: Award, unlocked: true, description: "You've made it a full week! That's commitment." },
+  { id: 'streak-15', name: '15-Day Streak', icon: Flame, unlocked: false, description: "You're on fire! Half a month of consistency." },
+  { id: 'streak-30', name: '30-Day Streak', icon: Trophy, unlocked: false, description: "A full month of healthy habits. Incredible!" },
+  { id: 'streak-75', name: '75-Day Hard', icon: ShieldCheck, unlocked: false, description: "You have the discipline of a warrior. Keep pushing." },
+  { id: 'streak-100', name: '100-Day Club', icon: Zap, unlocked: false, description: "Triple digits! You are a true wellness champion." },
+  { id: 'streak-150', name: '150-Day Milestone', icon: Flame, unlocked: false, description: "150 days of dedication. You are an inspiration." },
+  { id: 'streak-225', name: '225-Day Legend', icon: Flame, unlocked: false, description: "Your consistency is legendary. Keep shining." },
+  { id: 'streak-365', name: '365-Day Master', icon: Trophy, unlocked: false, description: "A full year of wellness! You've mastered the art of self-care." },
+  { id: 'first-snap', name: 'First Snap', icon: HeartPulse, unlocked: true, description: "Use the HealthSnap feature for the first time." },
+  { id: 'remedy-master', name: 'Remedy Master', icon: Leaf, unlocked: true, description: "Explore and save 5 remedies from the library." },
+  { id: 'community-star', name: 'Community Star', icon: Users, unlocked: true, description: "Make your first post in the community feed." },
+  { id: 'hydration-hero', name: 'Hydration Hero', icon: Droplets, unlocked: true, description: "Log your water intake for 3 consecutive days." },
+  { id: 'sleep-champ', name: 'Sleep Champion', icon: Bed, unlocked: false, description: "Achieve your sleep goal for 7 consecutive nights." },
+  { id: 'ayurveda-apprentice', name: 'Ayurveda Apprentice', icon: BookOpen, unlocked: false, description: 'Log 5 different Ayurvedic remedies within a month.' },
+  { id: 'wellness-voyager', name: 'Wellness Voyager', icon: Map, unlocked: false, description: 'Complete 3 "Symptom Check" journeys successfully.' },
+  { id: 'green-thumb', name: 'Green Thumb', icon: Sprout, unlocked: false, description: 'Identify 10 different plants or herbs using "HealthSnap".' },
+  { id: 'social-healer', name: 'Social Healer', icon: HeartHandshake, unlocked: false, description: 'Get 25 emoji reactions on your shared posts.' },
+  { id: 'mindful-master', name: 'Mindful Master', icon: BrainCircuit, unlocked: false, description: 'Log 7 consecutive days of a "Mindful Moment".' },
+  { id: 'workout-warrior', name: 'Workout Warrior', icon: Dumbbell, unlocked: false, description: 'Log 10 gym sessions or workouts within a 15-day period.' },
+  { id: 'homeopathy-herald', name: 'Homeopathy Herald', icon: ShieldPlus, unlocked: false, description: 'Follow a homeopathic remedy for 3 days.' },
+  { id: 'recipe-explorer', name: 'Recipe Explorer', icon: Bookmark, unlocked: false, description: 'Save 5 different healthy recipes or remedies.' },
+  { id: 'connect-conquer', name: 'Connect & Conquer', icon: UserPlus, unlocked: false, description: 'Add 5 new friends and view 10 of their stories.' },
+  { id: 'feedback-fanatic', name: 'Feedback Fanatic', icon: ThumbsUp, unlocked: false, description: 'Provide feedback or upvote 15 community posts.' },
 ];
 
 export const challenges: Challenge[] = [
@@ -335,7 +353,13 @@ export const challenges: Challenge[] = [
 ];
 
 
-export type Achievement = (typeof achievements)[0];
+export type Achievement = {
+  id: string;
+  name: string;
+  icon: LucideIcon;
+  unlocked: boolean;
+  description: string;
+};
 export type Remedy = (typeof remedies)[0];
 export type Challenge = {
   id: string;
