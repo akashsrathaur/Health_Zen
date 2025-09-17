@@ -14,7 +14,7 @@ import { Progress } from '@/components/ui/progress';
 import { initialDailyVibes, userData, challenges as initialChallenges, type Challenge, type DailyVibe, allVibeIcons } from '@/lib/data';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, CheckCircle, Edit, Minus, Plus, Camera, RefreshCcw, XCircle, Pill, PlusCircle, Trash2 } from 'lucide-react';
+import { ArrowRight, CheckCircle, Edit, Minus, Plus, Camera, RefreshCcw, XCircle, Pill, PlusCircle, Trash2, Clock } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -120,7 +120,7 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
         setCurrentVibe(prev => {
              if (!prev || prev.id !== 'sleep') return prev;
              const goal = 8;
-             return { ...prev, value: `${hours}h`, progress: (hours / goal) * 100 }
+             return { ...prev, value: `${hours.toFixed(1)}h`, progress: (hours / goal) * 100 }
         })
     }
     
@@ -397,6 +397,14 @@ function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, o
     );
 }
 
+const formatTime = (ms: number) => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+};
+
 export default function DashboardPage() {
   const [challenges, setChallenges] = useState<Challenge[]>(initialChallenges);
   const [dailyVibes, setDailyVibes] = useState<DailyVibe[]>(initialDailyVibes);
@@ -406,9 +414,50 @@ export default function DashboardPage() {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [activeChallengeId, setActiveChallengeId] = useState<string | null>(null);
   const [activeVibeId, setActiveVibeId] = useState<string | null>(null);
+  const [isSleepLoggingActive, setIsSleepLoggingActive] = useState(false);
+  const [timeToUnlock, setTimeToUnlock] = useState(0);
+
   const { toast } = useToast();
 
+   useEffect(() => {
+        const checkSleepTime = () => {
+            const now = new Date();
+            const currentHour = now.getHours();
+            
+            const startHour = 5;
+            const endHour = 7;
+
+            if (currentHour >= startHour && currentHour < endHour) {
+                setIsSleepLoggingActive(true);
+                setTimeToUnlock(0);
+            } else {
+                setIsSleepLoggingActive(false);
+                let unlockTime = new Date();
+                unlockTime.setHours(startHour, 0, 0, 0);
+
+                if (currentHour >= endHour) {
+                    unlockTime.setDate(unlockTime.getDate() + 1);
+                }
+                
+                setTimeToUnlock(unlockTime.getTime() - now.getTime());
+            }
+        };
+
+        checkSleepTime();
+        const interval = setInterval(checkSleepTime, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
+
   const handleEditVibe = (vibe: DailyVibe) => {
+    if (vibe.id === 'sleep' && !isSleepLoggingActive) {
+      toast({
+        title: "Sleep Logging Locked",
+        description: "You can only log your sleep between 5 AM and 7 AM.",
+        variant: "destructive"
+      });
+      return;
+    }
     setVibeToEdit(vibe);
     setIsEditVibeOpen(true);
   }
@@ -528,14 +577,28 @@ export default function DashboardPage() {
                     {dailyVibes.map((vibe) => {
                       const Icon = typeof vibe.icon === 'string' ? allVibeIcons[vibe.icon as keyof typeof allVibeIcons] : vibe.icon;
                       const isTask = !nonSnapVibeIds.includes(vibe.id);
+                      const isSleepCard = vibe.id === 'sleep';
+
                       return (
                         <motion.div key={vibe.id} variants={itemVariants}>
-                          <Card className="p-4 transition-all duration-200 hover:bg-secondary/10">
-                              <div className='flex items-center' onClick={() => handleEditVibe(vibe)}>
+                          <Card 
+                            className={cn("p-4 transition-all duration-200", 
+                                (isSleepCard && !isSleepLoggingActive) ? 'cursor-not-allowed bg-muted/50' : 'hover:bg-secondary/10 cursor-pointer'
+                            )}
+                            onClick={() => handleEditVibe(vibe)}
+                          >
+                              <div className='flex items-center'>
                                   <Icon className="mr-4 h-8 w-8 text-primary" />
                                   <div className="flex-1">
                                       <p className="font-medium">{vibe.title}</p>
-                                      <p className="text-sm text-muted-foreground">{vibe.value}</p>
+                                      {isSleepCard && !isSleepLoggingActive ? (
+                                        <div className='flex items-center gap-2 text-xs text-muted-foreground'>
+                                          <Clock className="h-3 w-3" />
+                                          <span>Unlocks in {formatTime(timeToUnlock)}</span>
+                                        </div>
+                                      ) : (
+                                        <p className="text-sm text-muted-foreground">{vibe.value}</p>
+                                      )}
                                   </div>
                                   {isTask && (
                                     <Button 
