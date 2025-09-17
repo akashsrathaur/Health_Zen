@@ -3,10 +3,12 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
-import { getUserFromFirestore } from '@/actions/user';
+import { auth, db } from '@/lib/firebase';
+import { getUserFromFirestore, createUserInFirestore } from '@/actions/user';
 import type { User } from '@/lib/user-store';
 import { defaultUser } from '@/lib/user-store';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { initialChallenges, initialDailyVibes } from '@/lib/data';
 
 interface AuthContextType {
   user: User | null;
@@ -20,8 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
 });
 
-// A simple retry function
-const retry = <T,>(fn: () => Promise<T>, retries = 3, delay = 500): Promise<T> => {
+const retry = <T,>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> => {
   return new Promise((resolve, reject) => {
     const attempt = (n: number) => {
       fn()
@@ -30,7 +31,8 @@ const retry = <T,>(fn: () => Promise<T>, retries = 3, delay = 500): Promise<T> =
           if (n === 1) {
             reject(err);
           } else {
-            setTimeout(() => attempt(n - 1), delay);
+            console.log(`Retrying... attempts left: ${n - 1}`);
+            setTimeout(() => attempt(n - 1), delay * (Math.pow(2, retries - n)));
           }
         });
     };
@@ -50,14 +52,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (userProfile) {
           setUser(userProfile);
+          // Check if user has userData, if not, create it.
+          const userDataRef = doc(db, 'userData', uid);
+          const userDataSnap = await getDoc(userDataRef);
+          if (!userDataSnap.exists()) {
+              await setDoc(userDataRef, {
+                  dailyVibes: initialDailyVibes,
+                  challenges: initialChallenges,
+                  posts: []
+              });
+          }
+
         } else {
-          // If profile doesn't exist, create a temporary one to avoid showing "Wellness Seeker"
-          // This can happen if there's a delay in Firestore document creation after signup
+          // This case might happen if Firestore is slow to create the user document after signup.
+          console.warn(`User profile for ${uid} not found, using default. This can happen on first login.`);
           setUser({ ...defaultUser, uid: uid, name: 'New User' });
         }
       } catch (error) {
         console.error("Failed to fetch user profile from Firestore on client after retries:", error);
-        // In case of error, set a default object to keep the app functional
         setUser({ ...defaultUser, uid: uid, name: 'Guest' });
       } finally {
         setLoading(false);

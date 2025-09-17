@@ -17,6 +17,9 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { nanoid } from 'nanoid';
+import { useData } from '@/context/data-context';
+import { addChallenge as addChallengeAction, updateChallenge as updateChallengeAction } from '@/actions/challenges';
+import { useAuth } from '@/context/auth-context';
 
 
 function ChallengeCard({ challenge, onUploadProof, onShare }: { challenge: Challenge, onUploadProof: (challengeId: string) => void, onShare: (challenge: Challenge) => void }) {
@@ -204,6 +207,9 @@ function CreateChallengeDialog({ isOpen, onClose, onChallengeCreate }: { isOpen:
             isCustom: true,
         };
         onChallengeCreate(newChallenge);
+        setTitle('');
+        setDescription('');
+        setGoalDays(30);
     }
     
     return (
@@ -239,11 +245,13 @@ function CreateChallengeDialog({ isOpen, onClose, onChallengeCreate }: { isOpen:
 
 function ShareDialog({ isOpen, onClose, challenge }: { isOpen: boolean, onClose: () => void, challenge: Challenge | null }) {
     const { toast } = useToast();
-    const shareUrl = challenge ? `${window.location.origin}/challenges/join?id=${challenge.id}` : '';
+    const shareUrl = challenge && typeof window !== 'undefined' ? `${window.location.origin}/challenges/join?id=${challenge.id}` : '';
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(shareUrl);
-        toast({ title: "Link Copied!", description: "Challenge link has been copied to your clipboard." });
+        if (shareUrl) {
+            navigator.clipboard.writeText(shareUrl);
+            toast({ title: "Link Copied!", description: "Challenge link has been copied to your clipboard." });
+        }
     }
 
     if (!challenge) return null;
@@ -279,7 +287,8 @@ function ShareDialog({ isOpen, onClose, challenge }: { isOpen: boolean, onClose:
 }
 
 export default function ChallengesPage() {
-  const [challenges, setChallenges] = useState<Challenge[]>(initialChallenges);
+  const { user } = useAuth();
+  const { challenges, setChallenges, loading } = useData();
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
@@ -292,34 +301,49 @@ export default function ChallengesPage() {
     setIsCameraOpen(true);
   };
   
-  const handleImageCaptured = (imageDataUrl: string) => {
-    if (activeChallengeId) {
-      setChallenges(prevChallenges => 
-        prevChallenges.map(c => 
-          c.id === activeChallengeId 
-            ? { ...c, isCompletedToday: true, currentDay: c.currentDay + 1 } 
-            : c
-        )
-      );
-      toast({
-          title: "Streak Continued!",
-          description: `You've completed your goal for today. Great job!`
-      })
+  const handleImageCaptured = async (imageDataUrl: string) => {
+    if (activeChallengeId && user) {
+        const challengeToUpdate = challenges.find(c => c.id === activeChallengeId);
+        if (challengeToUpdate) {
+            const updatedChallenge = { ...challengeToUpdate, isCompletedToday: true, currentDay: challengeToUpdate.currentDay + 1 };
+            
+            // Optimistic update
+            setChallenges(prevChallenges => 
+                prevChallenges.map(c => c.id === activeChallengeId ? updatedChallenge : c)
+            );
+
+            await updateChallengeAction(user.uid, updatedChallenge);
+
+            toast({
+                title: "Streak Continued!",
+                description: `You've completed your goal for today. Great job!`
+            });
+        }
     }
     setIsCameraOpen(false);
     setActiveChallengeId(null);
   };
 
-  const handleChallengeCreate = (newChallenge: Challenge) => {
-    setChallenges(prev => [newChallenge, ...prev]);
-    setIsCreateOpen(false);
-    setChallengeToShare(newChallenge);
-    setIsShareOpen(true);
+  const handleChallengeCreate = async (newChallenge: Challenge) => {
+    if (user) {
+        // Optimistic update
+        setChallenges(prev => [newChallenge, ...prev]);
+        
+        await addChallengeAction(user.uid, newChallenge);
+        
+        setIsCreateOpen(false);
+        setChallengeToShare(newChallenge);
+        setIsShareOpen(true);
+    }
   }
 
   const handleShare = (challenge: Challenge) => {
     setChallengeToShare(challenge);
     setIsShareOpen(true);
+  }
+
+  if (loading) {
+      return <div>Loading challenges...</div>
   }
 
   return (

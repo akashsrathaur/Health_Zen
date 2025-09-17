@@ -6,7 +6,8 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/context/auth-context';
 import { AuthGuard } from '@/components/auth-guard';
-import { NotificationProvider } from '@/hooks/use-notifications';
+import { NotificationProvider } from '@/hooks/use-notifications.tsx';
+import { DataProvider } from '@/context/data-context';
 
 export const metadata: Metadata = {
   title: 'HealthZen',
@@ -38,10 +39,12 @@ export default function RootLayout({
             <BalancerProvider>
               <NotificationProvider>
                 <AuthProvider>
-                  <AuthGuard>
-                    {children}
-                  </AuthGuard>
-                  <Toaster />
+                  <DataProvider>
+                    <AuthGuard>
+                      {children}
+                    </AuthGuard>
+                    <Toaster />
+                  </DataProvider>
                 </AuthProvider>
               </NotificationProvider>
             </BalancerProvider>

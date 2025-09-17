@@ -22,6 +22,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/auth-context';
 import { defaultUser } from '@/lib/user-store';
+import { useData } from '@/context/data-context';
+import { addCommunityPost as addPostAction } from '@/actions/community';
 
 
 function PostCard({ post }: { post: CommunityPost }) {
@@ -239,11 +241,11 @@ function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, o
 }
 
 export default function CommunityPage() {
-  const [posts, setPosts] = useState<CommunityPost[]>(initialCommunityPosts);
   const { user } = useAuth();
+  const { posts, setPosts, loading } = useData();
   const userData = user || { ...defaultUser, uid: '' };
   
-  const handleAddPost = (content: string, imageUrl?: string, imageHint?: string) => {
+  const handleAddPost = async (content: string, imageUrl?: string, imageHint?: string) => {
     if (!user) return;
     const newPost: CommunityPost = {
       id: nanoid(),
@@ -257,8 +259,16 @@ export default function CommunityPage() {
       imageHint: imageHint,
       reactions: {},
     };
+
+    // Optimistic update
     setPosts(prevPosts => [newPost, ...prevPosts]);
+
+    await addPostAction(user.uid, newPost);
   };
+
+  if (loading) {
+      return <div>Loading community posts...</div>
+  }
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -274,7 +284,7 @@ export default function CommunityPage() {
       </div>
 
       <div className="space-y-6">
-        <CreatePost onAddPost={handleAddPost} userData={userData} />
+        {user && <CreatePost onAddPost={handleAddPost} userData={userData} />}
         <Separator />
         {posts.map((post) => (
           <PostCard key={post.id} post={post} />

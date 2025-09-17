@@ -11,11 +11,11 @@ import {
   CardFooter
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { initialDailyVibes, initialChallenges, type Challenge, type DailyVibe, allVibeIcons, getAchievements, type Achievement } from '@/lib/data';
+import { initialDailyVibes, type Challenge, type DailyVibe, allVibeIcons, getAchievements, type Achievement } from '@/lib/data';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle, Edit, Minus, Plus, Camera, RefreshCcw, XCircle, Pill, PlusCircle, Trash2, Clock, Info } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useTransition } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -29,7 +29,10 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { format } from 'date-fns';
 import { useAuth } from '@/context/auth-context';
 import { defaultUser } from '@/lib/user-store';
-import { useNotifications } from '@/hooks/use-notifications';
+import { useNotifications } from '@/hooks/use-notifications.tsx';
+import { useData } from '@/context/data-context';
+import { updateDailyVibes as updateDailyVibesAction } from '@/actions/dashboard';
+import { updateChallenge as updateChallengeAction } from '@/actions/challenges';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -428,18 +431,11 @@ const formatTime = (ms: number) => {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 };
 
-// This is a simplified representation. In a real app, this would be part of a larger state management solution.
-type ProgressState = {
-    streak: number;
-    completedTasks: number;
-    // Add other relevant metrics here
-}
-
 export default function DashboardPage() {
   const { user } = useAuth();
   const userData = user || defaultUser;
-  const [challenges, setChallenges] = useState<Challenge[]>(initialChallenges);
-  const [dailyVibes, setDailyVibes] = useState<DailyVibe[]>(initialDailyVibes);
+  const { challenges, setChallenges, dailyVibes, setDailyVibes, loading, userProgress, setUserProgress } = useData();
+
   const [isAddVibeOpen, setIsAddVibeOpen] = useState(false);
   const [isEditVibeOpen, setIsEditVibeOpen] = useState(false);
   const [vibeToEdit, setVibeToEdit] = useState<DailyVibe | null>(null);
@@ -449,13 +445,15 @@ export default function DashboardPage() {
   const [isSleepLoggingActive, setIsSleepLoggingActive] = useState(false);
   const [timeToUnlockSleep, setTimeToUnlockSleep] = useState(0);
   const [timeToUnlockWater, setTimeToUnlockWater] = useState(0);
-  const [userProgress, setUserProgress] = useState<ProgressState>({ streak: 0, completedTasks: 0 });
+  
+  const [isPending, startTransition] = useTransition();
 
   const { toast } = useToast();
   const { addNotification } = useNotifications();
 
   // Achievement Check Logic
-  const checkAchievements = (newProgress: ProgressState) => {
+  const checkAchievements = (newProgress: { streak: number, completedTasks: number }) => {
+    if (!userProgress) return;
     const oldAchievements = getAchievements(userProgress);
     const newAchievements = getAchievements(newProgress);
 
@@ -526,7 +524,7 @@ export default function DashboardPage() {
         } else {
             setTimeToUnlockWater(0);
         }
-    }, [dailyVibes]);
+    }, [dailyVibes, setDailyVibes]);
 
 
   const handleEditVibe = (vibe: DailyVibe) => {
@@ -543,31 +541,49 @@ export default function DashboardPage() {
   }
 
   const handleSaveVibe = (updatedVibe: DailyVibe) => {
-    setDailyVibes(prev => prev.map(v => v.id === updatedVibe.id ? updatedVibe : v));
-    setIsEditVibeOpen(false);
-    setVibeToEdit(null);
-    toast({
-        title: "Daily Vibe Updated",
-        description: "Your changes have been saved."
-    })
+    startTransition(async () => {
+        if (!user) return;
+        const updatedVibes = dailyVibes.map(v => v.id === updatedVibe.id ? updatedVibe : v);
+        setDailyVibes(updatedVibes); // Optimistic update
+        await updateDailyVibesAction(user.uid, updatedVibes);
+        
+        setIsEditVibeOpen(false);
+        setVibeToEdit(null);
+        toast({
+            title: "Daily Vibe Updated",
+            description: "Your changes have been saved."
+        });
+    });
   }
 
   const handleDeleteVibe = (vibeId: string) => {
-    setDailyVibes(prev => prev.filter(v => v.id !== vibeId));
-    setIsEditVibeOpen(false);
-    setVibeToEdit(null);
-    toast({
-        title: "Daily Vibe Removed",
-        variant: "destructive"
-    })
+    startTransition(async () => {
+        if (!user) return;
+        const updatedVibes = dailyVibes.filter(v => v.id !== vibeId);
+        setDailyVibes(updatedVibes); // Optimistic update
+        await updateDailyVibesAction(user.uid, updatedVibes);
+        
+        setIsEditVibeOpen(false);
+        setVibeToEdit(null);
+        toast({
+            title: "Daily Vibe Removed",
+            variant: "destructive"
+        });
+    });
   }
 
   const handleAddVibe = (newVibe: DailyVibe) => {
-    setDailyVibes(prev => [...prev, newVibe]);
-    toast({
-        title: "New Vibe Added!",
-        description: `'${newVibe.title}' has been added to your daily tasks.`
-    })
+    startTransition(async () => {
+        if (!user) return;
+        const updatedVibes = [...dailyVibes, newVibe];
+        setDailyVibes(updatedVibes); // Optimistic update
+        await updateDailyVibesAction(user.uid, updatedVibes);
+
+        toast({
+            title: "New Vibe Added!",
+            description: `'${newVibe.title}' has been added to your daily tasks.`
+        });
+    });
   }
 
   const handleMarkChallengeAsDone = (challengeId: string) => {
@@ -586,10 +602,10 @@ export default function DashboardPage() {
       setActiveChallengeId(null);
       setIsCameraOpen(true);
     } else if (vibe && vibe.id === 'medication') {
-        // Handle medication without camera
-        const isCompleted = vibe.progress === 100;
-        setDailyVibes(prevVibes =>
-            prevVibes.map(v =>
+        startTransition(async () => {
+            if (!user || !userProgress) return;
+            const isCompleted = vibe.progress === 100;
+            const updatedVibes = dailyVibes.map(v =>
                 v.id === vibeId
                 ? { ...v, 
                     progress: isCompleted ? 0 : 100,
@@ -597,64 +613,73 @@ export default function DashboardPage() {
                     completedAt: isCompleted ? undefined : new Date().toISOString()
                   }
                 : v
-            )
-        );
-        toast({
-            title: isCompleted ? 'Medication reset' : 'Medication taken!',
-            description: isCompleted ? `Marked as pending.` : `You've logged your medication for this dose.`
+            );
+            setDailyVibes(updatedVibes);
+            await updateDailyVibesAction(user.uid, updatedVibes);
+
+            toast({
+                title: isCompleted ? 'Medication reset' : 'Medication taken!',
+                description: isCompleted ? `Marked as pending.` : `You've logged your medication for this dose.`
+            });
+            if(!isCompleted) {
+              checkAchievements({ ...userProgress, completedTasks: userProgress.completedTasks + 1 });
+            }
         });
-        if(!isCompleted) {
-          checkAchievements({ ...userProgress, completedTasks: userProgress.completedTasks + 1 });
-        }
     }
   };
 
   const handleImageCaptured = (imageDataUrl: string) => {
-    let completedSomething = false;
-    if (activeChallengeId) {
-      const challenge = challenges.find(c => c.id === activeChallengeId);
-      if (challenge) {
-        completedSomething = true;
-        setChallenges(prevChallenges => 
-          prevChallenges.map(c => 
-            c.id === activeChallengeId 
-              ? { ...c, isCompletedToday: true, currentDay: c.currentDay + 1 } 
-              : c
-          )
-        );
-        toast({
-          title: "Streak Continued!",
-          description: `You've completed '${challenge.title}' for today. Keep it up!`
-        });
-      }
-    } else if (activeVibeId) {
-        const vibe = dailyVibes.find(v => v.id === activeVibeId);
-        if (vibe) {
+    startTransition(async () => {
+        if (!user || !userProgress) return;
+        let completedSomething = false;
+
+        if (activeChallengeId) {
+          const challenge = challenges.find(c => c.id === activeChallengeId);
+          if (challenge) {
             completedSomething = true;
-            setDailyVibes(prevVibes =>
-                prevVibes.map(v =>
+            const updatedChallenge = { ...challenge, isCompletedToday: true, currentDay: challenge.currentDay + 1 };
+            setChallenges(prev => prev.map(c => c.id === activeChallengeId ? updatedChallenge : c));
+            await updateChallengeAction(user.uid, updatedChallenge);
+            
+            toast({
+              title: "Streak Continued!",
+              description: `You've completed '${challenge.title}' for today. Keep it up!`
+            });
+          }
+        } else if (activeVibeId) {
+            const vibe = dailyVibes.find(v => v.id === activeVibeId);
+            if (vibe) {
+                completedSomething = true;
+                const updatedVibes = dailyVibes.map(v =>
                     v.id === activeVibeId
                     ? { ...v, completedAt: new Date().toISOString() }
                     : v
-                )
-            );
-            toast({
-                title: 'Task Completed!',
-                description: `You've successfully completed '${vibe.title}'.`
-            });
+                );
+                setDailyVibes(updatedVibes);
+                await updateDailyVibesAction(user.uid, updatedVibes);
+
+                toast({
+                    title: 'Task Completed!',
+                    description: `You've successfully completed '${vibe.title}'.`
+                });
+            }
         }
-    }
 
-    if (completedSomething) {
-      checkAchievements({ ...userProgress, completedTasks: userProgress.completedTasks + 1 });
-    }
+        if (completedSomething) {
+          checkAchievements({ ...userProgress, completedTasks: userProgress.completedTasks + 1 });
+        }
 
-    setIsCameraOpen(false);
-    setActiveChallengeId(null);
-    setActiveVibeId(null);
+        setIsCameraOpen(false);
+        setActiveChallengeId(null);
+        setActiveVibeId(null);
+    });
   };
 
   const nonSnapVibeIds = ['sleep', 'streak'];
+
+  if (loading) {
+      return <div>Loading dashboard...</div>
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -738,7 +763,7 @@ export default function DashboardPage() {
                                             e.stopPropagation();
                                             handleMarkVibeAsDone(vibe.id)
                                         }}
-                                        disabled={(isCompleted && !isMedicationCard) || isWaterLocked}
+                                        disabled={(isCompleted && !isMedicationCard) || isWaterLocked || isPending}
                                         className="ml-2"
                                     >
                                         <CheckCircle className="mr-2 h-4 w-4" />
