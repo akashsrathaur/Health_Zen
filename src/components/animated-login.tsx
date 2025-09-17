@@ -211,5 +211,3 @@ export function AnimatedLogin() {
     </div>
   );
 }
-
-    
