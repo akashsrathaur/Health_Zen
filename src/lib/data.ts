@@ -13,6 +13,7 @@ import {
   Zap,
   Dumbbell,
   BookOpen,
+  Target,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -54,6 +55,12 @@ export const quickActions = [
     description: 'Monitor your progress',
     href: '/progress-tracker',
     icon: BarChart,
+  },
+  {
+    title: 'Challenges',
+    description: 'Start a new habit',
+    href: '/challenges',
+    icon: Target,
   },
 ];
 
@@ -230,7 +237,7 @@ export const achievements = [
   { id: 'energy-surge', name: 'Energy Surge', icon: Zap, unlocked: false },
 ];
 
-export const challenges = [
+export const challenges: Challenge[] = [
   {
     id: 'hydration-challenge',
     title: '30-Day Hydration Hero',
@@ -280,4 +287,17 @@ export const challenges = [
 
 export type Achievement = (typeof achievements)[0];
 export type Remedy = (typeof remedies)[0];
-export type Challenge = (typeof challenges)[0];
+export type Challenge = {
+  id: string;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  currentDay: number;
+  goalDays: number;
+  imageUrl: string;
+  imageHint: string;
+  isCompletedToday: boolean;
+  isCustom?: boolean;
+};
+
+    

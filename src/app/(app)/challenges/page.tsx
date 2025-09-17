@@ -7,15 +7,19 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription }
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { challenges as initialChallenges, userData, type Challenge } from '@/lib/data';
-import { Upload, Camera, RefreshCcw, CheckCircle, Video, XCircle } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Upload, Camera, RefreshCcw, CheckCircle, Video, XCircle, PlusCircle, Share2, Copy } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { nanoid } from 'nanoid';
 
 
-function ChallengeCard({ challenge, onUploadProof }: { challenge: Challenge, onUploadProof: (challengeId: string) => void }) {
+function ChallengeCard({ challenge, onUploadProof, onShare }: { challenge: Challenge, onUploadProof: (challengeId: string) => void, onShare: (challenge: Challenge) => void }) {
   const progress = (challenge.currentDay / challenge.goalDays) * 100;
 
   return (
@@ -46,7 +50,7 @@ function ChallengeCard({ challenge, onUploadProof }: { challenge: Challenge, onU
         </div>
         <Progress value={progress} />
       </CardContent>
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="p-4 pt-0 flex gap-2">
         <Button 
           className="w-full"
           onClick={() => onUploadProof(challenge.id)}
@@ -55,6 +59,11 @@ function ChallengeCard({ challenge, onUploadProof }: { challenge: Challenge, onU
           <Upload className="mr-2 h-4 w-4" />
           {challenge.isCompletedToday ? 'Completed' : 'Upload Proof'}
         </Button>
+        {challenge.isCustom && (
+          <Button variant="outline" size="icon" onClick={() => onShare(challenge)}>
+            <Share2 className="h-4 w-4" />
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );
@@ -174,11 +183,108 @@ function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, o
     );
 }
 
+function CreateChallengeDialog({ isOpen, onClose, onChallengeCreate }: { isOpen: boolean, onClose: () => void, onChallengeCreate: (challenge: Challenge) => void}) {
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [goalDays, setGoalDays] = useState(30);
+
+    const handleCreate = () => {
+        if (!title || !description || !goalDays) return;
+
+        const newChallenge: Challenge = {
+            id: `custom-${nanoid()}`,
+            title,
+            description,
+            icon: Target,
+            currentDay: 0,
+            goalDays: Number(goalDays),
+            imageUrl: `https://picsum.photos/seed/${nanoid()}/800/600`,
+            imageHint: 'custom challenge',
+            isCompletedToday: false,
+            isCustom: true,
+        };
+        onChallengeCreate(newChallenge);
+    }
+    
+    return (
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Create a New Challenge</DialogTitle>
+                    <DialogDescription>
+                        Define your own wellness challenge and invite your friends to join.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className='space-y-4 py-4'>
+                    <div className='space-y-2'>
+                        <Label htmlFor="challenge-title">Title</Label>
+                        <Input id="challenge-title" placeholder="e.g., Daily Morning Yoga" value={title} onChange={(e) => setTitle(e.target.value)} />
+                    </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="challenge-description">Description</Label>
+                        <Textarea id="challenge-description" placeholder="A brief description of your challenge" value={description} onChange={(e) => setDescription(e.target.value)} />
+                    </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="challenge-goal">Goal (in days)</Label>
+                        <Input id="challenge-goal" type="number" value={goalDays} onChange={(e) => setGoalDays(parseInt(e.target.value, 10))} />
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button onClick={handleCreate} disabled={!title || !description || !goalDays}>Create and Share</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+function ShareDialog({ isOpen, onClose, challenge }: { isOpen: boolean, onClose: () => void, challenge: Challenge | null }) {
+    const { toast } = useToast();
+    const shareUrl = challenge ? `${window.location.origin}/challenges/join?id=${challenge.id}` : '';
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(shareUrl);
+        toast({ title: "Link Copied!", description: "Challenge link has been copied to your clipboard." });
+    }
+
+    if (!challenge) return null;
+
+    return (
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Share Challenge</DialogTitle>
+                    <DialogDescription>
+                        Share this link with your friends and family to invite them.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="flex items-center space-x-2 mt-4">
+                    <div className="grid flex-1 gap-2">
+                        <Label htmlFor="link" className="sr-only">
+                        Link
+                        </Label>
+                        <Input
+                        id="link"
+                        defaultValue={shareUrl}
+                        readOnly
+                        />
+                    </div>
+                    <Button type="submit" size="sm" className="px-3" onClick={handleCopy}>
+                        <span className="sr-only">Copy</span>
+                        <Copy className="h-4 w-4" />
+                    </Button>
+                </div>
+            </DialogContent>
+        </Dialog>
+    )
+}
 
 export default function ChallengesPage() {
   const [challenges, setChallenges] = useState<Challenge[]>(initialChallenges);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const [activeChallengeId, setActiveChallengeId] = useState<string | null>(null);
+  const [challengeToShare, setChallengeToShare] = useState<Challenge | null>(null);
   const { toast } = useToast();
 
   const handleOpenUpload = (challengeId: string) => {
@@ -204,18 +310,35 @@ export default function ChallengesPage() {
     setActiveChallengeId(null);
   };
 
+  const handleChallengeCreate = (newChallenge: Challenge) => {
+    setChallenges(prev => [newChallenge, ...prev]);
+    setIsCreateOpen(false);
+    setChallengeToShare(newChallenge);
+    setIsShareOpen(true);
+  }
+
+  const handleShare = (challenge: Challenge) => {
+    setChallengeToShare(challenge);
+    setIsShareOpen(true);
+  }
 
   return (
     <div className="flex flex-col gap-8">
-      <div>
-        <h1 className="font-headline text-3xl font-bold tracking-tight">
-          Wellness Challenges
-        </h1>
-        <p className="text-muted-foreground">
-          <Balancer>
-            Commit to a challenge, track your progress, and build healthy habits.
-          </Balancer>
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 className="font-headline text-3xl font-bold tracking-tight">
+            Wellness Challenges
+            </h1>
+            <p className="text-muted-foreground">
+            <Balancer>
+                Commit to a challenge, track your progress, and build healthy habits.
+            </Balancer>
+            </p>
+        </div>
+        <Button onClick={() => setIsCreateOpen(true)}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Create New Challenge
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -232,6 +355,7 @@ export default function ChallengesPage() {
               <ChallengeCard 
                 challenge={challenge}
                 onUploadProof={handleOpenUpload}
+                onShare={handleShare}
               />
             </motion.div>
           ))}
@@ -243,6 +367,18 @@ export default function ChallengesPage() {
         onClose={() => setIsCameraOpen(false)}
         onImageCaptured={handleImageCaptured}
       />
+      <CreateChallengeDialog
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onChallengeCreate={handleChallengeCreate}
+      />
+       <ShareDialog
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        challenge={challengeToShare}
+      />
     </div>
   );
 }
+
+    
