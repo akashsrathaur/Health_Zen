@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -37,16 +38,7 @@ export default function SignupPage() {
         }
 
         try {
-            // Since Firebase phone auth is complex, we'll use email/password for now.
-            // If email is not provided, we create a dummy one from the phone number.
-            const authEmail = email || `${phone}@example.com`;
-
-            if (!phone) {
-                setError("Phone number is required.");
-                return;
-            }
-
-            const userCredential = await createUserWithEmailAndPassword(auth, authEmail, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const firebaseUser = userCredential.user;
 
             await createUserInFirestore(firebaseUser.uid, {
@@ -64,13 +56,13 @@ export default function SignupPage() {
         } catch (error: any) {
             switch (error.code) {
                 case 'auth/email-already-in-use':
-                    setError('This email or phone number is already associated with an account.');
+                    setError('This email is already associated with an account.');
                     break;
                 case 'auth/weak-password':
                     setError('The password is too weak. It must be at least 6 characters long.');
                     break;
                 case 'auth/invalid-email':
-                    setError('Please enter a valid email address if you choose to provide one.');
+                    setError('Please enter a valid email address.');
                     break;
                 default:
                     setError('An unexpected error occurred. Please try again.');
@@ -117,18 +109,18 @@ export default function SignupPage() {
                     </Select>
                 </div>
             </div>
-            <div className="grid gap-2 text-left">
-                <Label htmlFor="phone">Phone</Label>
-                <div className="relative">
-                    <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="phone" type="tel" placeholder="123-456-7890" required className="pl-10" value={phone} onChange={(e) => setPhone(e.target.value)} />
-                </div>
-            </div>
-            <div className="grid gap-2 text-left">
-                <Label htmlFor="email">E-mail (Optional)</Label>
+             <div className="grid gap-2 text-left">
+                <Label htmlFor="email">E-mail</Label>
                 <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="email" type="email" placeholder="akash.r@example.com" className="pl-10" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <Input id="email" type="email" placeholder="akash.r@example.com" required className="pl-10" value={email} onChange={(e) => setEmail(e.target.value)} />
+                </div>
+            </div>
+             <div className="grid gap-2 text-left">
+                <Label htmlFor="phone">Phone (Optional)</Label>
+                <div className="relative">
+                    <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input id="phone" type="tel" placeholder="123-456-7890" className="pl-10" value={phone} onChange={(e) => setPhone(e.target.value)} />
                 </div>
             </div>
             <div className="grid gap-2 text-left">

@@ -95,7 +95,7 @@ const Robot = ({ state }: { state: RobotState }) => {
 export function AnimatedLogin() {
   const router = useRouter();
   const [robotState, setRobotState] = useState<RobotState>('idle');
-  const [emailOrMobile, setEmailOrMobile] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
@@ -111,17 +111,9 @@ export function AnimatedLogin() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
-    // Simple check if it's a phone number
-    const isPhoneNumber = /^\d{10,}$/.test(emailOrMobile);
-    if (isPhoneNumber) {
-        setError("Phone number login is not yet implemented.");
-        setRobotState('wrong');
-        return;
-    }
 
     try {
-        await signInWithEmailAndPassword(auth, emailOrMobile, password);
+        await signInWithEmailAndPassword(auth, email, password);
         setRobotState('correct');
         // The AuthProvider will handle the redirect
     } catch (error: any) {
@@ -165,14 +157,14 @@ export function AnimatedLogin() {
             <CardContent className="p-6">
                 <form onSubmit={handleLogin} className="space-y-4">
                      <div className="grid gap-2">
-                        <Label htmlFor="emailOrMobile">Email or Mobile Number</Label>
+                        <Label htmlFor="email">Email</Label>
                         <Input 
-                            id="emailOrMobile" 
-                            type="text" 
-                            placeholder="Email or 10-digit mobile" 
+                            id="email" 
+                            type="email" 
+                            placeholder="you@example.com" 
                             required 
-                            value={emailOrMobile}
-                            onChange={(e) => setEmailOrMobile(e.target.value)}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             onFocus={handleEmailFocus}
                             onBlur={() => setRobotState(password.length > 0 ? 'peeking' : 'idle')}
                         />
@@ -204,3 +196,5 @@ export function AnimatedLogin() {
     </div>
   );
 }
+
+    

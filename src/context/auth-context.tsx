@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
@@ -34,9 +35,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // This is the crucial fallback.
           // If Firestore is inaccessible due to IAM permissions,
           // we create a temporary local user object to prevent the app from crashing.
-          if (e.message === 'Could not retrieve user profile.') {
+          if (e.message.includes('Could not retrieve user profile')) {
              console.warn(
-              'Failed to fetch user profile, likely due to missing IAM permissions. Using a temporary local profile. See README.md for the fix.'
+              'WARNING: Failed to fetch user profile from Firestore. This is likely due to missing IAM permissions in your Google Cloud project. The app will use a temporary local profile. PLEASE FOLLOW THE INSTRUCTIONS IN README.md TO FIX THIS.'
             );
             setUser({
               uid: fbUser.uid,
@@ -74,3 +75,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+    
