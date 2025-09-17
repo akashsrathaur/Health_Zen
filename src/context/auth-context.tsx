@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
@@ -25,16 +24,10 @@ const publicRoutes = ['/login', '/signup'];
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
-  const [serverLoading, setServerLoading] = useState(true);
-  const [clientLoading, setClientLoading] = useState(true);
-  const [clientSide, setClientSide] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const router = useRouter();
   const pathname = usePathname();
-  
-  useEffect(() => {
-      setClientSide(true);
-  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
@@ -60,30 +53,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         setUser(null);
       }
-      setServerLoading(false);
-      setClientLoading(false);
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    if (serverLoading) return;
+    if (loading) return;
 
     const isPublicRoute = publicRoutes.some((path) => pathname.startsWith(path));
 
-    if (firebaseUser && isPublicRoute) {
-      router.replace('/dashboard');
-    } else if (!firebaseUser && !isPublicRoute) {
+    if (!firebaseUser && !isPublicRoute) {
       router.replace('/login');
+    } else if (firebaseUser && isPublicRoute) {
+      router.replace('/dashboard');
     }
-  }, [serverLoading, firebaseUser, pathname, router]);
+  }, [loading, firebaseUser, pathname, router]);
 
-  useEffect(() => {
-    setClientLoading(serverLoading || (!user && !!firebaseUser));
-  },[serverLoading, user, firebaseUser])
-
-  if (!clientSide || clientLoading) {
+  if (loading) {
       return (
         <div className="h-screen w-full flex items-center justify-center bg-background">
             <div className="flex flex-col items-center gap-4">
@@ -96,7 +84,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 
   return (
-    <AuthContext.Provider value={{ user, firebaseUser, loading: serverLoading }}>
+    <AuthContext.Provider value={{ user, firebaseUser, loading }}>
       {children}
     </AuthContext.Provider>
   );
