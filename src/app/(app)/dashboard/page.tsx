@@ -14,12 +14,15 @@ import { Progress } from '@/components/ui/progress';
 import { initialDailyVibes, userData, challenges as initialChallenges, type Challenge, type DailyVibe } from '@/lib/data';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, CheckCircle, Edit, Minus, Plus, Upload } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowRight, CheckCircle, Edit, Minus, Plus, Camera, RefreshCcw, XCircle } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import Image from 'next/image';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -160,10 +163,125 @@ function EditVibesDialog({ isOpen, onClose, dailyVibes, onSave }: { isOpen: bool
 
 }
 
+function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, onClose: () => void, onImageCaptured: (imageDataUrl: string) => void}) {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+    const [capturedImage, setCapturedImage] = useState<string | null>(null);
+    const { toast } = useToast();
+
+    useEffect(() => {
+        let stream: MediaStream | null = null;
+        
+        const getCameraPermission = async () => {
+            if (!isOpen) return;
+
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+                setHasCameraPermission(true);
+
+                if (videoRef.current) {
+                    videoRef.current.srcObject = stream;
+                }
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+                setHasCameraPermission(false);
+                toast({
+                    variant: 'destructive',
+                    title: 'Camera Access Denied',
+                    description: 'Please enable camera permissions in your browser settings.',
+                });
+            }
+        };
+
+        getCameraPermission();
+
+        return () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+             if (videoRef.current) {
+                videoRef.current.srcObject = null;
+            }
+            setCapturedImage(null);
+        }
+    }, [isOpen, toast]);
+
+    const handleCapture = () => {
+        if (videoRef.current && canvasRef.current) {
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            if (context) {
+                context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+                setCapturedImage(canvas.toDataURL('image/jpeg'));
+            }
+        }
+    }
+
+    const handleRetake = () => {
+        setCapturedImage(null);
+    }
+    
+    const handleUsePhoto = () => {
+        if (capturedImage) {
+            onImageCaptured(capturedImage);
+        }
+    }
+
+    return (
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+            <DialogContent className="sm:max-w-[625px]">
+                <DialogHeader>
+                    <DialogTitle>Upload Proof</DialogTitle>
+                </DialogHeader>
+                <div className="relative aspect-video w-full bg-black rounded-md overflow-hidden flex items-center justify-center">
+                    {hasCameraPermission === null && <p className='text-white'>Requesting camera...</p>}
+                    {hasCameraPermission === false && (
+                        <Alert variant="destructive" className="m-4">
+                            <AlertTitle>Camera Access Required</AlertTitle>
+                            <AlertDescription>
+                                Please allow camera access in your browser to use this feature.
+                            </AlertDescription>
+                        </Alert>
+                    )}
+
+                    {capturedImage ? (
+                        <Image src={capturedImage} alt="Captured photo" layout="fill" objectFit="contain" />
+                    ) : (
+                        <video ref={videoRef} className={cn("w-full h-full object-cover", hasCameraPermission === false && 'hidden')} autoPlay playsInline muted />
+                    )}
+                    <canvas ref={canvasRef} className="hidden" />
+                </div>
+                <DialogFooter>
+                    {capturedImage ? (
+                        <div className="w-full flex justify-between">
+                            <Button variant="outline" onClick={handleRetake}>
+                                <RefreshCcw className="mr-2 h-4 w-4" /> Retake
+                            </Button>
+                            <Button onClick={handleUsePhoto}>
+                                <CheckCircle className="mr-2 h-4 w-4" /> Continue Streak
+                            </Button>
+                        </div>
+                    ) : (
+                        <Button className="w-full" onClick={handleCapture} disabled={!hasCameraPermission}>
+                            <Camera className="mr-2 h-4 w-4" /> Capture Photo
+                        </Button>
+                    )}
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
 export default function DashboardPage() {
   const [challenges, setChallenges] = useState<Challenge[]>(initialChallenges);
   const [dailyVibes, setDailyVibes] = useState<DailyVibe[]>(initialDailyVibes);
   const [isEditVibesOpen, setIsEditVibesOpen] = useState(false);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [activeChallengeId, setActiveChallengeId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleSaveVibes = (updatedVibes: DailyVibe[]) => {
@@ -172,20 +290,32 @@ export default function DashboardPage() {
   }
 
   const handleMarkAsDone = (challengeId: string) => {
-    setChallenges(prevChallenges => 
-      prevChallenges.map(c => 
-        c.id === challengeId && !c.isCompletedToday
-          ? { ...c, isCompletedToday: true, currentDay: c.currentDay + 1 } 
-          : c
-      )
-    );
     const challenge = challenges.find(c => c.id === challengeId);
     if (challenge && !challenge.isCompletedToday) {
-      toast({
-        title: "Streak Continued!",
-        description: `You've completed '${challenge.title}' for today. Keep it up!`
-      });
+      setActiveChallengeId(challengeId);
+      setIsCameraOpen(true);
     }
+  };
+
+  const handleImageCaptured = (imageDataUrl: string) => {
+    if (activeChallengeId) {
+      const challenge = challenges.find(c => c.id === activeChallengeId);
+      if (challenge) {
+        setChallenges(prevChallenges => 
+          prevChallenges.map(c => 
+            c.id === activeChallengeId 
+              ? { ...c, isCompletedToday: true, currentDay: c.currentDay + 1 } 
+              : c
+          )
+        );
+        toast({
+          title: "Streak Continued!",
+          description: `You've completed '${challenge.title}' for today. Keep it up!`
+        });
+      }
+    }
+    setIsCameraOpen(false);
+    setActiveChallengeId(null);
   };
 
   return (
@@ -256,6 +386,13 @@ export default function DashboardPage() {
         dailyVibes={dailyVibes}
         onSave={handleSaveVibes}
       />
+      <CameraDialog
+        isOpen={isCameraOpen}
+        onClose={() => setIsCameraOpen(false)}
+        onImageCaptured={handleImageCaptured}
+      />
     </div>
   );
 }
+
+    
