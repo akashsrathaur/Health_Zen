@@ -17,6 +17,7 @@ import {
   Users,
   BarChart,
   Settings,
+  Target,
 } from 'lucide-react';
 
 const navItems = [
@@ -26,6 +27,7 @@ const navItems = [
   { href: '/remedies', label: 'Remedies', icon: Leaf },
   { href: '/community', label: 'Community', icon: Users },
   { href: '/progress-tracker', label: 'Tracker', icon: BarChart },
+  { href: '/challenges', label: 'Challenges', icon: Target },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 

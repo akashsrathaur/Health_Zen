@@ -11,6 +11,8 @@ import {
   Brain,
   Smile,
   Zap,
+  Dumbbell,
+  BookOpen,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -228,5 +230,54 @@ export const achievements = [
   { id: 'energy-surge', name: 'Energy Surge', icon: Zap, unlocked: false },
 ];
 
+export const challenges = [
+  {
+    id: 'hydration-challenge',
+    title: '30-Day Hydration Hero',
+    description: 'Drink 8 glasses of water every day for 30 days.',
+    icon: Droplets,
+    currentDay: 12,
+    goalDays: 30,
+    imageUrl: 'https://picsum.photos/seed/challenge1/800/600',
+    imageHint: 'water bottle',
+    isCompletedToday: true,
+  },
+  {
+    id: 'gym-challenge',
+    title: 'Gym Rat Streak',
+    description: 'Hit the gym every day. No excuses!',
+    icon: Dumbbell,
+    currentDay: 5,
+    goalDays: 30,
+    imageUrl: 'https://picsum.photos/seed/challenge2/800/600',
+    imageHint: 'person gym',
+    isCompletedToday: false,
+  },
+  {
+    id: 'reading-challenge',
+    title: 'Bookworm Challenge',
+    description: 'Read 30 minutes every day.',
+    icon: BookOpen,
+    currentDay: 25,
+    goalDays: 30,
+    imageUrl: 'https://picsum.photos/seed/challenge3/800/600',
+    imageHint: 'person reading',
+    isCompletedToday: true,
+  },
+   {
+    id: 'meditation-challenge',
+    title: 'Mindful Mornings',
+    description: 'Start your day with 10 minutes of meditation.',
+    icon: Brain,
+    currentDay: 7,
+    goalDays: 14,
+    imageUrl: 'https://picsum.photos/seed/challenge4/800/600',
+    imageHint: 'meditation sunrise',
+    isCompletedToday: false,
+  },
+];
+
+
 export type Achievement = (typeof achievements)[0];
 export type Remedy = (typeof remedies)[0];
+export type Challenge = (typeof challenges)[0];
