@@ -177,11 +177,11 @@ export default function SymptomCheckPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Leaf className="text-green-500" /> Suggested Remedies
+                <Leaf className="text-green-500" /> Remedies
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <AdvicePoints text={state.data.suggestedRemedies} />
+              <AdvicePoints text={state.data.remedies} />
             </CardContent>
           </Card>
 

@@ -20,7 +20,7 @@ export type SymptomCheckInput = z.infer<typeof SymptomCheckInputSchema>;
 const SymptomCheckOutputSchema = z.object({
   homeopathyAdvice: z.string().describe('Homeopathy advice for the symptoms in bullet points.'),
   ayurvedicAdvice: z.string().describe('Ayurvedic advice for the symptoms in bullet points.'),
-  suggestedRemedies: z.string().describe('Suggested remedies for the symptoms in bullet points.'),
+  remedies: z.string().describe('Suggested remedies for the symptoms in bullet points.'),
 });
 export type SymptomCheckOutput = z.infer<typeof SymptomCheckOutputSchema>;
 
@@ -46,7 +46,7 @@ Your JSON response (use bullet points for advice, using \\n for new lines):
 {
     "homeopathyAdvice": "- Advice point 1\\n- Advice point 2",
     "ayurvedicAdvice": "- Advice point 1\\n- Advice point 2",
-    "suggestedRemedies": "- Remedy suggestion 1\\n- Remedy suggestion 2"
+    "remedies": "- Remedy suggestion 1\\n- Remedy suggestion 2"
 }
 `,
 });
