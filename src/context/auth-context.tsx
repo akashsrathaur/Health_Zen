@@ -27,9 +27,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [serverLoading, setServerLoading] = useState(true);
   const [clientLoading, setClientLoading] = useState(true);
+  const [clientSide, setClientSide] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
+  
+  useEffect(() => {
+      setClientSide(true);
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
@@ -56,7 +61,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(null);
       }
       setServerLoading(false);
-      setClientLoading(false); 
+      setClientLoading(false);
     });
 
     return () => unsubscribe();
@@ -78,7 +83,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setClientLoading(serverLoading || (!user && !!firebaseUser));
   },[serverLoading, user, firebaseUser])
 
-  if (clientLoading) {
+  if (!clientSide || clientLoading) {
       return (
         <div className="h-screen w-full flex items-center justify-center bg-background">
             <div className="flex flex-col items-center gap-4">
