@@ -36,6 +36,8 @@ const prompt = ai.definePrompt({
 
 Your entire response must be a valid JSON object and nothing else. Do NOT wrap it in markdown. Do not include any introductory text.
 
+**IMPORTANT: Keep the advice concise. For each category (Homeopathy, Ayurvedic, Remedies), provide a maximum of two bullet points. Each point should be a short, simple sentence.**
+
 If the symptoms sound serious (e.g., chest pain, difficulty breathing, severe bleeding), your first priority is to advise the user to see a doctor or seek emergency medical help immediately in all fields.
 
 Symptoms: {{{symptoms}}}
