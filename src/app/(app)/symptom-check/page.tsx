@@ -11,11 +11,12 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { Bot, Lightbulb, Heart, Loader2, Sparkles, Leaf } from 'lucide-react';
+import { Bot, Lightbulb, Heart, Loader2, Sparkles, Leaf, Share2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useEffect, useRef } from 'react';
 import { Label } from '@/components/ui/label';
 import { useFormStatus } from 'react-dom';
+import { useToast } from '@/hooks/use-toast';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -100,6 +101,45 @@ export default function SymptomCheckPage() {
     form: { symptoms: '' }
   });
   const formRef = useRef<HTMLFormElement>(null);
+  const { toast } = useToast();
+
+  const handleShare = async () => {
+    if (!state.data) return;
+
+    const shareText = `
+Dr. Cure Symptom Check Results:
+Symptoms: ${state.form.symptoms}
+
+Homeopathy Advice:
+${state.data.homeopathyAdvice}
+
+Ayurvedic Advice:
+${state.data.ayurvedicAdvice}
+
+Remedies:
+${state.data.remedies}
+
+Disclaimer: This advice is for informational purposes only.
+    `.trim();
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Dr. Cure - Wellness Advice',
+          text: shareText,
+          url: window.location.href,
+        });
+      } catch (error) {
+        console.error('Error sharing:', error);
+      }
+    } else {
+      navigator.clipboard.writeText(shareText);
+      toast({
+        title: "Copied to Clipboard",
+        description: "The advice has been copied to your clipboard.",
+      });
+    }
+  };
 
   useEffect(() => {
     if(!state.error && state.data){
@@ -185,9 +225,14 @@ export default function SymptomCheckPage() {
             </CardContent>
           </Card>
 
-           <Button variant="outline" className="w-full">
-            Add to My Streak
-          </Button>
+           <div className="flex gap-2">
+            <Button variant="outline" className="w-full">
+                Add to My Streak
+            </Button>
+            <Button variant="outline" className="w-full" onClick={handleShare}>
+                <Share2 className="mr-2 h-4 w-4" /> Share
+            </Button>
+          </div>
         </div>
       )}
     </div>
