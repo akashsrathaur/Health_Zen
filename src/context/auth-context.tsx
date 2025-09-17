@@ -62,27 +62,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                   posts: []
               });
           }
-
+          return true;
         } else {
           // This case might happen if Firestore is slow to create the user document after signup.
           console.warn(`User profile for ${uid} not found, using default. This can happen on first login.`);
           setUser({ ...defaultUser, uid: uid, name: 'New User' });
+          return false;
         }
       } catch (error) {
         console.error("Failed to fetch user profile from Firestore on client after retries:", error);
+        // Set a guest user so the UI doesn't break, but indicate an issue.
         setUser({ ...defaultUser, uid: uid, name: 'Guest' });
-      } finally {
-        setLoading(false);
+        return false;
       }
   }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
-      setFirebaseUser(fbUser);
       if (fbUser) {
         setLoading(true);
+        setFirebaseUser(fbUser);
         await fetchUserData(fbUser.uid);
+        setLoading(false);
       } else {
+        setFirebaseUser(null);
         setUser(null);
         setLoading(false);
       }
