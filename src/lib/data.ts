@@ -64,20 +64,23 @@ export const quickActions = [
   },
 ];
 
-export const dailyVibes = [
+export const initialDailyVibes: DailyVibe[] = [
   {
+    id: 'water',
     title: 'Water Intake',
     value: '4/8 glasses',
     icon: Droplets,
     progress: 50,
   },
   {
+    id: 'sleep',
     title: 'Sleep',
-    value: '7h 30m',
+    value: '7.5h',
     icon: Bed,
     progress: 94,
   },
   {
+    id: 'streak',
     title: 'Streak',
     value: '12 days',
     icon: Flame,
@@ -298,6 +301,14 @@ export type Challenge = {
   imageHint: string;
   isCompletedToday: boolean;
   isCustom?: boolean;
+};
+
+export type DailyVibe = {
+    id: 'water' | 'sleep' | 'streak';
+    title: string;
+    value: string;
+    icon: LucideIcon;
+    progress?: number;
 };
 
     
