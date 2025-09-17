@@ -130,7 +130,8 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
         if (!prev || prev.id !== 'medication') return prev;
         const now = new Date().toISOString();
         const progress = checked ? 100 : 0;
-        return { ...prev, value: checked ? 'Taken' : 'Pending', progress: progress, completedAt: checked ? now : undefined };
+        const value = checked ? 'Taken' : 'Pending'
+        return { ...prev, value, progress, completedAt: checked ? now : undefined };
       });
     }
 
@@ -159,7 +160,7 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
                     <DialogDescription>Update or remove this daily task.</DialogDescription>
                 </DialogHeader>
                 <div className='space-y-6 py-4'>
-                    {isCompleted && (
+                    {isCompleted && currentVibe.id !== 'medication' && (
                          <Alert variant="default" className='border-green-500/50 bg-green-500/10 text-green-700 dark:text-green-300'>
                             <Info className="h-4 w-4 !text-green-600 dark:!text-green-400" />
                             <AlertTitle>Task Completed</AlertTitle>
@@ -191,7 +192,7 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
                             />
                         </div>
                     )}
-                    {currentVibe.id === 'medication' && isEditable && (
+                    {currentVibe.id === 'medication' && (
                       <div className="flex items-center justify-between rounded-lg border p-4">
                         <div className='space-y-0.5'>
                           <Label htmlFor='medication-taken'>Medication</Label>
@@ -221,11 +222,11 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
                 </div>
                 <DialogFooter className='justify-between'>
                     { !isStreakVibe ? (
-                        <Button variant="destructive" onClick={handleDelete} className="mr-auto" disabled={isCompleted}><Trash2 /> Delete</Button>
+                        <Button variant="destructive" onClick={handleDelete} className="mr-auto" disabled={isCompleted && currentVibe.id !== 'medication'}><Trash2 /> Delete</Button>
                     ) : <div /> }
                     <div className='flex gap-2'>
                         <Button variant="outline" onClick={onClose}>Cancel</Button>
-                        <Button onClick={handleSaveChanges} disabled={isCompleted}>Save Changes</Button>
+                        <Button onClick={handleSaveChanges} disabled={isCompleted && currentVibe.id !== 'medication'}>Save Changes</Button>
                     </div>
                 </DialogFooter>
             </DialogContent>
@@ -585,7 +586,7 @@ export default function DashboardPage() {
     setActiveVibeId(null);
   };
 
-  const nonSnapVibeIds = ['sleep', 'streak'];
+  const nonSnapVibeIds = ['sleep', 'streak', 'medication'];
 
   return (
     <div className="flex flex-col gap-8">
@@ -618,11 +619,14 @@ export default function DashboardPage() {
                       const isTask = !nonSnapVibeIds.includes(vibe.id);
                       const isSleepCard = vibe.id === 'sleep';
                       const isWaterCard = vibe.id === 'water';
-                      const isCompleted = !!vibe.completedAt;
+                      const isMedicationCard = vibe.id === 'medication';
+                      const isCompleted = isMedicationCard ? vibe.progress === 100 : !!vibe.completedAt;
                       
                       const isWaterLocked = isWaterCard && timeToUnlockWater > 0;
                       let isVibeDisabled = (isSleepCard && !isSleepLoggingActive) || (isWaterCard && isWaterLocked);
                       if (isWaterCard && isCompleted && !isWaterLocked) isVibeDisabled = false;
+                      if (isMedicationCard) isVibeDisabled = false;
+
 
                       let vibeValue = vibe.value;
                       if (isTask && isCompleted && vibe.completedAt) {
