@@ -266,7 +266,16 @@ export const progressData = {
 };
 
 export const achievements = [
+  { id: 'streak-1', name: '1-Day Streak', icon: Flame, unlocked: true },
+  { id: 'streak-3', name: '3-Day Streak', icon: Flame, unlocked: true },
   { id: 'streak-7', name: '7-Day Streak', icon: Flame, unlocked: true },
+  { id: 'streak-15', name: '15-Day Streak', icon: Flame, unlocked: false },
+  { id: 'streak-30', name: '30-Day Streak', icon: Flame, unlocked: false },
+  { id: 'streak-75', name: '75-Day Streak', icon: Flame, unlocked: false },
+  { id: 'streak-100', name: '100-Day Streak', icon: Flame, unlocked: false },
+  { id: 'streak-150', name: '150-Day Streak', icon: Flame, unlocked: false },
+  { id: 'streak-225', name: '225-Day Streak', icon: Flame, unlocked: false },
+  { id: 'streak-365', name: '365-Day Streak', icon: Flame, unlocked: false },
   { id: 'first-snap', name: 'First Snap', icon: HeartPulse, unlocked: true },
   { id: 'remedy-master', name: 'Remedy Master', icon: Leaf, unlocked: true },
   { id: 'community-star', name: 'Community Star', icon: Users, unlocked: true },
