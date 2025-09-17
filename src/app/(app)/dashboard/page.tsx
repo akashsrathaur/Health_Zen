@@ -111,7 +111,7 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
             const current = prev.value.split('/')[0];
             const goal = prev.value.split('/')[1];
             const newValue = Math.max(0, parseInt(current) + amount);
-            return { ...prev, value: `${newValue}/${goal}`, progress: (newValue / parseInt(goal.match(/\d+/)?.[0] || '1')) * 100 };
+            return { ...prev, value: `${newValue}/${goal.trim()}`, progress: (newValue / parseInt(goal.match(/\d+/)?.[0] || '1')) * 100 };
         });
     }
 
@@ -497,6 +497,8 @@ export default function DashboardPage() {
     setActiveVibeId(null);
   };
 
+  const nonSnapVibeIds = ['sleep', 'streak'];
+
   return (
     <div className="flex flex-col gap-8">
       <div>
@@ -525,7 +527,7 @@ export default function DashboardPage() {
                 >
                     {dailyVibes.map((vibe) => {
                       const Icon = typeof vibe.icon === 'string' ? allVibeIcons[vibe.icon as keyof typeof allVibeIcons] : vibe.icon;
-                      const isTask = vibe.id !== 'streak';
+                      const isTask = !nonSnapVibeIds.includes(vibe.id);
                       return (
                         <motion.div key={vibe.id} variants={itemVariants}>
                           <Card className="p-4 transition-all duration-200 hover:bg-secondary/10">
@@ -600,7 +602,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
-
-    
