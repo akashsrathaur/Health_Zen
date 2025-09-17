@@ -36,14 +36,6 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
-export const userData = {
-  name: 'Akash Rathaur',
-  age: 20,
-  avatarUrl: 'https://picsum.photos/seed/avatar1/100/100',
-  streak: 12,
-  level: 5,
-};
-
 export const allVibeIcons = {
     Activity,
     Footprints,
@@ -132,7 +124,7 @@ export const initialDailyVibes: DailyVibe[] = [
   {
     id: 'streak',
     title: 'Streak',
-    value: '12 days',
+    value: '0 days',
     icon: Flame,
   },
 ];
@@ -227,7 +219,7 @@ export const communityPosts = [
   {
     id: 'post-1',
     user: {
-      name: 'Akash Rathaur',
+      name: 'Community Member',
       avatarUrl: 'https://picsum.photos/seed/avatar2/100/100',
     },
     timestamp: '2h ago',
@@ -239,7 +231,7 @@ export const communityPosts = [
   {
     id: 'post-2',
     user: {
-      name: 'Saumyaa SHree',
+      name: 'Wellness Guru',
       avatarUrl: 'https://picsum.photos/seed/avatar3/100/100',
     },
     timestamp: '5h ago',
@@ -251,7 +243,7 @@ export const communityPosts = [
   {
     id: 'post-3',
     user: {
-      name: 'Jaanvi',
+      name: 'Zen Master',
       avatarUrl: 'https://picsum.photos/seed/avatar4/100/100',
     },
     timestamp: '1d ago',

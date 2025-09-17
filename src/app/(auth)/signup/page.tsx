@@ -5,15 +5,21 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { User, KeyRound, Mail, Smartphone, ArrowLeft } from 'lucide-react';
+import { User, KeyRound, Mail, Smartphone, ArrowLeft, VenetianMask, Calendar } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Icons } from '@/components/icons';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { setUser } from '@/lib/user-store';
+import { nanoid } from 'nanoid';
 
 export default function SignupPage() {
     const router = useRouter();
+    const [fullName, setFullName] = useState('');
+    const [age, setAge] = useState('');
+    const [gender, setGender] = useState<'Male' | 'Female' | 'Other' | 'Prefer not to say' | ''>('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
@@ -28,7 +34,15 @@ export default function SignupPage() {
             return;
         }
 
-        // If validation passes
+        // If validation passes, simulate saving the user and redirect
+        setUser({
+            name: fullName,
+            age: parseInt(age, 10) || 0,
+            gender: gender || 'Prefer not to say',
+            avatarUrl: `https://picsum.photos/seed/${nanoid()}/100/100`, // random avatar
+            streak: 0
+        });
+
         router.push('/dashboard');
     }
 
@@ -40,10 +54,34 @@ export default function SignupPage() {
       <Card className="rounded-t-3xl border-t-4 border-primary bg-card/80 p-8 backdrop-blur-md">
         <form onSubmit={handleSignup} className="animate-pop-in space-y-4" style={{ animationDelay: '0.2s' }}>
             <div className="grid gap-2 text-left">
-                <Label htmlFor="username">User Name</Label>
+                <Label htmlFor="fullname">Full Name</Label>
                 <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="username" type="text" placeholder="Akash Rathaur" required className="pl-10" />
+                    <Input id="fullname" type="text" placeholder="Akash Rathaur" required className="pl-10" value={fullName} onChange={(e) => setFullName(e.target.value)}/>
+                </div>
+            </div>
+             <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2 text-left">
+                    <Label htmlFor="age">Age</Label>
+                    <div className="relative">
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input id="age" type="number" placeholder="20" required className="pl-10" value={age} onChange={(e) => setAge(e.target.value)} />
+                    </div>
+                </div>
+                <div className="grid gap-2 text-left">
+                    <Label htmlFor="gender">Gender</Label>
+                     <Select required onValueChange={(v) => setGender(v as any)} value={gender}>
+                        <SelectTrigger className="pl-10">
+                             <VenetianMask className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Male">Male</SelectItem>
+                            <SelectItem value="Female">Female</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
+                            <SelectItem value="Prefer not to say">Prefer not to say</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
             <div className="grid gap-2 text-left">

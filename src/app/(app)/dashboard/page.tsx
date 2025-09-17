@@ -11,7 +11,8 @@ import {
   CardFooter
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { initialDailyVibes, userData, challenges as initialChallenges, type Challenge, type DailyVibe, allVibeIcons } from '@/lib/data';
+import { initialDailyVibes, challenges as initialChallenges, type Challenge, type DailyVibe, allVibeIcons } from '@/lib/data';
+import { getUser } from '@/lib/user-store';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle, Edit, Minus, Plus, Camera, RefreshCcw, XCircle, Pill, PlusCircle, Trash2, Clock, Info } from 'lucide-react';
@@ -426,6 +427,7 @@ const formatTime = (ms: number) => {
 };
 
 export default function DashboardPage() {
+  const [userData, setUserData] = useState(getUser());
   const [challenges, setChallenges] = useState<Challenge[]>(initialChallenges);
   const [dailyVibes, setDailyVibes] = useState<DailyVibe[]>(initialDailyVibes);
   const [isAddVibeOpen, setIsAddVibeOpen] = useState(false);
@@ -441,6 +443,7 @@ export default function DashboardPage() {
   const { toast } = useToast();
 
    useEffect(() => {
+        setUserData(getUser());
         const sleepCheckInterval = setInterval(() => {
             const now = new Date();
             const currentHour = now.getHours();

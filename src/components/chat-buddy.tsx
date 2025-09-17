@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { chatBuddyAction, type Message } from '@/actions/chat-buddy';
-import { userData } from '@/lib/data';
+import { getUser } from '@/lib/user-store';
 import { nanoid } from 'nanoid';
 import { ScrollArea } from './ui/scroll-area';
 import { Avatar, AvatarFallback } from './ui/avatar';
@@ -56,6 +56,7 @@ export function ChatBuddy() {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [persona, setPersona] = useState<BuddyPersona>(initialPersona);
     const [isMaximized, setIsMaximized] = useState(false);
+    const [userData, setUserData] = useState(getUser());
     
     const formRef = useRef<HTMLFormElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -83,6 +84,7 @@ export function ChatBuddy() {
     };
     
     useEffect(() => {
+        setUserData(getUser());
         scrollToBottom();
     }, [messages, isPending]);
     
@@ -108,7 +110,8 @@ export function ChatBuddy() {
         startTransition(async () => {
             
             formData.set('buddyPersona', JSON.stringify(persona));
-            formData.set('userData', JSON.stringify({ name: userData.name, streak: userData.streak }));
+            const currentUser = getUser();
+            formData.set('userData', JSON.stringify({ name: currentUser.name, streak: currentUser.streak }));
             const chatHistoryForAI = [...messages, newUserMessage]
                 .filter(m => m.role === 'user' || m.role === 'model')
                 .map(m => ({role: m.role, content: m.content}));
@@ -407,7 +410,3 @@ function BuddySettingsDialog({ isOpen, setIsOpen, persona, setPersona }: { isOpe
         </Dialog>
     );
 }
-
-    
-
-    

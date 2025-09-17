@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,15 +12,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { userData } from '@/lib/data';
+import { getUser } from '@/lib/user-store';
 import { Flame, Bell, User, LogOut, Settings } from 'lucide-react';
 import { Badge } from './ui/badge';
 import Link from 'next/link';
 import { ThemeSwitcher } from './theme-switcher';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function UserNav() {
+  const [userData, setUserData] = useState(getUser());
   const [unreadCount, setUnreadCount] = useState(2);
+
+  useEffect(() => {
+    setUserData(getUser());
+  }, []);
 
   const handleNotificationToggle = (open: boolean) => {
     if (open) {
