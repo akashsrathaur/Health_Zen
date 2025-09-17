@@ -33,9 +33,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setFirebaseUser(fbUser);
       if (fbUser) {
-        // User is logged in
-        const userProfile = await getUserFromFirestore(fbUser.uid);
-        setUser(userProfile);
+        try {
+          // User is logged in
+          const userProfile = await getUserFromFirestore(fbUser.uid);
+          setUser(userProfile);
+        } catch (e) {
+            console.error("Failed to fetch user profile, this is expected if IAM permissions are not set. See README.md", e);
+            // In case of error (e.g. permissions not set), we'll set a default user
+            // to prevent the app from crashing.
+            setUser({
+                uid: fbUser.uid,
+                name: 'New User',
+                age: 0,
+                gender: 'Prefer not to say',
+                avatarUrl: '',
+                streak: 0
+            })
+        }
       } else {
         // User is logged out
         setUser(null);
