@@ -30,20 +30,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           const userProfile = await getUserFromFirestore(fbUser.uid);
           setUser(userProfile);
-        } catch (e) {
-          console.error(
-            'Failed to fetch user profile, this is expected if IAM permissions are not set. See README.md',
-            e
-          );
-          // When the profile fetch fails, create a temporary local profile
-          setUser({
-            uid: fbUser.uid,
-            name: 'New User (Read-Only)',
-            age: 0,
-            gender: 'Prefer not to say',
-            avatarUrl: `https://picsum.photos/seed/${fbUser.uid}/100/100`,
-            streak: 0,
-          });
+        } catch (e: any) {
+          // This is the crucial fallback.
+          // If Firestore is inaccessible due to IAM permissions,
+          // we create a temporary local user object to prevent the app from crashing.
+          if (e.message === 'Could not retrieve user profile.') {
+             console.warn(
+              'Failed to fetch user profile, likely due to missing IAM permissions. Using a temporary local profile. See README.md for the fix.'
+            );
+            setUser({
+              uid: fbUser.uid,
+              name: 'New User',
+              age: 0,
+              gender: 'Prefer not to say',
+              avatarUrl: `https://picsum.photos/seed/${fbUser.uid}/100/100`,
+              streak: 0,
+            });
+          } else {
+             console.error("An unexpected error occurred while fetching user profile:", e);
+             setUser(null); // Log out the user on other unexpected errors
+          }
         }
       } else {
         setUser(null);
