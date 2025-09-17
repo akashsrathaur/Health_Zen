@@ -24,11 +24,11 @@ import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
 export function UserNav() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const [unreadCount, setUnreadCount] = useState(2);
   
-  const userData = user || defaultUser;
+  const userData = user || { ...defaultUser, uid: ''};
 
   const handleNotificationToggle = (open: boolean) => {
     if (open) {
@@ -40,6 +40,16 @@ export function UserNav() {
     await signOut(auth);
     router.push('/login');
   };
+
+  if (loading) {
+    return (
+       <div className="flex items-center gap-4">
+        <div className="h-8 w-8 rounded-full bg-muted animate-pulse"></div>
+        <div className="h-8 w-8 rounded-full bg-muted animate-pulse"></div>
+        <div className="h-9 w-9 rounded-full bg-muted animate-pulse"></div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex items-center gap-4">
