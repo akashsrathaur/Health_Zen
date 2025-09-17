@@ -55,8 +55,7 @@ export async function chatBuddyAction(
                 buddyPersona,
                 chatHistory: chatHistoryForAI,
                 userData,
-            }, 
-            process.env.GEMINI_API_KEY
+            }
         );
         
         return { response: result.response };
