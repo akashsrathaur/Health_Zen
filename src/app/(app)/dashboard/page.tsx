@@ -11,10 +11,10 @@ import {
   CardFooter
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { initialDailyVibes, userData, challenges as initialChallenges, type Challenge, type DailyVibe } from '@/lib/data';
+import { initialDailyVibes, userData, challenges as initialChallenges, type Challenge, type DailyVibe, allVibeIcons } from '@/lib/data';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, CheckCircle, Edit, Minus, Plus, Camera, RefreshCcw, XCircle, Pill } from 'lucide-react';
+import { ArrowRight, CheckCircle, Edit, Minus, Plus, Camera, RefreshCcw, XCircle, Pill, PlusCircle, Trash2 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -24,6 +24,8 @@ import { cn } from '@/lib/utils';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import Image from 'next/image';
 import { Switch } from '@/components/ui/switch';
+import { nanoid } from 'nanoid';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -94,81 +96,86 @@ function ChallengeCard({ challenge, onMarkAsDone }: { challenge: Challenge, onMa
   );
 }
 
-function EditVibesDialog({ isOpen, onClose, dailyVibes, onSave }: { isOpen: boolean, onClose: () => void, dailyVibes: DailyVibe[], onSave: (vibes: DailyVibe[]) => void}) {
-    const [vibes, setVibes] = useState(dailyVibes);
+function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: boolean, onClose: () => void, vibe: DailyVibe | null, onSave: (vibe: DailyVibe) => void, onDelete: (vibeId: string) => void}) {
+    const [currentVibe, setCurrentVibe] = useState<DailyVibe | null>(vibe);
 
     useEffect(() => {
-        setVibes(dailyVibes);
-    }, [dailyVibes, isOpen])
+        setCurrentVibe(vibe);
+    }, [vibe, isOpen])
+
+    if (!currentVibe) return null;
 
     const handleWaterChange = (amount: number) => {
-        setVibes(prevVibes => prevVibes.map(vibe => {
-            if (vibe.id === 'water') {
-                const current = vibe.value.split('/')[0];
-                const goal = vibe.value.split('/')[1];
-                const newValue = Math.max(0, parseInt(current) + amount);
-                return { ...vibe, value: `${newValue}/${goal}`, progress: (newValue / parseInt(goal.match(/\d+/)?.[0] || '1')) * 100 };
-            }
-            return vibe;
-        }));
+        setCurrentVibe(prev => {
+            if (!prev || prev.id !== 'water') return prev;
+            const current = prev.value.split('/')[0];
+            const goal = prev.value.split('/')[1];
+            const newValue = Math.max(0, parseInt(current) + amount);
+            return { ...prev, value: `${newValue}/${goal}`, progress: (newValue / parseInt(goal.match(/\d+/)?.[0] || '1')) * 100 };
+        });
     }
 
     const handleSleepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const hours = parseFloat(e.target.value) || 0;
-        setVibes(prevVibes => prevVibes.map(vibe => {
-             if (vibe.id === 'sleep') {
-                const goal = 8; // Assuming 8 hours goal
-                return { ...vibe, value: `${hours}h`, progress: (hours / goal) * 100 }
-            }
-            return vibe;
-        }))
+        setCurrentVibe(prev => {
+             if (!prev || prev.id !== 'sleep') return prev;
+             const goal = 8;
+             return { ...prev, value: `${hours}h`, progress: (hours / goal) * 100 }
+        })
     }
     
     const handleMedicationToggle = (checked: boolean) => {
-      setVibes(prevVibes => prevVibes.map(vibe => {
-        if (vibe.id === 'medication') {
-          return { ...vibe, value: checked ? 'Taken' : 'Pending', progress: checked ? 100 : 0 };
-        }
-        return vibe;
-      }));
+      setCurrentVibe(prev => {
+        if (!prev || prev.id !== 'medication') return prev;
+        return { ...prev, value: checked ? 'Taken' : 'Pending', progress: checked ? 100 : 0 };
+      });
     }
 
-    const waterVibe = vibes.find(v => v.id === 'water');
-    const sleepVibe = vibes.find(v => v.id === 'sleep');
-    const medicationVibe = vibes.find(v => v.id === 'medication');
+    const handleCustomVibeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setCurrentVibe(prev => prev ? { ...prev, [name]: value } as DailyVibe : null);
+    }
+    
+    const handleSaveChanges = () => {
+        if (currentVibe) onSave(currentVibe);
+    }
+
+    const handleDelete = () => {
+        if (currentVibe) onDelete(currentVibe.id);
+    }
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Edit Daily Vibe</DialogTitle>
-                    <DialogDescription>Update your daily stats. Consistency is key!</DialogDescription>
+                    <DialogDescription>Update or remove this daily task.</DialogDescription>
                 </DialogHeader>
                 <div className='space-y-6 py-4'>
-                    {waterVibe && (
+                    {currentVibe.id === 'water' && (
                         <div className="space-y-2">
                             <Label>Water Intake</Label>
                             <div className="flex items-center gap-4">
                                 <Button size="icon" variant="outline" onClick={() => handleWaterChange(-1)}><Minus /></Button>
-                                <span className="text-lg font-bold w-20 text-center">{waterVibe.value}</span>
+                                <span className="text-lg font-bold w-20 text-center">{currentVibe.value}</span>
                                 <Button size="icon" variant="outline" onClick={() => handleWaterChange(1)}><Plus /></Button>
                             </div>
                         </div>
                     )}
-                     {sleepVibe && (
+                    {currentVibe.id === 'sleep' && (
                         <div className="space-y-2">
                             <Label htmlFor="sleep-hours">Sleep Duration (hours)</Label>
                             <Input 
                                 id="sleep-hours" 
                                 type="number" 
                                 step="0.5" 
-                                value={sleepVibe.value ? parseFloat(sleepVibe.value) : 0} 
+                                value={currentVibe.value ? parseFloat(currentVibe.value) : 0} 
                                 onChange={handleSleepChange} 
                                 className="w-40"
                             />
                         </div>
                     )}
-                    {medicationVibe && (
+                    {currentVibe.id === 'medication' && (
                       <div className="flex items-center justify-between rounded-lg border p-4">
                         <div className='space-y-0.5'>
                           <Label htmlFor='medication-taken'>Medication</Label>
@@ -178,19 +185,96 @@ function EditVibesDialog({ isOpen, onClose, dailyVibes, onSave }: { isOpen: bool
                         </div>
                         <Switch
                           id='medication-taken'
-                          checked={medicationVibe.progress === 100}
+                          checked={currentVibe.progress === 100}
                           onCheckedChange={handleMedicationToggle}
                         />
                       </div>
                     )}
+                    {currentVibe.isCustom && (
+                        <>
+                            <div className="space-y-2">
+                                <Label htmlFor="custom-title">Title</Label>
+                                <Input id="custom-title" name="title" value={currentVibe.title} onChange={handleCustomVibeChange} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="custom-value">Value / Target</Label>
+                                <Input id="custom-value" name="value" value={currentVibe.value} onChange={handleCustomVibeChange} />
+                            </div>
+                        </>
+                    )}
                 </div>
-                <DialogFooter>
-                    <Button onClick={() => onSave(vibes)}>Save Changes</Button>
+                <DialogFooter className='justify-between'>
+                    <Button variant="destructive" onClick={handleDelete} className="mr-auto"><Trash2 /> Delete</Button>
+                    <div className='flex gap-2'>
+                        <Button variant="outline" onClick={onClose}>Cancel</Button>
+                        <Button onClick={handleSaveChanges}>Save Changes</Button>
+                    </div>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
     )
+}
 
+function AddVibeDialog({ isOpen, onClose, onAdd }: { isOpen: boolean, onClose: () => void, onAdd: (vibe: DailyVibe) => void }) {
+    const [title, setTitle] = useState('');
+    const [iconName, setIconName] = useState<keyof typeof allVibeIcons>('Activity');
+    
+    const handleAdd = () => {
+        if (!title) return;
+        const newVibe: DailyVibe = {
+            id: nanoid(),
+            title,
+            value: 'Not set',
+            icon: iconName,
+            isCustom: true,
+            progress: 0,
+        };
+        onAdd(newVibe);
+        setTitle('');
+        onClose();
+    }
+    
+    return (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Add Daily Vibe</DialogTitle>
+                    <DialogDescription>Create a new custom task to track daily.</DialogDescription>
+                </DialogHeader>
+                 <div className='space-y-4 py-4'>
+                    <div className="space-y-2">
+                        <Label htmlFor="new-vibe-title">Title</Label>
+                        <Input id="new-vibe-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g., Morning Walk"/>
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="new-vibe-icon">Icon</Label>
+                        <Select value={iconName} onValueChange={(value) => setIconName(value as keyof typeof allVibeIcons)}>
+                            <SelectTrigger id="new-vibe-icon">
+                                <SelectValue placeholder="Select an icon" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {Object.keys(allVibeIcons).map(iconKey => {
+                                    const IconComponent = allVibeIcons[iconKey as keyof typeof allVibeIcons];
+                                    return (
+                                        <SelectItem key={iconKey} value={iconKey}>
+                                            <div className='flex items-center gap-2'>
+                                                <IconComponent />
+                                                <span>{iconKey}</span>
+                                            </div>
+                                        </SelectItem>
+                                    )
+                                })}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                 </div>
+                <DialogFooter>
+                    <Button variant="outline" onClick={onClose}>Cancel</Button>
+                    <Button onClick={handleAdd} disabled={!title}>Add Vibe</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
 }
 
 function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, onClose: () => void, onImageCaptured: (imageDataUrl: string) => void}) {
@@ -309,7 +393,9 @@ function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, o
 export default function DashboardPage() {
   const [challenges, setChallenges] = useState<Challenge[]>(initialChallenges);
   const [dailyVibes, setDailyVibes] = useState<DailyVibe[]>(initialDailyVibes);
-  const [isEditVibesOpen, setIsEditVibesOpen] = useState(false);
+  const [isAddVibeOpen, setIsAddVibeOpen] = useState(false);
+  const [isEditVibeOpen, setIsEditVibeOpen] = useState(false);
+  const [vibeToEdit, setVibeToEdit] = useState<DailyVibe | null>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [activeChallengeId, setActiveChallengeId] = useState<string | null>(null);
   const { toast } = useToast();
@@ -340,12 +426,36 @@ export default function DashboardPage() {
       })
   }
 
-  const handleSaveVibes = (updatedVibes: DailyVibe[]) => {
-    setDailyVibes(updatedVibes);
-    setIsEditVibesOpen(false);
+  const handleEditVibe = (vibe: DailyVibe) => {
+    setVibeToEdit(vibe);
+    setIsEditVibeOpen(true);
+  }
+
+  const handleSaveVibe = (updatedVibe: DailyVibe) => {
+    setDailyVibes(prev => prev.map(v => v.id === updatedVibe.id ? updatedVibe : v));
+    setIsEditVibeOpen(false);
+    setVibeToEdit(null);
     toast({
         title: "Daily Vibe Updated",
-        description: "Your daily progress has been saved successfully."
+        description: "Your changes have been saved."
+    })
+  }
+
+  const handleDeleteVibe = (vibeId: string) => {
+    setDailyVibes(prev => prev.filter(v => v.id !== vibeId));
+    setIsEditVibeOpen(false);
+    setVibeToEdit(null);
+    toast({
+        title: "Daily Vibe Removed",
+        variant: "destructive"
+    })
+  }
+
+  const handleAddVibe = (newVibe: DailyVibe) => {
+    setDailyVibes(prev => [...prev, newVibe]);
+    toast({
+        title: "New Vibe Added!",
+        description: `'${newVibe.title}' has been added to your daily tasks.`
     })
   }
 
@@ -394,8 +504,8 @@ export default function DashboardPage() {
             <section>
                 <div className='flex items-center justify-between mb-4'>
                     <h2 className="text-xl font-semibold">Daily Vibe</h2>
-                    <Button variant="ghost" size="sm" onClick={() => setIsEditVibesOpen(true)}>
-                        <Edit className='mr-2 h-4 w-4' /> Edit
+                    <Button variant="ghost" size="sm" onClick={() => setIsAddVibeOpen(true)}>
+                        <PlusCircle className='mr-2 h-4 w-4' /> Add Vibe
                     </Button>
                 </div>
                 <motion.div 
@@ -404,36 +514,39 @@ export default function DashboardPage() {
                   initial="hidden"
                   animate="visible"
                 >
-                    {dailyVibes.map((vibe) => (
-                      <motion.div key={vibe.id} variants={itemVariants}>
-                        <Card className="p-4 transition-all duration-200 hover:bg-secondary/10">
-                            <div className='flex items-center'>
-                                <vibe.icon className="mr-4 h-8 w-8 text-primary" />
-                                <div className="flex-1">
-                                    <p className="font-medium">{vibe.title}</p>
-                                    <p className="text-sm text-muted-foreground">{vibe.value}</p>
-                                </div>
-                                {vibe.id === 'water' && (
-                                    <div className="flex items-center gap-2">
-                                        <Button size="icon" variant="ghost" className='h-8 w-8 rounded-full' onClick={() => handleWaterChange(-1)}><Minus className='h-4 w-4'/></Button>
-                                        <Button size="icon" variant="ghost" className='h-8 w-8 rounded-full' onClick={() => handleWaterChange(1)}><Plus className='h-4 w-4'/></Button>
-                                    </div>
-                                )}
-                                {vibe.id === 'medication' && (
-                                   <Button 
-                                        size="sm" 
-                                        variant={vibe.progress === 100 ? 'secondary' : 'default'}
-                                        onClick={handleMedicationToggle}
-                                    >
-                                        <CheckCircle className="mr-2 h-4 w-4" />
-                                        {vibe.progress === 100 ? 'Taken' : 'Take Now'}
-                                   </Button>
-                                )}
-                            </div>
-                            {vibe.progress !== undefined && <Progress value={vibe.progress} className="w-full mt-3" />}
-                        </Card>
-                      </motion.div>
-                    ))}
+                    {dailyVibes.map((vibe) => {
+                      const Icon = typeof vibe.icon === 'string' ? allVibeIcons[vibe.icon as keyof typeof allVibeIcons] : vibe.icon;
+                      return (
+                        <motion.div key={vibe.id} variants={itemVariants}>
+                          <Card className="p-4 transition-all duration-200 hover:bg-secondary/10 cursor-pointer" onClick={() => handleEditVibe(vibe)}>
+                              <div className='flex items-center'>
+                                  <Icon className="mr-4 h-8 w-8 text-primary" />
+                                  <div className="flex-1">
+                                      <p className="font-medium">{vibe.title}</p>
+                                      <p className="text-sm text-muted-foreground">{vibe.value}</p>
+                                  </div>
+                                  {vibe.id === 'water' && (
+                                      <div className="flex items-center gap-2">
+                                          <Button size="icon" variant="ghost" className='h-8 w-8 rounded-full' onClick={(e) => {e.stopPropagation(); handleWaterChange(-1)}}><Minus className='h-4 w-4'/></Button>
+                                          <Button size="icon" variant="ghost" className='h-8 w-8 rounded-full' onClick={(e) => {e.stopPropagation(); handleWaterChange(1)}}><Plus className='h-4 w-4'/></Button>
+                                      </div>
+                                  )}
+                                  {vibe.id === 'medication' && (
+                                    <Button 
+                                          size="sm" 
+                                          variant={vibe.progress === 100 ? 'secondary' : 'default'}
+                                          onClick={(e) => {e.stopPropagation(); handleMedicationToggle()}}
+                                      >
+                                          <CheckCircle className="mr-2 h-4 w-4" />
+                                          {vibe.progress === 100 ? 'Taken' : 'Take Now'}
+                                    </Button>
+                                  )}
+                              </div>
+                              {vibe.progress !== undefined && <Progress value={vibe.progress} className="w-full mt-3" />}
+                          </Card>
+                        </motion.div>
+                      )
+                    })}
                 </motion.div>
             </section>
         </div>
@@ -458,11 +571,17 @@ export default function DashboardPage() {
             </section>
         </div>
       </div>
-      <EditVibesDialog 
-        isOpen={isEditVibesOpen}
-        onClose={() => setIsEditVibesOpen(false)}
-        dailyVibes={dailyVibes}
-        onSave={handleSaveVibes}
+      <AddVibeDialog
+        isOpen={isAddVibeOpen}
+        onClose={() => setIsAddVibeOpen(false)}
+        onAdd={handleAddVibe}
+      />
+      <EditVibeDialog 
+        isOpen={isEditVibeOpen}
+        onClose={() => setIsEditVibeOpen(false)}
+        vibe={vibeToEdit}
+        onSave={handleSaveVibe}
+        onDelete={handleDeleteVibe}
       />
       <CameraDialog
         isOpen={isCameraOpen}

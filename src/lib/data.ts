@@ -16,6 +16,11 @@ import {
   BookOpen,
   Target,
   Pill,
+  Activity,
+  Footprints,
+  Salad,
+  GlassWater,
+  Sunrise,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -25,6 +30,30 @@ export const userData = {
   avatarUrl: 'https://picsum.photos/seed/avatar1/100/100',
   streak: 12,
   level: 5,
+};
+
+export const allVibeIcons = {
+    Activity,
+    Footprints,
+    Salad,
+    GlassWater,
+    Sunrise,
+    Flame,
+    Droplets,
+    Bed,
+    HeartPulse,
+    Bot,
+    Leaf,
+    Users,
+    BarChart,
+    ShieldCheck,
+    Brain,
+    Smile,
+    Zap,
+    Dumbbell,
+    BookOpen,
+    Target,
+    Pill
 };
 
 export const quickActions = [
@@ -313,9 +342,10 @@ export type Challenge = {
 };
 
 export type DailyVibe = {
-    id: 'water' | 'sleep' | 'streak' | 'medication';
+    id: string;
     title: string;
     value: string;
-    icon: LucideIcon;
+    icon: LucideIcon | keyof typeof allVibeIcons;
     progress?: number;
+    isCustom?: boolean;
 };
