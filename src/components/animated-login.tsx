@@ -93,7 +93,7 @@ const Robot = ({ state }: { state: RobotState }) => {
 export function AnimatedLogin() {
   const router = useRouter();
   const [robotState, setRobotState] = useState<RobotState>('idle');
-  const [email, setEmail] = useState('akash.r@example.com');
+  const [emailOrMobile, setEmailOrMobile] = useState('akash.r@example.com');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
@@ -149,14 +149,14 @@ export function AnimatedLogin() {
             <CardContent className="p-6">
                 <form onSubmit={handleLogin} className="space-y-4">
                      <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="emailOrMobile">Email or Mobile Number</Label>
                         <Input 
-                            id="email" 
-                            type="email" 
-                            placeholder="akash.r@example.com" 
+                            id="emailOrMobile" 
+                            type="text" 
+                            placeholder="akash.r@example.com or 1234567890" 
                             required 
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={emailOrMobile}
+                            onChange={(e) => setEmailOrMobile(e.target.value)}
                             onFocus={handleEmailFocus}
                             onBlur={() => setRobotState(password.length > 0 ? 'peeking' : 'idle')}
                         />
@@ -166,7 +166,6 @@ export function AnimatedLogin() {
                         <Input 
                             id="password" 
                             type="password" 
-                            placeholder="••••••••" 
                             required
                             value={password}
                             onChange={handlePasswordChange}
