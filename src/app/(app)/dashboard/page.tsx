@@ -544,7 +544,9 @@ export default function DashboardPage() {
     startTransition(async () => {
         if (!user) return;
         const updatedVibes = dailyVibes.map(v => v.id === updatedVibe.id ? updatedVibe : v);
-        setDailyVibes(updatedVibes); // Optimistic update
+        // We only set the state optimistically for UI responsiveness,
+        // but the canonical data will come from the Firestore listener.
+        setDailyVibes(updatedVibes); 
         await updateDailyVibesAction(user.uid, updatedVibes);
         
         setIsEditVibeOpen(false);
@@ -560,7 +562,7 @@ export default function DashboardPage() {
     startTransition(async () => {
         if (!user) return;
         const updatedVibes = dailyVibes.filter(v => v.id !== vibeId);
-        setDailyVibes(updatedVibes); // Optimistic update
+        setDailyVibes(updatedVibes);
         await updateDailyVibesAction(user.uid, updatedVibes);
         
         setIsEditVibeOpen(false);
@@ -576,7 +578,7 @@ export default function DashboardPage() {
     startTransition(async () => {
         if (!user) return;
         const updatedVibes = [...dailyVibes, newVibe];
-        setDailyVibes(updatedVibes); // Optimistic update
+        setDailyVibes(updatedVibes);
         await updateDailyVibesAction(user.uid, updatedVibes);
 
         toast({
@@ -605,15 +607,13 @@ export default function DashboardPage() {
         startTransition(async () => {
             if (!user || !userProgress) return;
             const isCompleted = vibe.progress === 100;
-            const updatedVibes = dailyVibes.map(v =>
-                v.id === vibeId
-                ? { ...v, 
-                    progress: isCompleted ? 0 : 100,
-                    value: isCompleted ? 'Pending' : 'Taken',
-                    completedAt: isCompleted ? undefined : new Date().toISOString()
-                  }
-                : v
-            );
+            const updatedVibe = { ...vibe, 
+                progress: isCompleted ? 0 : 100,
+                value: isCompleted ? 'Pending' : 'Taken',
+                completedAt: isCompleted ? undefined : new Date().toISOString()
+              };
+
+            const updatedVibes = dailyVibes.map(v => v.id === vibeId ? updatedVibe : v);
             setDailyVibes(updatedVibes);
             await updateDailyVibesAction(user.uid, updatedVibes);
 
@@ -622,7 +622,8 @@ export default function DashboardPage() {
                 description: isCompleted ? `Marked as pending.` : `You've logged your medication for this dose.`
             });
             if(!isCompleted) {
-              checkAchievements({ ...userProgress, completedTasks: userProgress.completedTasks + 1 });
+              const newProgress = { ...userProgress, completedTasks: userProgress.completedTasks + 1 };
+              checkAchievements(newProgress);
             }
         });
     }
@@ -650,11 +651,8 @@ export default function DashboardPage() {
             const vibe = dailyVibes.find(v => v.id === activeVibeId);
             if (vibe) {
                 completedSomething = true;
-                const updatedVibes = dailyVibes.map(v =>
-                    v.id === activeVibeId
-                    ? { ...v, completedAt: new Date().toISOString() }
-                    : v
-                );
+                const updatedVibe = { ...vibe, completedAt: new Date().toISOString() };
+                const updatedVibes = dailyVibes.map(v => v.id === activeVibeId ? updatedVibe : v);
                 setDailyVibes(updatedVibes);
                 await updateDailyVibesAction(user.uid, updatedVibes);
 
@@ -666,7 +664,8 @@ export default function DashboardPage() {
         }
 
         if (completedSomething) {
-          checkAchievements({ ...userProgress, completedTasks: userProgress.completedTasks + 1 });
+          const newProgress = { ...userProgress, completedTasks: userProgress.completedTasks + 1 };
+          checkAchievements(newProgress);
         }
 
         setIsCameraOpen(false);

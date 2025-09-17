@@ -28,5 +28,6 @@ export async function addCommunityPost(userId: string, newPost: CommunityPost) {
             posts: arrayUnion(newPost)
         });
     }
+    // Revalidating the path is not strictly necessary with onSnapshot, but it's good practice for server actions.
     revalidatePath('/community');
 }

@@ -24,6 +24,7 @@ import { useAuth } from '@/context/auth-context';
 import { defaultUser } from '@/lib/user-store';
 import { useData } from '@/context/data-context';
 import { addCommunityPost as addPostAction } from '@/actions/community';
+import { formatDistanceToNow } from 'date-fns';
 
 
 function PostCard({ post }: { post: CommunityPost }) {
@@ -36,7 +37,7 @@ function PostCard({ post }: { post: CommunityPost }) {
         </Avatar>
         <div className="grid gap-0.5">
           <p className="font-semibold">{post.user.name}</p>
-          <p className="text-sm text-muted-foreground">{post.timestamp}</p>
+          <p className="text-sm text-muted-foreground">{formatDistanceToNow(new Date(post.timestamp), { addSuffix: true })}</p>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -253,7 +254,7 @@ export default function CommunityPage() {
         name: user.name,
         avatarUrl: user.avatarUrl,
       },
-      timestamp: 'Just now',
+      timestamp: new Date().toISOString(),
       content: content,
       imageUrl: imageUrl,
       imageHint: imageHint,

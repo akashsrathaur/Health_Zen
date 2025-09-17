@@ -5,9 +5,6 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { Challenge, DailyVibe, CommunityPost } from '@/lib/data';
 import { initialChallenges, initialDailyVibes } from '@/lib/data';
 import { useAuth } from './auth-context';
-import { getChallenges } from '@/actions/challenges';
-import { getDailyVibes } from '@/actions/dashboard';
-import { getCommunityPosts } from '@/actions/community';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
@@ -32,19 +29,22 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   const { user, loading: authLoading } = useAuth();
-  const [challenges, setChallenges] = useState<Challenge[]>(initialChallenges);
-  const [dailyVibes, setDailyVibes] = useState<DailyVibe[]>(initialDailyVibes);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [dailyVibes, setDailyVibes] = useState<DailyVibe[]>([]);
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [userProgress, setUserProgress] = useState<ProgressState | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (authLoading) return;
+    if (authLoading) {
+      setLoading(true);
+      return;
+    }
     if (!user) {
         setLoading(false);
         // Reset to initial state when user logs out
-        setChallenges(initialChallenges);
-        setDailyVibes(initialDailyVibes);
+        setChallenges([]);
+        setDailyVibes([]);
         setPosts([]);
         setUserProgress(null);
         return;
@@ -56,20 +56,27 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribe = onSnapshot(userDataRef, (docSnap) => {
         if (docSnap.exists()) {
             const data = docSnap.data();
-            setChallenges(data.challenges || initialChallenges);
-            setDailyVibes(data.dailyVibes || initialDailyVibes);
-            setPosts(data.posts || []);
+            const serverChallenges = data.challenges || [];
+            const serverDailyVibes = data.dailyVibes || [];
+
+            setChallenges(serverChallenges);
+            setDailyVibes(serverDailyVibes);
+            setPosts(data.posts?.sort((a: CommunityPost, b: CommunityPost) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()) || []);
             
-            const completedTasks = (data.dailyVibes || []).filter((v: DailyVibe) => v.completedAt || v.progress === 100).length + 
-                                   (data.challenges || []).filter((c: Challenge) => c.isCompletedToday).length;
+            const completedTasks = serverDailyVibes.filter((v: DailyVibe) => {
+              if (v.id === 'medication') return v.progress === 100;
+              return !!v.completedAt;
+            }).length;
             
+            const completedChallenges = serverChallenges.filter((c: Challenge) => c.isCompletedToday).length;
+
             setUserProgress({
-                streak: user.streak, // Assuming streak is on the main user object
-                completedTasks: completedTasks,
+                streak: user.streak, 
+                completedTasks: completedTasks + completedChallenges,
             });
 
         } else {
-            // Set default data if no userData document exists yet
+            // This case might happen for a brand new user before the doc is created.
             setChallenges(initialChallenges);
             setDailyVibes(initialDailyVibes);
             setPosts([]);
@@ -102,4 +109,3 @@ export const useData = () => {
   }
   return context;
 };
-
