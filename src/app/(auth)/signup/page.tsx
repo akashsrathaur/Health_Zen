@@ -38,14 +38,16 @@ export default function SignupPage() {
         }
 
         try {
-            // Since Firebase phone auth is complex, we'll use email/password for now
-            // but still collect the phone number.
-            if (!email) {
-                setError("Email is required for account creation at this time.");
+            // Since Firebase phone auth is complex, we'll use email/password for now.
+            // If email is not provided, we create a dummy one from the phone number.
+            const authEmail = email || `${phone}@example.com`;
+
+            if (!phone) {
+                setError("Phone number is required.");
                 return;
             }
 
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, authEmail, password);
             const firebaseUser = userCredential.user;
 
             await createUserInFirestore(firebaseUser.uid, {
@@ -63,13 +65,13 @@ export default function SignupPage() {
         } catch (error: any) {
             switch (error.code) {
                 case 'auth/email-already-in-use':
-                    setError('This email address is already in use.');
+                    setError('This email or phone number is already associated with an account.');
                     break;
                 case 'auth/weak-password':
                     setError('The password is too weak. It must be at least 6 characters long.');
                     break;
                 case 'auth/invalid-email':
-                    setError('Please enter a valid email address.');
+                    setError('Please enter a valid email address if you choose to provide one.');
                     break;
                 default:
                     setError('An unexpected error occurred. Please try again.');
