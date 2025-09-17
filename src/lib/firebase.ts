@@ -22,6 +22,8 @@ let db: Firestore;
 if (getApps().length === 0) {
     if (!firebaseConfig.apiKey) {
         console.warn("Firebase configuration is missing or incomplete. Firebase services will be disabled. This is normal during the build process, but if you see this in the browser, your environment variables are not set correctly.");
+        // We create dummy objects to prevent the app from crashing if Firebase is not configured.
+        // The rest of the app should handle these gracefully.
         app = {} as FirebaseApp;
         auth = {} as Auth;
         db = {} as Firestore;
@@ -34,9 +36,14 @@ if (getApps().length === 0) {
 
 // We always get the auth and firestore instances from the initialized app.
 // This ensures we don't have issues with missing config during server-side builds.
+// The check for app.options ensures that we don't try to get services from a dummy app.
 if (app.options) {
     auth = getAuth(app);
     db = getFirestore(app);
+} else {
+    // If the app is a dummy object, the services should be too.
+    auth = {} as Auth;
+    db = {} as Firestore;
 }
 
 export { app, auth, db };
