@@ -25,7 +25,9 @@ const publicRoutes = ['/login', '/signup'];
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [serverLoading, setServerLoading] = useState(true);
+  const [clientLoading, setClientLoading] = useState(true);
+
   const router = useRouter();
   const pathname = usePathname();
 
@@ -34,57 +36,63 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setFirebaseUser(fbUser);
       if (fbUser) {
         try {
-          // User is logged in
           const userProfile = await getUserFromFirestore(fbUser.uid);
           setUser(userProfile);
         } catch (e) {
-            console.error("Failed to fetch user profile, this is expected if IAM permissions are not set. See README.md", e);
-            // In case of error (e.g. permissions not set), we'll set a default user
-            // to prevent the app from crashing. This is a temporary measure.
-             setUser({
-                uid: fbUser.uid,
-                name: 'New User (Read-Only)',
-                age: 0,
-                gender: 'Prefer not to say',
-                avatarUrl: `https://picsum.photos/seed/${fbUser.uid}/100/100`,
-                streak: 0
-            });
+          console.error(
+            'Failed to fetch user profile, this is expected if IAM permissions are not set. See README.md',
+            e
+          );
+          setUser({
+            uid: fbUser.uid,
+            name: 'New User (Read-Only)',
+            age: 0,
+            gender: 'Prefer not to say',
+            avatarUrl: `https://picsum.photos/seed/${fbUser.uid}/100/100`,
+            streak: 0,
+          });
         }
       } else {
-        // User is logged out
         setUser(null);
       }
-      setLoading(false);
+      setServerLoading(false);
+      setClientLoading(false); 
     });
 
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    if (loading) return;
+    if (serverLoading) return;
 
-    const isPublicRoute = publicRoutes.some(path => pathname.startsWith(path));
+    const isPublicRoute = publicRoutes.some((path) => pathname.startsWith(path));
 
     if (firebaseUser && isPublicRoute) {
-        // Logged-in user tries to access login/signup, redirect to dashboard
-        router.replace('/dashboard');
+      router.replace('/dashboard');
     } else if (!firebaseUser && !isPublicRoute) {
-        // Logged-out user tries to access a protected route, redirect to login
-        router.replace('/login');
+      router.replace('/login');
     }
+  }, [serverLoading, firebaseUser, pathname, router]);
 
-  }, [loading, firebaseUser, pathname, router]);
+  useEffect(() => {
+    setClientLoading(serverLoading || (!user && !!firebaseUser));
+  },[serverLoading, user, firebaseUser])
 
-  const showLoading = loading || (!user && !!firebaseUser);
+  if (clientLoading) {
+      return (
+        <div className="h-screen w-full flex items-center justify-center bg-background">
+            <div className="flex flex-col items-center gap-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                <p className="text-muted-foreground">Loading your wellness journey...</p>
+            </div>
+        </div>
+      )
+  }
+
 
   return (
-    <AuthContext.Provider value={{ user, firebaseUser, loading: showLoading }}>
-      {showLoading ? <div className='h-screen w-full flex items-center justify-center bg-background'>
-          <div className='flex flex-col items-center gap-4'>
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            <p className='text-muted-foreground'>Loading your wellness journey...</p>
-          </div>
-      </div> : children}
+    <AuthContext.Provider value={{ user, firebaseUser, loading: serverLoading }}>
+      {children}
     </AuthContext.Provider>
   );
 };
