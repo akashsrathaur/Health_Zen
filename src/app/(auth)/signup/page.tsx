@@ -53,8 +53,8 @@ export default function SignupPage() {
                 streak: 0,
             });
 
-            // The AuthProvider will handle redirecting to the dashboard
-            // router.push('/dashboard');
+            // Explicitly redirect to the dashboard after successful signup.
+            router.push('/dashboard');
 
         } catch (error: any) {
             switch (error.code) {
