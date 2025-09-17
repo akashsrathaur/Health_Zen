@@ -116,7 +116,8 @@ const Bear = ({ state }: { state: BearState }) => {
                             exit={{ y: 30, opacity: 0 }}
                             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                         >
-                            <path d="M30 100 C 10 80, 25 40, 48 50 L 52 50 C 60 40, 90 40, 70 50 L68 50 C 95 40, 110 80, 90 100 Z" fill="#B0BEC5" />
+                           <path d="M 25 90 C 10 70, 25 50, 45 55" fill="#B0BEC5" />
+                           <path d="M 95 90 C 110 70, 95 50, 75 55" fill="#B0BEC5" />
                         </motion.g>
                     )}
                 </AnimatePresence>
