@@ -134,7 +134,6 @@ export const initialDailyVibes: DailyVibe[] = [
     title: 'Streak',
     value: '12 days',
     icon: Flame,
-    progress: 100,
   },
 ];
 
@@ -381,4 +380,5 @@ export type DailyVibe = {
     icon: LucideIcon | keyof typeof allVibeIcons;
     progress?: number;
     isCustom?: boolean;
+    completedAt?: string;
 };

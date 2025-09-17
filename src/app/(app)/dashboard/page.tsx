@@ -14,7 +14,7 @@ import { Progress } from '@/components/ui/progress';
 import { initialDailyVibes, userData, challenges as initialChallenges, type Challenge, type DailyVibe, allVibeIcons } from '@/lib/data';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, CheckCircle, Edit, Minus, Plus, Camera, RefreshCcw, XCircle, Pill, PlusCircle, Trash2, Clock } from 'lucide-react';
+import { ArrowRight, CheckCircle, Edit, Minus, Plus, Camera, RefreshCcw, XCircle, Pill, PlusCircle, Trash2, Clock, Info } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -26,6 +26,7 @@ import Image from 'next/image';
 import { Switch } from '@/components/ui/switch';
 import { nanoid } from 'nanoid';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { format } from 'date-fns';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -127,7 +128,8 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
     const handleMedicationToggle = (checked: boolean) => {
       setCurrentVibe(prev => {
         if (!prev || prev.id !== 'medication') return prev;
-        return { ...prev, value: checked ? 'Taken' : 'Pending', progress: checked ? 100 : 0 };
+        const now = new Date().toISOString();
+        return { ...prev, value: checked ? 'Taken' : 'Pending', progress: checked ? 100 : 0, completedAt: checked ? now : undefined };
       });
     }
 
@@ -145,6 +147,8 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
     }
 
     const isStreakVibe = currentVibe.id === 'streak';
+    const isCompleted = currentVibe.progress === 100 && currentVibe.completedAt;
+    const isEditable = !isCompleted && !isStreakVibe;
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -154,7 +158,16 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
                     <DialogDescription>Update or remove this daily task.</DialogDescription>
                 </DialogHeader>
                 <div className='space-y-6 py-4'>
-                    {currentVibe.id === 'water' && (
+                    {isCompleted && (
+                         <Alert variant="default" className='border-green-500/50 bg-green-500/10 text-green-700 dark:text-green-300'>
+                            <Info className="h-4 w-4 !text-green-600 dark:!text-green-400" />
+                            <AlertTitle>Task Completed</AlertTitle>
+                            <AlertDescription>
+                                Completed on {format(new Date(currentVibe.completedAt!), "MMMM d, yyyy 'at' hh:mm a")}. This can't be edited.
+                            </AlertDescription>
+                        </Alert>
+                    )}
+                    {currentVibe.id === 'water' && isEditable && (
                         <div className="space-y-2">
                             <Label>Water Intake</Label>
                             <div className="flex items-center gap-4">
@@ -164,7 +177,7 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
                             </div>
                         </div>
                     )}
-                    {currentVibe.id === 'sleep' && (
+                    {currentVibe.id === 'sleep' && isEditable && (
                         <div className="space-y-2">
                             <Label htmlFor="sleep-hours">Sleep Duration (hours)</Label>
                             <Input 
@@ -177,7 +190,7 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
                             />
                         </div>
                     )}
-                    {currentVibe.id === 'medication' && (
+                    {currentVibe.id === 'medication' && isEditable && (
                       <div className="flex items-center justify-between rounded-lg border p-4">
                         <div className='space-y-0.5'>
                           <Label htmlFor='medication-taken'>Medication</Label>
@@ -192,7 +205,7 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
                         />
                       </div>
                     )}
-                    {currentVibe.isCustom && (
+                    {currentVibe.isCustom && isEditable && (
                         <>
                             <div className="space-y-2">
                                 <Label htmlFor="custom-title">Title</Label>
@@ -207,11 +220,11 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
                 </div>
                 <DialogFooter className='justify-between'>
                     { !isStreakVibe ? (
-                        <Button variant="destructive" onClick={handleDelete} className="mr-auto"><Trash2 /> Delete</Button>
+                        <Button variant="destructive" onClick={handleDelete} className="mr-auto" disabled={isCompleted}><Trash2 /> Delete</Button>
                     ) : <div /> }
                     <div className='flex gap-2'>
                         <Button variant="outline" onClick={onClose}>Cancel</Button>
-                        <Button onClick={handleSaveChanges}>Save Changes</Button>
+                        <Button onClick={handleSaveChanges} disabled={isCompleted}>Save Changes</Button>
                     </div>
                 </DialogFooter>
             </DialogContent>
@@ -534,7 +547,7 @@ export default function DashboardPage() {
             setDailyVibes(prevVibes =>
                 prevVibes.map(v =>
                     v.id === activeVibeId
-                    ? { ...v, progress: 100, value: 'Completed' }
+                    ? { ...v, progress: 100, completedAt: new Date().toISOString() }
                     : v
                 )
             );
@@ -582,45 +595,52 @@ export default function DashboardPage() {
                       const Icon = typeof vibe.icon === 'string' ? allVibeIcons[vibe.icon as keyof typeof allVibeIcons] : vibe.icon;
                       const isTask = !nonSnapVibeIds.includes(vibe.id);
                       const isSleepCard = vibe.id === 'sleep';
+                      const isCompleted = vibe.progress === 100;
+
+                      let vibeValue = vibe.value;
+                      if (isTask && isCompleted && vibe.completedAt) {
+                          vibeValue = `Completed at ${format(new Date(vibe.completedAt), 'p')}`;
+                      }
 
                       return (
                         <motion.div key={vibe.id} variants={itemVariants}>
                           <Card 
                             className={cn("p-4 transition-all duration-200", 
-                                (isSleepCard && !isSleepLoggingActive) ? 'cursor-not-allowed bg-muted/50' : 'hover:bg-secondary/10 cursor-pointer'
+                                (isSleepCard && !isSleepLoggingActive) ? 'cursor-not-allowed bg-muted/50' : 'hover:bg-secondary/10 cursor-pointer',
+                                isCompleted && 'bg-green-500/10 border-green-500/20'
                             )}
                             onClick={() => handleEditVibe(vibe)}
                           >
                               <div className='flex items-center'>
-                                  <Icon className="mr-4 h-8 w-8 text-primary" />
+                                  <Icon className={cn("mr-4 h-8 w-8 text-primary", isCompleted && 'text-green-500')} />
                                   <div className="flex-1">
-                                      <p className="font-medium">{vibe.title}</p>
+                                      <p className={cn("font-medium", isCompleted && 'text-green-600 dark:text-green-400')}>{vibe.title}</p>
                                       {isSleepCard && !isSleepLoggingActive ? (
                                         <div className='flex items-center gap-2 text-xs text-muted-foreground'>
                                           <Clock className="h-3 w-3" />
                                           <span>Unlocks in {formatTime(timeToUnlock)}</span>
                                         </div>
                                       ) : (
-                                        <p className="text-sm text-muted-foreground">{vibe.value}</p>
+                                        <p className="text-sm text-muted-foreground">{vibeValue}</p>
                                       )}
                                   </div>
                                   {isTask && (
                                     <Button 
                                         size="sm" 
-                                        variant={vibe.progress === 100 ? 'secondary' : 'default'}
+                                        variant={isCompleted ? 'secondary' : 'default'}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleMarkVibeAsDone(vibe.id)
                                         }}
-                                        disabled={vibe.progress === 100}
+                                        disabled={isCompleted}
                                         className="ml-2"
                                     >
                                         <CheckCircle className="mr-2 h-4 w-4" />
-                                        {vibe.progress === 100 ? 'Done' : 'Mark Done'}
+                                        {isCompleted ? 'Done' : 'Mark Done'}
                                     </Button>
                                   )}
                               </div>
-                              {vibe.progress !== undefined && vibe.id !== 'streak' && <Progress value={vibe.progress} className="w-full mt-3" />}
+                              {vibe.progress !== undefined && vibe.id !== 'streak' && <Progress value={vibe.progress} className={cn("w-full mt-3", isCompleted && '[&>div]:bg-green-500')} />}
                           </Card>
                         </motion.div>
                       )
