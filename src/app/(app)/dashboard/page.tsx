@@ -99,27 +99,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-            <section>
-                <div className='flex items-center justify-between mb-4'>
-                    <h2 className="text-xl font-semibold">Accepted Challenges</h2>
-                    <Button variant="ghost" asChild>
-                        <Link href="/challenges">View All <ArrowRight className='ml-2 h-4 w-4'/></Link>
-                    </Button>
-                </div>
-                <motion.div 
-                  className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
-                  variants={containerVariants}
-                  initial="hidden"
-                  animate="visible"
-                >
-                    {acceptedChallenges.map((challenge) => (
-                      <ChallengeCard key={challenge.id} challenge={challenge} />
-                    ))}
-                </motion.div>
-            </section>
-        </div>
-        <div className='lg:col-span-1'>
+         <div className='lg:col-span-1'>
             <section>
                 <h2 className="mb-4 text-xl font-semibold">Daily Vibe</h2>
                 <motion.div 
@@ -139,6 +119,26 @@ export default function DashboardPage() {
                             {vibe.progress !== undefined && <Progress value={vibe.progress} className="w-20" />}
                         </Card>
                       </motion.div>
+                    ))}
+                </motion.div>
+            </section>
+        </div>
+        <div className="lg:col-span-2">
+            <section>
+                <div className='flex items-center justify-between mb-4'>
+                    <h2 className="text-xl font-semibold">Accepted Challenges</h2>
+                    <Button variant="ghost" asChild>
+                        <Link href="/challenges">View All <ArrowRight className='ml-2 h-4 w-4'/></Link>
+                    </Button>
+                </div>
+                <motion.div 
+                  className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
+                    {acceptedChallenges.map((challenge) => (
+                      <ChallengeCard key={challenge.id} challenge={challenge} />
                     ))}
                 </motion.div>
             </section>
