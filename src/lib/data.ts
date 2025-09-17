@@ -1,3 +1,4 @@
+
 import {
   Flame,
   Droplets,
@@ -14,6 +15,7 @@ import {
   Dumbbell,
   BookOpen,
   Target,
+  Pill,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -78,6 +80,13 @@ export const initialDailyVibes: DailyVibe[] = [
     value: '7.5h',
     icon: Bed,
     progress: 94,
+  },
+  {
+    id: 'medication',
+    title: 'Medication',
+    value: 'Pending',
+    icon: Pill,
+    progress: 0,
   },
   {
     id: 'streak',
@@ -304,11 +313,9 @@ export type Challenge = {
 };
 
 export type DailyVibe = {
-    id: 'water' | 'sleep' | 'streak';
+    id: 'water' | 'sleep' | 'streak' | 'medication';
     title: string;
     value: string;
     icon: LucideIcon;
     progress?: number;
 };
-
-    

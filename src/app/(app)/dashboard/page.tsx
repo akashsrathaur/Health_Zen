@@ -14,7 +14,7 @@ import { Progress } from '@/components/ui/progress';
 import { initialDailyVibes, userData, challenges as initialChallenges, type Challenge, type DailyVibe } from '@/lib/data';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, CheckCircle, Edit, Minus, Plus, Camera, RefreshCcw, XCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle, Edit, Minus, Plus, Camera, RefreshCcw, XCircle, Pill } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -23,6 +23,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import Image from 'next/image';
+import { Switch } from '@/components/ui/switch';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -122,9 +123,19 @@ function EditVibesDialog({ isOpen, onClose, dailyVibes, onSave }: { isOpen: bool
             return vibe;
         }))
     }
+    
+    const handleMedicationToggle = (checked: boolean) => {
+      setVibes(prevVibes => prevVibes.map(vibe => {
+        if (vibe.id === 'medication') {
+          return { ...vibe, value: checked ? 'Taken' : 'Pending', progress: checked ? 100 : 0 };
+        }
+        return vibe;
+      }));
+    }
 
     const waterVibe = vibes.find(v => v.id === 'water');
     const sleepVibe = vibes.find(v => v.id === 'sleep');
+    const medicationVibe = vibes.find(v => v.id === 'medication');
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -156,6 +167,21 @@ function EditVibesDialog({ isOpen, onClose, dailyVibes, onSave }: { isOpen: bool
                                 className="w-40"
                             />
                         </div>
+                    )}
+                    {medicationVibe && (
+                      <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div className='space-y-0.5'>
+                          <Label htmlFor='medication-taken'>Medication</Label>
+                           <p className="text-sm text-muted-foreground">
+                                Mark if you've taken your daily medication.
+                            </p>
+                        </div>
+                        <Switch
+                          id='medication-taken'
+                          checked={medicationVibe.progress === 100}
+                          onCheckedChange={handleMedicationToggle}
+                        />
+                      </div>
                     )}
                 </div>
                 <DialogFooter>
@@ -241,7 +267,7 @@ function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, o
                 <DialogHeader>
                     <DialogTitle>Upload Proof</DialogTitle>
                 </DialogHeader>
-                <div className="relative aspect-[9/16] w-full bg-black rounded-md overflow-hidden flex items-center justify-center">
+                 <div className="relative aspect-[9/16] w-full bg-black rounded-md overflow-hidden flex items-center justify-center">
                     {hasCameraPermission === null && <p className='text-white'>Requesting camera...</p>}
                     {hasCameraPermission === false && (
                         <Alert variant="destructive" className="m-4">
@@ -300,9 +326,27 @@ export default function DashboardPage() {
       }));
   }
 
+    const handleMedicationToggle = () => {
+      setDailyVibes(prevVibes => prevVibes.map(vibe => {
+          if (vibe.id === 'medication') {
+              const isTaken = vibe.progress === 100;
+              return { ...vibe, value: isTaken ? 'Pending' : 'Taken', progress: isTaken ? 0 : 100 };
+          }
+          return vibe;
+      }));
+      toast({
+        title: "Medication Updated",
+        description: `You've marked your medication as ${dailyVibes.find(v => v.id === 'medication')?.progress !== 100 ? 'taken' : 'pending'}.`
+      })
+  }
+
   const handleSaveVibes = (updatedVibes: DailyVibe[]) => {
     setDailyVibes(updatedVibes);
     setIsEditVibesOpen(false);
+    toast({
+        title: "Daily Vibe Updated",
+        description: "Your daily progress has been saved successfully."
+    })
   }
 
   const handleMarkAsDone = (challengeId: string) => {
@@ -361,7 +405,7 @@ export default function DashboardPage() {
                   animate="visible"
                 >
                     {dailyVibes.map((vibe) => (
-                      <motion.div key={vibe.title} variants={itemVariants}>
+                      <motion.div key={vibe.id} variants={itemVariants}>
                         <Card className="p-4 transition-all duration-200 hover:bg-secondary/10">
                             <div className='flex items-center'>
                                 <vibe.icon className="mr-4 h-8 w-8 text-primary" />
@@ -374,6 +418,16 @@ export default function DashboardPage() {
                                         <Button size="icon" variant="ghost" className='h-8 w-8 rounded-full' onClick={() => handleWaterChange(-1)}><Minus className='h-4 w-4'/></Button>
                                         <Button size="icon" variant="ghost" className='h-8 w-8 rounded-full' onClick={() => handleWaterChange(1)}><Plus className='h-4 w-4'/></Button>
                                     </div>
+                                )}
+                                {vibe.id === 'medication' && (
+                                   <Button 
+                                        size="sm" 
+                                        variant={vibe.progress === 100 ? 'secondary' : 'default'}
+                                        onClick={handleMedicationToggle}
+                                    >
+                                        <CheckCircle className="mr-2 h-4 w-4" />
+                                        {vibe.progress === 100 ? 'Taken' : 'Take Now'}
+                                   </Button>
                                 )}
                             </div>
                             {vibe.progress !== undefined && <Progress value={vibe.progress} className="w-full mt-3" />}
