@@ -16,33 +16,21 @@ let app: FirebaseApp;
 let auth: Auth;
 let db: Firestore;
 
-const firebaseConfigValues = Object.values(firebaseConfig);
-const hasAllConfig = firebaseConfigValues.every(value => !!value);
-
-if (hasAllConfig) {
-  if (!getApps().length) {
-    try {
-      app = initializeApp(firebaseConfig);
-    } catch (e) {
-      console.error("Failed to initialize Firebase", e);
-      // Provide dummy objects to prevent app from crashing
-      app = {} as FirebaseApp;
+// This check is crucial for Next.js rendering.
+// On the server, we might not have the env vars during build.
+// On the client, we will always have them.
+if (firebaseConfig.apiKey) {
+    if (!getApps().length) {
+        app = initializeApp(firebaseConfig);
+    } else {
+        app = getApp();
     }
-  } else {
-    app = getApp();
-  }
-
-  try {
     auth = getAuth(app);
     db = getFirestore(app);
-  } catch(e) {
-    console.error("Failed to get Firebase services", e);
-    auth = {} as Auth;
-    db = {} as Firestore;
-  }
 } else {
-  console.warn("Firebase configuration is incomplete. Firebase services will be disabled.");
-  // Provide dummy objects to prevent app from crashing if config is missing
+  // If the config is not available, we provide dummy objects
+  // to prevent the app from crashing during build time.
+  console.warn("Firebase configuration is incomplete. Firebase services will be disabled during build.");
   app = {} as FirebaseApp;
   auth = {} as Auth;
   db = {} as Firestore;

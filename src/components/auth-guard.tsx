@@ -1,9 +1,9 @@
+
 'use client';
 
 import { useAuth } from '@/context/auth-context';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { Icons } from './icons';
 
 const publicRoutes = ['/login', '/signup'];
 
@@ -23,12 +23,12 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  const isPublicRoute = publicRoutes.some((path) => pathname.startsWith(path));
+
   useEffect(() => {
     if (loading) {
       return; // Wait for the auth state to be determined.
     }
-
-    const isPublicRoute = publicRoutes.some((path) => pathname.startsWith(path));
 
     // If user is not logged in and trying to access a protected route, redirect to login
     if (!firebaseUser && !isPublicRoute) {
@@ -40,25 +40,18 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       router.replace('/dashboard');
     }
 
-  }, [firebaseUser, loading, pathname, router]);
+  }, [firebaseUser, loading, pathname, router, isPublicRoute]);
 
   // While loading the initial auth state, show a loading screen.
   if (loading) {
     return <LoadingScreen />;
   }
-
-  const isPublicRoute = publicRoutes.some((path) => pathname.startsWith(path));
-
-  // If user is logged in, they can see protected routes.
-  if (firebaseUser && !isPublicRoute) {
-    return <>{children}</>;
-  }
-
-  // If user is not logged in, they can see public routes.
-  if (!firebaseUser && isPublicRoute) {
-    return <>{children}</>;
-  }
   
-  // For any other case (like during a redirect), show a loading screen to prevent flicker.
+  // After loading, if we are on a public route or if user is authenticated for a private one
+  if (isPublicRoute || firebaseUser) {
+    return <>{children}</>;
+  }
+
+  // Fallback loading screen during redirection
   return <LoadingScreen />;
 }

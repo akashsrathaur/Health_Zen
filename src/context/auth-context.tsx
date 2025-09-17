@@ -28,20 +28,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setFirebaseUser(fbUser);
       if (fbUser) {
-        // Fetch user profile from Firestore on the client side.
+        setLoading(true); // Set loading while we fetch from firestore
         try {
+          // Fetch user profile from Firestore on the client side.
           const userProfile = await getUserFromFirestore(fbUser.uid);
           setUser(userProfile);
         } catch (error) {
           console.error("Failed to fetch user profile from Firestore on client:", error);
-          // If it fails even on the client, the user might not have a doc yet
-          // or there's a serious issue. Log them out to be safe.
           setUser(null); 
+        } finally {
+            setLoading(false);
         }
       } else {
         setUser(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
