@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { initialDailyVibes, challenges as initialChallenges, type Challenge, type DailyVibe, allVibeIcons } from '@/lib/data';
-import { getUser } from '@/lib/user-store';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle, Edit, Minus, Plus, Camera, RefreshCcw, XCircle, Pill, PlusCircle, Trash2, Clock, Info } from 'lucide-react';
@@ -28,6 +27,8 @@ import { Switch } from '@/components/ui/switch';
 import { nanoid } from 'nanoid';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { format } from 'date-fns';
+import { useAuth } from '@/context/auth-context';
+import { defaultUser } from '@/lib/user-store';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -427,7 +428,8 @@ const formatTime = (ms: number) => {
 };
 
 export default function DashboardPage() {
-  const [userData, setUserData] = useState(getUser());
+  const { user } = useAuth();
+  const userData = user || defaultUser;
   const [challenges, setChallenges] = useState<Challenge[]>(initialChallenges);
   const [dailyVibes, setDailyVibes] = useState<DailyVibe[]>(initialDailyVibes);
   const [isAddVibeOpen, setIsAddVibeOpen] = useState(false);
@@ -443,7 +445,6 @@ export default function DashboardPage() {
   const { toast } = useToast();
 
    useEffect(() => {
-        setUserData(getUser());
         const sleepCheckInterval = setInterval(() => {
             const now = new Date();
             const currentHour = now.getHours();

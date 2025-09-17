@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { communityPosts as initialCommunityPosts } from '@/lib/data';
+import { communityPosts as initialCommunityPosts, type CommunityPost } from '@/lib/data';
 import { Textarea } from '@/components/ui/textarea';
 import { Camera, Send, CircleUser, Video, RefreshCcw, CheckCircle, XCircle } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
@@ -20,9 +20,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
-import { getUser } from '@/lib/user-store';
+import { useAuth } from '@/context/auth-context';
+import { defaultUser } from '@/lib/user-store';
 
-type CommunityPost = (typeof initialCommunityPosts)[0];
 
 function PostCard({ post }: { post: CommunityPost }) {
   return (
@@ -62,7 +62,7 @@ function PostCard({ post }: { post: CommunityPost }) {
   );
 }
 
-function CreatePost({ onAddPost, userData }: { onAddPost: (content: string, imageUrl?: string, imageHint?: string) => void, userData: ReturnType<typeof getUser> }) {
+function CreatePost({ onAddPost, userData }: { onAddPost: (content: string, imageUrl?: string, imageHint?: string) => void, userData: NonNullable<ReturnType<typeof useAuth>['user']> }) {
     const [content, setContent] = useState('');
     const [image, setImage] = useState<string | null>(null);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -240,18 +240,16 @@ function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, o
 
 export default function CommunityPage() {
   const [posts, setPosts] = useState<CommunityPost[]>(initialCommunityPosts);
-  const [userData, setUserData] = useState(getUser());
-
-  useEffect(() => {
-    setUserData(getUser());
-  }, []);
+  const { user } = useAuth();
+  const userData = user || { ...defaultUser, uid: '' };
   
   const handleAddPost = (content: string, imageUrl?: string, imageHint?: string) => {
+    if (!user) return;
     const newPost: CommunityPost = {
       id: nanoid(),
       user: {
-        name: userData.name,
-        avatarUrl: userData.avatarUrl,
+        name: user.name,
+        avatarUrl: user.avatarUrl,
       },
       timestamp: 'Just now',
       content: content,

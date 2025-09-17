@@ -1,8 +1,10 @@
+
 import type { Metadata } from 'next';
 import { Provider as BalancerProvider } from 'react-wrap-balancer';
 import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
+import { AuthProvider } from '@/context/auth-context';
 
 export const metadata: Metadata = {
   title: 'HealthZen',
@@ -32,8 +34,10 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <BalancerProvider>
-              {children}
-              <Toaster />
+              <AuthProvider>
+                {children}
+                <Toaster />
+              </AuthProvider>
             </BalancerProvider>
         </ThemeProvider>
       </body>

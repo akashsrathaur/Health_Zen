@@ -7,16 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { getUser } from "@/lib/user-store";
+import { useAuth } from "@/context/auth-context";
+import { defaultUser } from "@/lib/user-store";
 import { Flame } from "lucide-react";
-import { useEffect, useState } from "react";
 
 export default function SettingsPage() {
-    const [userData, setUserData] = useState(getUser());
-
-    useEffect(() => {
-        setUserData(getUser());
-    }, []);
+    const { user } = useAuth();
+    const userData = user || defaultUser;
 
     return (
         <div className="mx-auto max-w-3xl space-y-8">

@@ -1,12 +1,16 @@
+
 import { AnimatedLogin } from "@/components/animated-login";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export default function LoginPage() {
   return (
     <div className="w-full max-w-sm">
-      <AnimatedLogin />
+      <Suspense>
+        <AnimatedLogin />
+      </Suspense>
        <div className="mt-4 text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{' '}
         <Button variant="link" asChild className="p-0">

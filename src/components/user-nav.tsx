@@ -12,25 +12,33 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { getUser } from '@/lib/user-store';
+import { defaultUser } from '@/lib/user-store';
 import { Flame, Bell, User, LogOut, Settings } from 'lucide-react';
 import { Badge } from './ui/badge';
 import Link from 'next/link';
 import { ThemeSwitcher } from './theme-switcher';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useAuth } from '@/context/auth-context';
+import { auth } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 
 export function UserNav() {
-  const [userData, setUserData] = useState(getUser());
+  const { user } = useAuth();
+  const router = useRouter();
   const [unreadCount, setUnreadCount] = useState(2);
-
-  useEffect(() => {
-    setUserData(getUser());
-  }, []);
+  
+  const userData = user || defaultUser;
 
   const handleNotificationToggle = (open: boolean) => {
     if (open) {
       setUnreadCount(0);
     }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push('/login');
   };
 
   return (
@@ -109,11 +117,9 @@ export function UserNav() {
           <DropdownMenuSeparator />
           <ThemeSwitcher />
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <Link href="/login">
+          <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
-            </Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

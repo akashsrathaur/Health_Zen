@@ -215,7 +215,7 @@ export const remedies = [
   },
 ];
 
-export const communityPosts = [
+export const communityPosts: CommunityPost[] = [
   {
     id: 'post-1',
     user: {
@@ -296,53 +296,18 @@ export const achievements: Achievement[] = [
   { id: 'feedback-fanatic', name: 'Feedback Fanatic', icon: ThumbsUp, unlocked: false, description: 'Provide feedback or upvote 15 community posts.' },
 ];
 
-export const challenges: Challenge[] = [
-  {
-    id: 'hydration-challenge',
-    title: '30-Day Hydration Hero',
-    description: 'Drink 8 glasses of water every day for 30 days.',
-    icon: Droplets,
-    currentDay: 12,
-    goalDays: 30,
-    imageUrl: 'https://picsum.photos/seed/challenge1/800/600',
-    imageHint: 'water bottle',
-    isCompletedToday: true,
-  },
-  {
-    id: 'gym-challenge',
-    title: 'Gym Rat Streak',
-    description: 'Hit the gym every day. No excuses!',
-    icon: Dumbbell,
-    currentDay: 5,
-    goalDays: 30,
-    imageUrl: 'https://picsum.photos/seed/challenge2/800/600',
-    imageHint: 'person gym',
-    isCompletedToday: false,
-  },
-  {
-    id: 'reading-challenge',
-    title: 'Bookworm Challenge',
-    description: 'Read 30 minutes every day.',
-    icon: BookOpen,
-    currentDay: 25,
-    goalDays: 30,
-    imageUrl: 'https://picsum.photos/seed/challenge3/800/600',
-    imageHint: 'person reading',
-    isCompletedToday: true,
-  },
-   {
-    id: 'meditation-challenge',
-    title: 'Mindful Mornings',
-    description: 'Start your day with 10 minutes of meditation.',
-    icon: Brain,
-    currentDay: 7,
-    goalDays: 14,
-    imageUrl: 'https://picsum.photos/seed/challenge4/800/600',
-    imageHint: 'meditation sunrise',
-    isCompletedToday: false,
-  },
-];
-
+export type CommunityPost = {
+  id: string;
+  user: {
+    name: string;
+    avatarUrl: string;
+  };
+  timestamp: string;
+  content: string;
+  imageUrl?: string;
+  imageHint?: string;
+  reactions: { [key: string]: number };
+};
 
 export type Achievement = {
   id: string;

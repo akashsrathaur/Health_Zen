@@ -12,7 +12,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { chatBuddyAction, type Message } from '@/actions/chat-buddy';
-import { getUser } from '@/lib/user-store';
 import { nanoid } from 'nanoid';
 import { ScrollArea } from './ui/scroll-area';
 import { Avatar, AvatarFallback } from './ui/avatar';
@@ -22,6 +21,8 @@ import { format, isToday, isYesterday, formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import React from 'react';
+import { useAuth } from '@/context/auth-context';
+import { defaultUser } from '@/lib/user-store';
 
 
 type BuddyPersona = {
@@ -56,7 +57,8 @@ export function ChatBuddy() {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [persona, setPersona] = useState<BuddyPersona>(initialPersona);
     const [isMaximized, setIsMaximized] = useState(false);
-    const [userData, setUserData] = useState(getUser());
+    const { user } = useAuth();
+    const userData = user || defaultUser;
     
     const formRef = useRef<HTMLFormElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -84,7 +86,6 @@ export function ChatBuddy() {
     };
     
     useEffect(() => {
-        setUserData(getUser());
         scrollToBottom();
     }, [messages, isPending]);
     
@@ -110,12 +111,13 @@ export function ChatBuddy() {
         startTransition(async () => {
             
             formData.set('buddyPersona', JSON.stringify(persona));
-            const currentUser = getUser();
-            formData.set('userData', JSON.stringify({ name: currentUser.name, streak: currentUser.streak }));
             const chatHistoryForAI = [...messages, newUserMessage]
                 .filter(m => m.role === 'user' || m.role === 'model')
                 .map(m => ({role: m.role, content: m.content}));
             formData.set('chatHistory', JSON.stringify(chatHistoryForAI));
+            
+            const currentUserData = { name: userData.name, streak: userData.streak };
+            formData.set('userData', JSON.stringify(currentUserData));
             
             try {
                 // Add a 1-second delay for a more human-like feel

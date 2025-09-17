@@ -8,6 +8,8 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card, CardContent } from './ui/card';
 import { useRouter } from 'next/navigation';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 type RobotState = 'idle' | 'peeking' | 'wrong' | 'correct';
 
@@ -93,7 +95,7 @@ const Robot = ({ state }: { state: RobotState }) => {
 export function AnimatedLogin() {
   const router = useRouter();
   const [robotState, setRobotState] = useState<RobotState>('idle');
-  const [emailOrMobile, setEmailOrMobile] = useState('akash.r@example.com');
+  const [emailOrMobile, setEmailOrMobile] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
@@ -106,20 +108,34 @@ export function AnimatedLogin() {
     }
   }, [robotState, password]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    // Simulate API call
-    if (password !== 'password') {
+    
+    // Simple check if it's a phone number
+    const isPhoneNumber = /^\d{10,}$/.test(emailOrMobile);
+    if (isPhoneNumber) {
+        setError("Phone number login is not yet implemented.");
         setRobotState('wrong');
-        setError("Wrong password. The correct password is 'password'.");
-    } else {
+        return;
+    }
+
+    try {
+        await signInWithEmailAndPassword(auth, emailOrMobile, password);
         setRobotState('correct');
-        setError('');
-        // Handle successful login
-        setTimeout(() => {
-             router.push('/dashboard');
-        }, 1200);
+        // The AuthProvider will handle the redirect
+    } catch (error: any) {
+        setRobotState('wrong');
+        switch (error.code) {
+            case 'auth/user-not-found':
+            case 'auth/wrong-password':
+            case 'auth/invalid-credential':
+                setError("Invalid email or password.");
+                break;
+            default:
+                setError("An unexpected error occurred. Please try again.");
+                break;
+        }
     }
   }
 
@@ -153,7 +169,7 @@ export function AnimatedLogin() {
                         <Input 
                             id="emailOrMobile" 
                             type="text" 
-                            placeholder="akash.r@example.com or 1234567890" 
+                            placeholder="Email or 10-digit mobile" 
                             required 
                             value={emailOrMobile}
                             onChange={(e) => setEmailOrMobile(e.target.value)}
