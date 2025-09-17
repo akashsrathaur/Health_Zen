@@ -50,6 +50,7 @@ export async function symptomCheckAction(prevState: State, formData: FormData): 
     const formattedResult: SymptomCheckOutput = {
       homeopathyAdvice: result.homeopathyAdvice.replace(/•/g, '-'),
       ayurvedicAdvice: result.ayurvedicAdvice.replace(/•/g, '-'),
+      suggestedRemedies: result.suggestedRemedies.replace(/•/g, '-'),
     }
 
     return {

@@ -20,6 +20,7 @@ export type SymptomCheckInput = z.infer<typeof SymptomCheckInputSchema>;
 const SymptomCheckOutputSchema = z.object({
   homeopathyAdvice: z.string().describe('Homeopathy advice for the symptoms in bullet points.'),
   ayurvedicAdvice: z.string().describe('Ayurvedic advice for the symptoms in bullet points.'),
+  suggestedRemedies: z.string().describe('Suggested remedies for the symptoms in bullet points.'),
 });
 export type SymptomCheckOutput = z.infer<typeof SymptomCheckOutputSchema>;
 
@@ -31,18 +32,19 @@ const prompt = ai.definePrompt({
   name: 'symptomCheckPrompt',
   input: {schema: SymptomCheckInputSchema},
   output: {schema: SymptomCheckOutputSchema},
-  prompt: `You are HealthSnap, an empathetic wellness assistant. A user will describe their symptoms in any language, and you will provide Homeopathy and Ayurvedic advice in point-wise format, in the same language as the user's input.
+  prompt: `You are HealthSnap, an empathetic wellness assistant. A user will describe their symptoms in any language, and you will provide Homeopathy, Ayurvedic, and Remedy advice in point-wise format, in the same language as the user's input.
 
 Your entire response must be a valid JSON object and nothing else. Do NOT wrap it in markdown. Do not include any introductory text.
 
-If the symptoms sound serious (e.g., chest pain, difficulty breathing, severe bleeding), your first priority is to advise the user to see a doctor or seek emergency medical help immediately in both 'homeopathyAdvice' and 'ayurvedicAdvice' fields.
+If the symptoms sound serious (e.g., chest pain, difficulty breathing, severe bleeding), your first priority is to advise the user to see a doctor or seek emergency medical help immediately in all fields.
 
 Symptoms: {{{symptoms}}}
 
 Your JSON response (use bullet points for advice, using \\n for new lines):
 {
     "homeopathyAdvice": "- Advice point 1\\n- Advice point 2",
-    "ayurvedicAdvice": "- Advice point 1\\n- Advice point 2"
+    "ayurvedicAdvice": "- Advice point 1\\n- Advice point 2",
+    "suggestedRemedies": "- Remedy suggestion 1\\n- Remedy suggestion 2"
 }
 `,
 });

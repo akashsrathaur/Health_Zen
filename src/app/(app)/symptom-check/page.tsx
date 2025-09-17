@@ -11,7 +11,7 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { Bot, Lightbulb, Heart, Loader2, Sparkles } from 'lucide-react';
+import { Bot, Lightbulb, Heart, Loader2, Sparkles, Leaf } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useEffect, useRef } from 'react';
 import { Label } from '@/components/ui/label';
@@ -53,6 +53,15 @@ function LoadingState() {
           </CardContent>
         </Card>
         <Card className="animate-pulse">
+          <CardHeader>
+            <div className="h-6 w-1/2 rounded-md bg-muted"></div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="h-4 w-full rounded-md bg-muted"></div>
+            <div className="h-4 w-4/5 rounded-md bg-muted"></div>
+          </CardContent>
+        </Card>
+         <Card className="animate-pulse">
           <CardHeader>
             <div className="h-6 w-1/2 rounded-md bg-muted"></div>
           </CardHeader>
@@ -162,6 +171,17 @@ export default function SymptomCheckPage() {
             </CardHeader>
             <CardContent>
               <AdvicePoints text={state.data.ayurvedicAdvice} />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Leaf className="text-green-500" /> Suggested Remedies
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <AdvicePoints text={state.data.suggestedRemedies} />
             </CardContent>
           </Card>
 
