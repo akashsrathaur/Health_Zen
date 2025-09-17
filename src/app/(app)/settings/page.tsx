@@ -1,3 +1,4 @@
+
 'use client';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { userData } from "@/lib/data";
+import { Flame } from "lucide-react";
 
 export default function SettingsPage() {
     return (
@@ -31,8 +33,12 @@ export default function SettingsPage() {
                         <div className="grid gap-1">
                             <h3 className="font-semibold">{userData.name}</h3>
                             <p className="text-sm text-muted-foreground">{userData.age} years old</p>
-                            <Button variant="outline" size="sm">Change Photo</Button>
+                             <div className="flex items-center gap-1.5 text-sm text-yellow-500">
+                                <Flame className="h-4 w-4"/>
+                                <span className="font-semibold">{userData.streak} Day Streak</span>
+                            </div>
                         </div>
+                         <Button variant="outline" size="sm" className="ml-auto self-start">Change Photo</Button>
                     </div>
                      <div className="grid gap-2">
                         <Label htmlFor="name">Full Name</Label>

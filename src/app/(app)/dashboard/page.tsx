@@ -616,7 +616,7 @@ export default function DashboardPage() {
                                     </Button>
                                   )}
                               </div>
-                              {vibe.progress !== undefined && <Progress value={vibe.progress} className="w-full mt-3" />}
+                              {vibe.progress !== undefined && vibe.id !== 'streak' && <Progress value={vibe.progress} className="w-full mt-3" />}
                           </Card>
                         </motion.div>
                       )
