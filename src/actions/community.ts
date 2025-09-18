@@ -40,6 +40,16 @@ export async function getAllCommunityPosts(): Promise<CommunityPost[]> {
 // Add a new community post (public)
 export async function addCommunityPost(newPost: Omit<CommunityPost, 'id'>): Promise<{ success: boolean; id?: string; error?: string; details?: any }> {
   try {
+    // Check if Firebase is properly configured
+    if (!db || !db.app) {
+      console.error('Firebase not properly configured');
+      return {
+        success: false,
+        error: 'Firebase is not properly configured. Please set up your environment variables.',
+        details: { code: 'FIREBASE_NOT_CONFIGURED' }
+      };
+    }
+
     console.log('Adding community post:', newPost);
     const postsCollection = collection(db, COMMUNITY_POSTS_COLLECTION);
     console.log('Posts collection reference:', postsCollection);

@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Flame, Upload, Loader2, User, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BuddyPersona } from "@/lib/user-store";
+import { updateNotificationSettings } from "@/actions/notifications";
 
 const profileFormSchema = z.object({
   name: z.string().min(1, 'Name is required').max(50, 'Name must be less than 50 characters'),
@@ -47,14 +48,18 @@ export default function SettingsPage() {
     const [isSaving, setIsSaving] = useState(false);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
+    // Notification settings state
+    const [emailNotifications, setEmailNotifications] = useState(userData.emailNotifications ?? true);
+    const [pushNotifications, setPushNotifications] = useState(userData.pushNotifications ?? false);
+
     // Profile form
     const profileForm = useForm<ProfileFormData>({
         resolver: zodResolver(profileFormSchema),
         defaultValues: {
             name: userData.name,
             bio: userData.bio || '',
-            emailNotifications: true,
-            pushNotifications: false,
+            emailNotifications: userData.emailNotifications ?? true,
+            pushNotifications: userData.pushNotifications ?? false,
         },
         mode: 'onChange',
     });
@@ -87,8 +92,12 @@ export default function SettingsPage() {
             buddyFormState.gender !== (userData.buddyPersona?.gender || 'Non-binary') ||
             buddyFormState.relationship !== (userData.buddyPersona?.relationship || 'Friend');
         
-        setHasUnsavedChanges(profileChanged || buddyChanged);
-    }, [profileFormState, buddyFormState, userData]);
+        const notificationsChanged = 
+            emailNotifications !== (userData.emailNotifications ?? true) ||
+            pushNotifications !== (userData.pushNotifications ?? false);
+        
+        setHasUnsavedChanges(profileChanged || buddyChanged || notificationsChanged);
+    }, [profileFormState, buddyFormState, userData, emailNotifications, pushNotifications]);
 
     const handlePhotoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -173,6 +182,19 @@ export default function SettingsPage() {
                 await updateBuddy(buddyData as BuddyPersona);
             } catch (error: any) {
                 errors.push(`Buddy: ${error.message}`);
+            }
+            
+            // Save notification settings
+            try {
+                const result = await updateNotificationSettings(user?.uid || '', {
+                    emailNotifications,
+                    pushNotifications
+                });
+                if (!result.success) {
+                    errors.push(`Notifications: ${result.error}`);
+                }
+            } catch (error: any) {
+                errors.push(`Notifications: ${error.message}`);
             }
             
             if (errors.length === 0) {
@@ -450,7 +472,11 @@ export default function SettingsPage() {
                                 Receive challenge updates and motivational quotes in your inbox.
                             </p>
                         </div>
-                        <Switch id="email-notifications" defaultChecked />
+                        <Switch 
+                            id="email-notifications" 
+                            checked={emailNotifications}
+                            onCheckedChange={setEmailNotifications}
+                        />
                     </div>
                     <div className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-secondary/50">
                         <div className="space-y-0.5">
@@ -459,7 +485,11 @@ export default function SettingsPage() {
                                 Get real-time alerts for tasks and motivation on your device.
                             </p>
                         </div>
-                        <Switch id="push-notifications" />
+                        <Switch 
+                            id="push-notifications" 
+                            checked={pushNotifications}
+                            onCheckedChange={setPushNotifications}
+                        />
                     </div>
                 </CardContent>
             </Card>

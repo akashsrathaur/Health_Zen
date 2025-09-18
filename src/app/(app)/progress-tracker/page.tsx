@@ -11,11 +11,15 @@ import {
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { getAchievements, progressData, type Achievement } from '@/lib/data';
 import { Button } from '@/components/ui/button';
-import { Download, Flame } from 'lucide-react';
+import { Download, Flame, Share2, Loader2 } from 'lucide-react';
 import { Icon } from '@/lib/icon-resolver';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { exportReportAsImage, shareReport } from '@/lib/export-report';
+import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
+import { Icons } from '@/components/icons';
 
 const waterChartConfig = {
   glasses: {
@@ -89,31 +93,104 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
 }
 
 export default function ProgressTrackerPage() {
+  const { toast } = useToast();
+  const [isExporting, setIsExporting] = useState(false);
+  
   const waterChartData = progressData.water.labels.map((label, i) => ({ day: label, glasses: progressData.water.data[i] }));
   const sleepChartData = progressData.sleep.labels.map((label, i) => ({ day: label, hours: progressData.sleep.data[i] }));
 
   // In a real app, this progress would come from user data
   const userProgress = {
       streak: 12,
-      completedTasks: 5, 
+      completedTasks: 5,
+      points: 245,
+      dailyPoints: 18,
   };
   
   const achievements = getAchievements(userProgress);
   const unlockedAchievements = achievements.filter(a => a.unlocked).length;
   const totalAchievements = achievements.length;
+  
+  const handleExportReport = async () => {
+    setIsExporting(true);
+    try {
+      await exportReportAsImage('progress-report', 'health-zen-progress-report');
+      toast({
+        title: 'Report Exported!',
+        description: 'Your progress report has been downloaded.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Export Failed',
+        description: 'Unable to export report. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+  
+  const handleShareReport = async () => {
+    setIsExporting(true);
+    try {
+      await shareReport('progress-report', `Check out my wellness progress! 🌟 ${userProgress.points} points earned and ${userProgress.streak} day streak! #HealthZen`);
+    } catch (error) {
+      toast({
+        title: 'Share Failed',
+        description: 'Unable to share report. It has been downloaded instead.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8" id="progress-report">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-headline text-3xl font-bold tracking-tight text-glow">Progress Tracker</h1>
           <p className="text-muted-foreground">
             <Balancer>Visualize your wellness journey and celebrate your milestones.</Balancer>
           </p>
+          <div className="flex items-center gap-4 mt-2">
+            <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
+              <Icons.points className="h-4 w-4" />
+              <span className="font-semibold">{userProgress.points} points</span>
+              <span className="text-muted-foreground">({userProgress.dailyPoints}/30 today)</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400">
+              <Icons.streak className="h-4 w-4" />
+              <span className="font-semibold">{userProgress.streak} day streak</span>
+            </div>
+          </div>
         </div>
-        <Button variant="outline" className="mt-4 sm:mt-0">
-          <Download className="mr-2 h-4 w-4" /> Export Report
-        </Button>
+        <div className="flex gap-2 mt-4 sm:mt-0">
+          <Button 
+            variant="outline" 
+            onClick={handleShareReport}
+            disabled={isExporting}
+          >
+            {isExporting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Share2 className="mr-2 h-4 w-4" />
+            )}
+            Share Report
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={handleExportReport}
+            disabled={isExporting}
+          >
+            {isExporting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="mr-2 h-4 w-4" />
+            )}
+            Export Report
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
