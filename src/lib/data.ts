@@ -120,6 +120,11 @@ export const initialDailyVibes: DailyVibe[] = [
     value: 'Pending',
     icon: 'Pill',
     progress: 0,
+    medicationConfig: {
+      dailyDoses: 2,
+      dosesTaken: 0,
+      intervalHours: 4,
+    },
   },
   {
     id: 'streak',
@@ -421,6 +426,12 @@ export type DailyVibe = {
     progress?: number;
     isCustom?: boolean;
     completedAt?: string;
+    medicationConfig?: {
+        dailyDoses: number;
+        dosesTaken: number;
+        lastDoseTime?: string;
+        intervalHours: number;
+    };
 };
 
     

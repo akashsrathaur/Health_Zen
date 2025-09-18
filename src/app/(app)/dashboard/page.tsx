@@ -197,7 +197,68 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
                             />
                         </div>
                     )}
-                    {currentVibe.id === 'medication' && (
+                    {currentVibe.id === 'medication' && !isCompleted && (
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label>Daily Doses Required</Label>
+                                <Select 
+                                    value={currentVibe.medicationConfig?.dailyDoses?.toString() || '1'} 
+                                    onValueChange={(value) => {
+                                        setCurrentVibe(prev => {
+                                            if (!prev) return prev;
+                                            return {
+                                                ...prev,
+                                                medicationConfig: {
+                                                    ...prev.medicationConfig!,
+                                                    dailyDoses: parseInt(value),
+                                                    dosesTaken: 0
+                                                }
+                                            };
+                                        });
+                                    }}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="1">1 dose per day</SelectItem>
+                                        <SelectItem value="2">2 doses per day</SelectItem>
+                                        <SelectItem value="3">3 doses per day</SelectItem>
+                                        <SelectItem value="4">4 doses per day</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Hours Between Doses</Label>
+                                <Select 
+                                    value={currentVibe.medicationConfig?.intervalHours?.toString() || '4'} 
+                                    onValueChange={(value) => {
+                                        setCurrentVibe(prev => {
+                                            if (!prev) return prev;
+                                            return {
+                                                ...prev,
+                                                medicationConfig: {
+                                                    ...prev.medicationConfig!,
+                                                    intervalHours: parseInt(value)
+                                                }
+                                            };
+                                        });
+                                    }}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="4">4 hours</SelectItem>
+                                        <SelectItem value="6">6 hours</SelectItem>
+                                        <SelectItem value="8">8 hours</SelectItem>
+                                        <SelectItem value="12">12 hours</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                    )}
+                    {currentVibe.id === 'medication' && isCompleted && (
                       <div className="flex items-center justify-between rounded-lg border p-4">
                         <div className='space-y-0.5'>
                           <Label htmlFor='medication-taken'>Medication</Label>
@@ -599,28 +660,54 @@ export default function DashboardPage() {
       setActiveVibeId(vibeId);
       setActiveChallengeId(null);
       setIsCameraOpen(true);
-    } else if (vibe && vibe.id === 'medication') {
+    } else if (vibe && vibe.id === 'medication' && vibe.medicationConfig) {
+        const config = vibe.medicationConfig;
+        const now = new Date();
+        const canTakeDose = !config.lastDoseTime || 
+          (now.getTime() - new Date(config.lastDoseTime).getTime()) >= (config.intervalHours * 60 * 60 * 1000);
+        
+        if (!canTakeDose) {
+          const nextDoseTime = new Date(new Date(config.lastDoseTime!).getTime() + (config.intervalHours * 60 * 60 * 1000));
+          const timeUntilNext = Math.ceil((nextDoseTime.getTime() - now.getTime()) / (60 * 1000));
+          toast({
+            title: "Too early for next dose",
+            description: `Please wait ${timeUntilNext} minutes before taking the next dose.`,
+            variant: "destructive"
+          });
+          return;
+        }
+
         startTransition(async () => {
             if (!user || !userProgress) return;
-            const isCompleted = vibe.progress === 100;
-            const updatedVibe = { ...vibe, 
-                progress: isCompleted ? 0 : 100,
-                value: isCompleted ? 'Pending' : 'Taken',
-                completedAt: isCompleted ? undefined : new Date().toISOString()
-              };
+            const newDosesTaken = config.dosesTaken + 1;
+            const isFullyCompleted = newDosesTaken >= config.dailyDoses;
+            const newProgress = Math.min((newDosesTaken / config.dailyDoses) * 100, 100);
+            
+            const updatedVibe = { 
+              ...vibe, 
+              progress: newProgress,
+              value: isFullyCompleted ? 'All doses taken' : `${newDosesTaken}/${config.dailyDoses} doses`,
+              completedAt: isFullyCompleted ? new Date().toISOString() : undefined,
+              medicationConfig: {
+                ...config,
+                dosesTaken: newDosesTaken,
+                lastDoseTime: now.toISOString()
+              }
+            };
 
             const updatedVibes = dailyVibes.map(v => v.id === vibeId ? updatedVibe : v);
             setDailyVibes(updatedVibes);
             await updateDailyVibesAction(user.uid, updatedVibes);
 
             toast({
-                title: isCompleted ? 'Medication reset' : 'Medication taken!',
-                description: isCompleted ? `Marked as pending.` : `You've logged your medication for this dose.`
+                title: 'Dose taken!',
+                description: isFullyCompleted ? 
+                  'All daily doses completed.' : 
+                  `${newDosesTaken} of ${config.dailyDoses} doses taken today.`
             });
-            if(!isCompleted) {
-              const newProgress = { ...userProgress, completedTasks: userProgress.completedTasks + 1 };
-              checkAchievements(newProgress);
-            }
+            
+            const newUserProgress = { ...userProgress, completedTasks: userProgress.completedTasks + 1 };
+            checkAchievements(newUserProgress);
         });
     }
   };
@@ -712,29 +799,40 @@ export default function DashboardPage() {
                       const isWaterLocked = isWaterCard && timeToUnlockWater > 0;
                       let isVibeDisabled = (isSleepCard && !isSleepLoggingActive) || (isWaterCard && isWaterLocked);
                       if (isWaterCard && isCompleted && !isWaterLocked) isVibeDisabled = false;
-                      if (isMedicationCard) isVibeDisabled = false;
-
+                      
+                      let isMedicationDisabled = false;
+                      if (isMedicationCard && vibe.medicationConfig) {
+                        const config = vibe.medicationConfig;
+                        if (config.lastDoseTime) {
+                          const now = new Date();
+                          const timeSinceLastDose = now.getTime() - new Date(config.lastDoseTime).getTime();
+                          const intervalMs = config.intervalHours * 60 * 60 * 1000;
+                          isMedicationDisabled = timeSinceLastDose < intervalMs && config.dosesTaken < config.dailyDoses;
+                        }
+                      }
 
                       let vibeValue = vibe.value;
                       if (!isMedicationCard && isTask && isCompleted && vibe.completedAt) {
                           vibeValue = `Completed at ${format(new Date(vibe.completedAt), 'p')}`;
-                      } else if(isMedicationCard) {
-                          vibeValue = vibe.progress === 100 ? 'Taken' : 'Pending';
                       }
 
                       return (
                         <motion.div key={vibe.id} variants={itemVariants}>
                           <Card 
-                            className={cn("p-4 transition-all duration-200", 
-                                isVibeDisabled ? 'cursor-not-allowed bg-muted/50' : 'hover:bg-secondary/10 cursor-pointer',
-                                isCompleted && !isWaterLocked && 'bg-green-500/10 border-green-500/20'
+                            className={cn("p-4 transition-all duration-300 hover:shadow-md", 
+                                isVibeDisabled || isMedicationDisabled ? 'cursor-not-allowed bg-muted/50' : 'hover:bg-card/50 cursor-pointer',
+                                isCompleted && !isWaterLocked && 'bg-primary/5 border-primary/20 shadow-sm'
                             )}
-                            onClick={() => !isVibeDisabled && handleEditVibe(vibe)}
+                            onClick={() => !isVibeDisabled && !isMedicationDisabled && handleEditVibe(vibe)}
                           >
                               <div className='flex items-center'>
-                                  <Icon name={vibe.icon} className={cn("mr-4 h-8 w-8 text-primary", isCompleted && !isWaterLocked && 'text-green-500')} />
+                                  <Icon name={vibe.icon} className={cn("mr-4 h-8 w-8", 
+                                    isCompleted && !isWaterLocked ? 'text-accent' : 'text-primary'
+                                  )} />
                                   <div className="flex-1">
-                                      <p className={cn("font-medium", isCompleted && !isWaterLocked && 'text-green-600 dark:text-green-400')}>{vibe.title}</p>
+                                      <p className={cn("font-medium", 
+                                        isCompleted && !isWaterLocked && 'text-accent'
+                                      )}>{vibe.title}</p>
                                       {isSleepCard && !isSleepLoggingActive ? (
                                         <div className='flex items-center gap-2 text-xs text-muted-foreground'>
                                           <Clock className="h-3 w-3" />
@@ -757,15 +855,25 @@ export default function DashboardPage() {
                                             e.stopPropagation();
                                             handleMarkVibeAsDone(vibe.id)
                                         }}
-                                        disabled={(isCompleted && !isMedicationCard) || isWaterLocked || isPending}
+                                        disabled={(isCompleted && !isMedicationCard) || isWaterLocked || isPending || isMedicationDisabled}
                                         className="ml-2"
                                     >
                                         <CheckCircle className="mr-2 h-4 w-4" />
-                                        {isCompleted ? 'Done' : 'Mark Done'}
+                                        {isMedicationCard && vibe.medicationConfig ? 
+                                          (vibe.medicationConfig.dosesTaken >= vibe.medicationConfig.dailyDoses ? 'Complete' : 'Take Dose') :
+                                          (isCompleted ? 'Done' : 'Mark Done')
+                                        }
                                     </Button>
                                   )}
                               </div>
-                              {vibe.progress !== undefined && vibe.id !== 'streak' && <Progress value={vibe.progress} className={cn("w-full mt-3", isCompleted && !isWaterLocked && '[&>div]:bg-green-500')} />}
+                              {vibe.progress !== undefined && vibe.id !== 'streak' && (
+                                <Progress 
+                                  value={vibe.progress} 
+                                  className={cn("w-full mt-3", 
+                                    isCompleted && !isWaterLocked && '[&>div]:bg-accent'
+                                  )} 
+                                />
+                              )}
                           </Card>
                         </motion.div>
                       )
