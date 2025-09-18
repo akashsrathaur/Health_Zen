@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -18,6 +18,7 @@ import { useAuth } from "@/context/auth-context";
 import { defaultUser } from "@/lib/user-store";
 import { useToast } from "@/hooks/use-toast";
 import { Flame, Upload, Loader2, User, Bot } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { BuddyPersona } from "@/lib/user-store";
 
 const profileFormSchema = z.object({
@@ -44,6 +45,7 @@ export default function SettingsPage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
     // Profile form
     const profileForm = useForm<ProfileFormData>({
@@ -54,6 +56,7 @@ export default function SettingsPage() {
             emailNotifications: true,
             pushNotifications: false,
         },
+        mode: 'onChange',
     });
 
     // Buddy form
@@ -65,7 +68,27 @@ export default function SettingsPage() {
             gender: userData.buddyPersona?.gender || 'Non-binary',
             relationship: userData.buddyPersona?.relationship || 'Friend',
         },
+        mode: 'onChange',
     });
+
+    // Track form changes
+    const profileFormState = profileForm.watch();
+    const buddyFormState = buddyForm.watch();
+
+    // Check if there are unsaved changes
+    React.useEffect(() => {
+        const profileChanged = 
+            profileFormState.name !== userData.name ||
+            (profileFormState.bio || '') !== (userData.bio || '');
+        
+        const buddyChanged = 
+            buddyFormState.name !== (userData.buddyPersona?.name || 'Zen') ||
+            buddyFormState.age !== (userData.buddyPersona?.age || 25) ||
+            buddyFormState.gender !== (userData.buddyPersona?.gender || 'Non-binary') ||
+            buddyFormState.relationship !== (userData.buddyPersona?.relationship || 'Friend');
+        
+        setHasUnsavedChanges(profileChanged || buddyChanged);
+    }, [profileFormState, buddyFormState, userData]);
 
     const handlePhotoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -113,45 +136,91 @@ export default function SettingsPage() {
         }
     };
 
-    const onProfileSubmit = async (data: ProfileFormData) => {
+    // Unified save function for all settings
+    const handleSaveAllChanges = async () => {
         setIsSaving(true);
+        const errors: string[] = [];
+        
         try {
-            await updateProfile({
-                name: data.name,
-                bio: data.bio,
-            });
-            toast({
-                title: 'Profile updated',
-                description: 'Your profile has been successfully updated.',
-            });
+            // Validate all forms first
+            const isProfileValid = await profileForm.trigger();
+            const isBuddyValid = await buddyForm.trigger();
+            
+            if (!isProfileValid || !isBuddyValid) {
+                toast({
+                    title: 'Validation Error',
+                    description: 'Please fix the errors in the form before saving.',
+                    variant: 'destructive',
+                });
+                return;
+            }
+            
+            const profileData = profileForm.getValues();
+            const buddyData = buddyForm.getValues();
+            
+            // Save profile changes
+            try {
+                await updateProfile({
+                    name: profileData.name,
+                    bio: profileData.bio,
+                });
+            } catch (error: any) {
+                errors.push(`Profile: ${error.message}`);
+            }
+            
+            // Save buddy changes
+            try {
+                await updateBuddy(buddyData as BuddyPersona);
+            } catch (error: any) {
+                errors.push(`Buddy: ${error.message}`);
+            }
+            
+            if (errors.length === 0) {
+                toast({
+                    title: 'Settings Saved!',
+                    description: 'All your settings have been successfully updated.',
+                });
+                setHasUnsavedChanges(false);
+            } else {
+                toast({
+                    title: 'Partial Save',
+                    description: `Some settings couldn't be saved: ${errors.join(', ')}`,
+                    variant: 'destructive',
+                });
+            }
         } catch (error: any) {
             toast({
-                title: 'Update failed',
-                description: error.message || 'Failed to update profile.',
+                title: 'Save Failed',
+                description: error.message || 'Failed to save settings.',
                 variant: 'destructive',
             });
         } finally {
             setIsSaving(false);
         }
     };
-
-    const onBuddySubmit = async (data: BuddyFormData) => {
-        setIsSaving(true);
-        try {
-            await updateBuddy(data as BuddyPersona);
-            toast({
-                title: 'Buddy updated',
-                description: 'Your wellness buddy has been successfully updated.',
-            });
-        } catch (error: any) {
-            toast({
-                title: 'Update failed',
-                description: error.message || 'Failed to update buddy settings.',
-                variant: 'destructive',
-            });
-        } finally {
-            setIsSaving(false);
-        }
+    
+    // Reset forms to original values
+    const handleDiscardChanges = () => {
+        profileForm.reset({
+            name: userData.name,
+            bio: userData.bio || '',
+            emailNotifications: true,
+            pushNotifications: false,
+        });
+        
+        buddyForm.reset({
+            name: userData.buddyPersona?.name || 'Zen',
+            age: userData.buddyPersona?.age || 25,
+            gender: userData.buddyPersona?.gender || 'Non-binary',
+            relationship: userData.buddyPersona?.relationship || 'Friend',
+        });
+        
+        setHasUnsavedChanges(false);
+        
+        toast({
+            title: 'Changes Discarded',
+            description: 'All unsaved changes have been reverted.',
+        });
     };
 
     return (
@@ -211,7 +280,7 @@ export default function SettingsPage() {
                     </div>
                     
                     <Form {...profileForm}>
-                        <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-4">
+                        <div className="space-y-4">
                             <FormField
                                 control={profileForm.control}
                                 name="name"
@@ -242,13 +311,7 @@ export default function SettingsPage() {
                                     </FormItem>
                                 )}
                             />
-                            <div className="flex justify-end">
-                                <Button type="submit" disabled={isSaving}>
-                                    {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                                    Save Profile
-                                </Button>
-                            </div>
-                        </form>
+                        </div>
                     </Form>
                 </CardContent>
             </Card>
@@ -264,7 +327,7 @@ export default function SettingsPage() {
                 </CardHeader>
                 <CardContent>
                     <Form {...buddyForm}>
-                        <form onSubmit={buddyForm.handleSubmit(onBuddySubmit)} className="space-y-4">
+                        <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField
                                     control={buddyForm.control}
@@ -350,13 +413,7 @@ export default function SettingsPage() {
                                     )}
                                 />
                             </div>
-                            <div className="flex justify-end">
-                                <Button type="submit" disabled={isSaving}>
-                                    {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                                    Save Buddy Settings
-                                </Button>
-                            </div>
-                        </form>
+                        </div>
                     </Form>
                 </CardContent>
             </Card>
@@ -403,6 +460,57 @@ export default function SettingsPage() {
                             </p>
                         </div>
                         <Switch id="push-notifications" />
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Unified Save Section */}
+            <Card className={cn(
+                "sticky bottom-4 transition-all duration-200",
+                hasUnsavedChanges ? "ring-2 ring-primary/20 shadow-lg" : "shadow-sm"
+            )}>
+                <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            {hasUnsavedChanges && (
+                                <div className="flex items-center gap-2 text-amber-600">
+                                    <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                                    <span className="text-sm font-medium">You have unsaved changes</span>
+                                </div>
+                            )}
+                            {!hasUnsavedChanges && (
+                                <div className="flex items-center gap-2 text-green-600">
+                                    <div className="h-2 w-2 rounded-full bg-green-500" />
+                                    <span className="text-sm font-medium">All changes saved</span>
+                                </div>
+                            )}
+                        </div>
+                        
+                        <div className="flex items-center gap-3">
+                            {hasUnsavedChanges && (
+                                <Button 
+                                    variant="outline" 
+                                    onClick={handleDiscardChanges}
+                                    disabled={isSaving}
+                                >
+                                    Discard Changes
+                                </Button>
+                            )}
+                            <Button 
+                                onClick={handleSaveAllChanges}
+                                disabled={!hasUnsavedChanges || isSaving}
+                                className="min-w-[120px]"
+                            >
+                                {isSaving ? (
+                                    <>
+                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        Saving...
+                                    </>
+                                ) : (
+                                    'Save All Changes'
+                                )}
+                            </Button>
+                        </div>
                     </div>
                 </CardContent>
             </Card>
