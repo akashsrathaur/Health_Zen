@@ -17,7 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { nanoid } from 'nanoid';
-import { addChallenge as addChallengeAction, updateChallenge as updateChallengeAction } from '@/actions/challenges';
+import { addChallenge as addChallengeAction, updateChallenge as updateChallengeAction } from '@/lib/user-utils';
 import { useAuth } from '@/context/auth-context';
 
 

@@ -31,8 +31,7 @@ import { format } from 'date-fns';
 import { useAuth } from '@/context/auth-context';
 import { defaultUser } from '@/lib/user-store';
 import { useNotifications } from '@/hooks/use-notifications.tsx';
-import { updateDailyVibes as updateDailyVibesAction } from '@/actions/dashboard';
-import { updateChallenge as updateChallengeAction } from '@/actions/challenges';
+import { updateDailyVibes as updateDailyVibesAction, updateChallenge as updateChallengeAction } from '@/lib/user-utils';
 
 const containerVariants = {
   hidden: { opacity: 0 },
