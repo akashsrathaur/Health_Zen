@@ -465,10 +465,8 @@ export default function DashboardPage() {
             description: `You've earned the "${ach.name}" badge. Keep it up!`,
         });
         addNotification({
-            id: `ach-${ach.id}-${Date.now()}`,
             title: `You've unlocked the ${ach.name} badge!`,
             description: 'Check your progress on the Tracker page.',
-            isRead: false,
         });
     });
 

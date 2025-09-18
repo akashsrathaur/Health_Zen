@@ -4,32 +4,31 @@
 
 @layer base {
   :root {
-    /* Light theme (default) - Wellness focused colors */
-    --background: 33 15% 96%; /* #FFFBF4 - Pure light background */
-    --foreground: 22 20% 12%; /* #161614 - Dark text */
-    --card: 33 25% 92%; /* #F7E4D2 - Cream cards */
+    --background: 33 15% 96%;
+    --foreground: 22 20% 12%;
+    --card: 33 25% 92%;
     --card-foreground: 22 20% 12%;
     --popover: 33 15% 96%;
     --popover-foreground: 22 20% 12%;
-    --primary: 15 55% 55%; /* #CC6A4C - Coral primary */
+    --primary: 15 55% 55%;
     --primary-foreground: 33 15% 96%;
-    --secondary: 35 28% 44%; /* #93784E - Earth tone */
+    --secondary: 35 28% 44%;
     --secondary-foreground: 33 15% 96%;
-    --muted: 33 20% 88%; /* Soft muted background */
+    --muted: 33 20% 88%;
     --muted-foreground: 22 15% 40%;
-    --accent: 15 55% 55%; /* Same as primary coral */
+    --accent: 15 55% 55%;
     --accent-foreground: 33 15% 96%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 33 20% 80%; /* Subtle borders */
-    --input: 33 25% 90%; /* Input backgrounds */
-    --ring: 15 55% 55%; /* Focus rings */
+    --border: 33 20% 80%;
+    --input: 33 25% 90%;
+    --ring: 15 55% 55%;
     --chart-1: 15 55% 55%;
     --chart-2: 35 28% 44%;
     --chart-3: 33 25% 75%;
     --chart-4: 200 70% 60%;
     --chart-5: 280 50% 60%;
-    --radius: 1rem; /* Slightly more rounded for soft feel */
+    --radius: 1rem;
 
     --sidebar-background: 33 25% 92%;
     --sidebar-foreground: 22 20% 15%;
@@ -40,34 +39,25 @@
   }
 
   .dark {
-    /* Dark theme - Maintains wellness feel with warmer tones */
-    --background: 22 15% 8%; /* Deep warm dark */
-    --foreground: 33 15% 92%; /* Light cream text */
-    
-    --card: 22 20% 12%; /* Dark cards with warmth */
+    --background: 22 15% 8%;
+    --foreground: 33 15% 92%;
+    --card: 22 20% 12%;
     --card-foreground: 33 15% 92%;
-    
     --popover: 22 15% 10%;
     --popover-foreground: 33 15% 92%;
-    
-    --primary: 15 60% 60%; /* Brighter coral for dark mode */
+    --primary: 15 60% 60%;
     --primary-foreground: 22 15% 8%;
-    
-    --secondary: 35 30% 35%; /* Darker earth tone */
+    --secondary: 35 30% 35%;
     --secondary-foreground: 33 15% 92%;
-    
     --muted: 22 15% 15%;
     --muted-foreground: 33 10% 65%;
-    
-    --accent: 15 60% 60%; /* Bright coral accent */
+    --accent: 15 60% 60%;
     --accent-foreground: 22 15% 8%;
-    
     --destructive: 0 62.8% 50%;
     --destructive-foreground: 0 0% 98%;
-    
-    --border: 22 15% 20%; /* Warm borders */
-    --input: 22 20% 15%; /* Input backgrounds */
-    --ring: 15 60% 60%; /* Focus rings */
+    --border: 22 15% 20%;
+    --input: 22 20% 15%;
+    --ring: 15 60% 60%;
     
     --chart-1: 15 60% 60%;
     --chart-2: 35 30% 50%;
@@ -96,7 +86,6 @@
 }
 
 @layer utilities {
-  /* Wellness-themed utility classes */
   .text-glow {
     text-shadow: 0 0 8px hsl(var(--primary) / 0.8), 0 0 20px hsl(var(--primary) / 0.5);
   }
@@ -105,66 +94,4 @@
     box-shadow: 0 0 10px hsl(var(--primary)), 0 0 20px hsl(var(--primary) / 0.7);
   }
 
-  .text-glow-earth {
-    text-shadow: 0 0 8px hsl(var(--secondary) / 0.8), 0 0 20px hsl(var(--secondary) / 0.5);
-  }
-
-  .soft-shadow {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  }
-
-  .warm-shadow {
-    box-shadow: 0 4px 20px rgba(204, 106, 76, 0.15), 0 2px 8px rgba(204, 106, 76, 0.1);
-  }
-
-  .gentle-border {
-    border: 1px solid hsl(var(--border));
-    transition: border-color 0.3s ease;
-  }
-
-  .gentle-border:hover {
-    border-color: hsl(var(--primary) / 0.5);
-  }
-
-  .smooth-transition {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .wellness-gradient {
-    background: linear-gradient(135deg, 
-      hsl(var(--card)) 0%, 
-      hsl(var(--muted)) 100%);
-  }
-
-  .coral-gradient {
-    background: linear-gradient(135deg, 
-      hsl(var(--primary) / 0.1) 0%, 
-      hsl(var(--primary) / 0.05) 100%);
-  }
-
-  @keyframes wellness-glow {
-    from {
-      text-shadow: 0 0 4px hsl(var(--primary) / 0.5);
-    }
-    to {
-      text-shadow: 0 0 8px hsl(var(--primary) / 0.8);
-    }
-  }
-  
-  .animate-wellness-glow {
-    animation: wellness-glow 2s ease-in-out infinite alternate;
-  }
-
-  /* Responsive text sizes for mobile-first design */
-  .text-responsive-xl {
-    @apply text-xl sm:text-2xl lg:text-3xl;
-  }
-  
-  .text-responsive-lg {
-    @apply text-lg sm:text-xl lg:text-2xl;
-  }
-  
-  .text-responsive-base {
-    @apply text-sm sm:text-base lg:text-lg;
-  }
 }
