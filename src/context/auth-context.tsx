@@ -133,20 +133,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Separate effect for listening to global community posts
   useEffect(() => {
+    console.log('Setting up community posts listener');
     const communityPostsRef = collection(db, 'communityPosts');
     const q = query(communityPostsRef, orderBy('timestamp', 'desc'));
     
     const unsubscribePosts = onSnapshot(q, (snapshot) => {
-      const postsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as CommunityPost[];
+      console.log('Community posts snapshot received:', snapshot.size, 'documents');
+      const postsData = snapshot.docs.map(doc => {
+        const data = doc.data();
+        console.log('Post data:', { id: doc.id, ...data });
+        return {
+          id: doc.id,
+          ...data
+        };
+      }) as CommunityPost[];
+      console.log('Setting posts in state:', postsData);
       setPosts(postsData);
     }, (error) => {
       console.error('Error listening to community posts:', error);
+      console.error('Error details:', {
+        code: (error as any)?.code,
+        message: (error as any)?.message
+      });
     });
 
-    return () => unsubscribePosts();
+    return () => {
+      console.log('Cleaning up community posts listener');
+      unsubscribePosts();
+    };
   }, []); // No dependencies - this should always be listening
 
   const contextValue = {

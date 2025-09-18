@@ -27,19 +27,31 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (loading) {
+      console.log('AuthGuard: Still loading auth state');
       return; // Wait for the auth state to be determined.
     }
 
+    console.log('AuthGuard: Auth state loaded', { 
+      firebaseUser: !!firebaseUser, 
+      pathname, 
+      isPublicRoute 
+    });
+
     // If user is not logged in and trying to access a protected route, redirect to login
     if (!firebaseUser && !isPublicRoute) {
+      console.log('AuthGuard: Redirecting to login - user not authenticated');
       router.replace('/login');
+      return;
     }
     
     // If user is logged in and tries to access a public route, redirect to dashboard
     if (firebaseUser && isPublicRoute) {
+      console.log('AuthGuard: Redirecting to dashboard - user already authenticated');
       router.replace('/dashboard');
+      return;
     }
 
+    console.log('AuthGuard: No redirect needed, staying on', pathname);
   }, [firebaseUser, loading, pathname, router, isPublicRoute]);
 
   // While loading the initial auth state, show a loading screen.

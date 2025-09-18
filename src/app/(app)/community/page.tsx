@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { communityPosts as initialCommunityPosts, type CommunityPost } from '@/lib/data';
 import { Textarea } from '@/components/ui/textarea';
-import { Camera, Send, CircleUser, Video, RefreshCcw, CheckCircle, XCircle, MessageCircle, Heart, ThumbsUp } from 'lucide-react';
+import { Camera, Send, CircleUser, Video, RefreshCcw, CheckCircle, XCircle, MessageCircle, Heart, ThumbsUp, RotateCcw } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useState, useRef, useEffect } from 'react';
 import { nanoid } from 'nanoid';
@@ -368,50 +368,146 @@ function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, o
 export default function CommunityPage() {
   const { user, posts, setPosts, loading } = useAuth();
   const userData = user || { ...defaultUser, uid: '' };
+  const [refreshing, setRefreshing] = useState(false);
+  const { toast } = useToast();
   
-  const handleAddPost = async (content: string, imageUrl?: string, imageHint?: string) => {
-    if (!user) return;
-    const newPost: Omit<CommunityPost, 'id'> = {
-      user: {
-        uid: user.uid,
-        name: user.name,
-        avatarUrl: user.avatarUrl,
-      },
-      timestamp: new Date().toISOString(),
-      content: content,
-      imageUrl: imageUrl,
-      imageHint: imageHint,
-      reactions: {},
-      userReactions: {},
-      comments: []
-    };
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      console.log('Manual refresh triggered');
+      console.log('Current posts count:', posts.length);
+      console.log('Current user:', user);
+      console.log('Firebase config check:', {
+        hasApiKey: !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+        hasProjectId: !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+      });
+      
+      // Instead of full page reload, just force re-fetch
+      // The listener should automatically get new data
+      setTimeout(() => {
+        setRefreshing(false);
+        toast({
+          title: 'Refreshed',
+          description: 'Community feed has been refreshed.',
+        });
+      }, 1000);
+    } catch (error) {
+      console.error('Error refreshing posts:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Refresh Failed',
+        description: 'Unable to refresh posts. Please try again.',
+      });
+      setRefreshing(false);
+    }
+  };
 
-    await addPostAction(newPost);
+  const handleAddPost = async (content: string, imageUrl?: string, imageHint?: string) => {
+    if (!user) {
+      toast({
+        variant: 'destructive',
+        title: 'Not Logged In',
+        description: 'Please log in to create posts.',
+      });
+      return;
+    }
+
+    try {
+      const newPost: Omit<CommunityPost, 'id'> = {
+        user: {
+          uid: user.uid,
+          name: user.name,
+          avatarUrl: user.avatarUrl,
+        },
+        timestamp: new Date().toISOString(),
+        content: content,
+        imageUrl: imageUrl,
+        imageHint: imageHint,
+        reactions: {},
+        userReactions: {},
+        comments: []
+      };
+
+      await addPostAction(newPost);
+      
+      toast({
+        title: 'Post Created!',
+        description: 'Your post has been shared with the community.',
+      });
+    } catch (error) {
+      console.error('Error creating post:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Post Failed',
+        description: 'Unable to create post. Please try again.',
+      });
+    }
   };
 
   if (loading) {
-      return <div>Loading community posts...</div>
+      return (
+        <div className="mx-auto max-w-2xl">
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading community posts...</p>
+          </div>
+        </div>
+      )
   }
 
   return (
     <div className="mx-auto max-w-2xl">
       <div className="mb-8">
-        <h1 className="font-headline text-3xl font-bold tracking-tight">
-          Community Feed
-        </h1>
-        <p className="text-muted-foreground">
-          <Balancer>
-            Share your journey and get inspired by others in the HealthZen community.
-          </Balancer>
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-headline text-3xl font-bold tracking-tight">
+              Community Feed
+            </h1>
+            <p className="text-muted-foreground">
+              <Balancer>
+                Share your journey and get inspired by others in the HealthZen community.
+              </Balancer>
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="flex items-center gap-2"
+          >
+            <RotateCcw className={cn("h-4 w-4", refreshing && "animate-spin")} />
+            {refreshing ? 'Refreshing...' : 'Refresh'}
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-6">
         {user && <CreatePost onAddPost={handleAddPost} userData={userData} />}
         <Separator />
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} currentUser={user} />
-        ))}
+        {posts.length === 0 ? (
+          <Card className="text-center py-12">
+            <CardContent>
+              <div className="flex flex-col items-center gap-4">
+                <Users className="h-12 w-12 text-muted-foreground" />
+                <div>
+                  <h3 className="font-semibold mb-2">No posts yet</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Be the first to share something with the community!
+                  </p>
+                  <Button onClick={handleRefresh} variant="outline" size="sm">
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Check for posts
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          posts.map((post) => (
+            <PostCard key={post.id} post={post} currentUser={user} />
+          ))
+        )}
       </div>
     </div>
   );

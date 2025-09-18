@@ -40,17 +40,31 @@ export async function getAllCommunityPosts(): Promise<CommunityPost[]> {
 // Add a new community post (public)
 export async function addCommunityPost(newPost: Omit<CommunityPost, 'id'>) {
   try {
+    console.log('Adding community post:', newPost);
     const postsCollection = collection(db, COMMUNITY_POSTS_COLLECTION);
-    await addDoc(postsCollection, {
+    console.log('Posts collection reference:', postsCollection);
+    
+    const postData = {
       ...newPost,
       timestamp: new Date().toISOString(),
-      reactions: {},
-      userReactions: {},
-      comments: []
-    });
+      reactions: newPost.reactions || {},
+      userReactions: newPost.userReactions || {},
+      comments: newPost.comments || []
+    };
+    
+    console.log('Post data to be saved:', postData);
+    const docRef = await addDoc(postsCollection, postData);
+    console.log('Post saved with ID:', docRef.id);
+    
     revalidatePath('/community');
+    return { success: true, id: docRef.id };
   } catch (error) {
     console.error('Error adding community post:', error);
+    console.error('Error details:', {
+      code: (error as any)?.code,
+      message: (error as any)?.message,
+      stack: (error as any)?.stack
+    });
     throw error;
   }
 }
