@@ -48,7 +48,3 @@ export const defaultUser: Omit<User, 'uid'> = {
         relationship: 'Friend',
     },
 }
-        gender: 'Non-binary',
-        relationship: 'Friend',
-    },
-}
