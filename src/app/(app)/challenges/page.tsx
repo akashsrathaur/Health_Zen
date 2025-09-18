@@ -624,12 +624,10 @@ export default function ChallengesPage() {
             </p>
         </div>
         <div className="flex gap-2">
-          {challenges.length === 0 && (
-            <Button variant="outline" onClick={() => setIsJoinChallengeOpen(true)}>
-              <Target className="mr-2 h-4 w-4" />
-              Join Challenge
-            </Button>
-          )}
+          <Button variant="outline" onClick={() => setIsJoinChallengeOpen(true)}>
+            <Users className="mr-2 h-4 w-4" />
+            Browse & Join Challenges
+          </Button>
           <Button onClick={() => setIsCreateOpen(true)}>
               <PlusCircle className="mr-2 h-4 w-4" />
               Create New Challenge
@@ -658,26 +656,43 @@ export default function ChallengesPage() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-          <AnimatePresence>
-            {challenges.map((challenge, index) => (
-               <motion.div
-                  key={challenge.id}
-                  layout
-                  initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -50, scale: 0.9 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <ChallengeCard 
-                  challenge={challenge}
-                  onUploadProof={handleOpenUpload}
-                  onShare={handleShare}
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <AnimatePresence>
+              {challenges.map((challenge, index) => (
+                 <motion.div
+                    key={challenge.id}
+                    layout
+                    initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -50, scale: 0.9 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <ChallengeCard 
+                    challenge={challenge}
+                    onUploadProof={handleOpenUpload}
+                    onShare={handleShare}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+          
+          {/* Discover More Challenges Section */}
+          <div className="bg-muted/30 rounded-lg p-6 text-center">
+            <div className="max-w-md mx-auto">
+              <Users className="h-12 w-12 text-primary mx-auto mb-3" />
+              <h3 className="text-lg font-semibold mb-2">Discover More Challenges</h3>
+              <p className="text-muted-foreground mb-4">
+                Join thousands of people in popular wellness challenges created by experienced community members!
+              </p>
+              <Button onClick={() => setIsJoinChallengeOpen(true)} size="lg">
+                <Users className="mr-2 h-4 w-4" />
+                Browse Public Challenges
+              </Button>
+            </div>
+          </div>
+        </>
       )}
 
       <CameraDialog 
