@@ -9,7 +9,7 @@ import {
   ChartConfig,
 } from '@/components/ui/chart';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, ResponsiveContainer, ReferenceLine } from 'recharts';
-import { getAchievements, progressData, type Achievement } from '@/lib/data';
+import { type Achievement } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Download, Flame, Share2, Loader2 } from 'lucide-react';
 import { Icon } from '@/lib/icon-resolver';
@@ -20,6 +20,9 @@ import { exportReportAsImage, shareReport } from '@/lib/export-report';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { Icons } from '@/components/icons';
+import { useAuth } from '@/context/auth-context';
+import { defaultUser } from '@/lib/user-store';
+import { getUserProgressData, getUserAchievements, type UserProgress } from '@/lib/user-progress';
 
 const waterChartConfig = {
   glasses: {
@@ -94,20 +97,26 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
 
 export default function ProgressTrackerPage() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isExporting, setIsExporting] = useState(false);
   
-  const waterChartData = progressData.water.labels.map((label, i) => ({ day: label, glasses: progressData.water.data[i] }));
-  const sleepChartData = progressData.sleep.labels.map((label, i) => ({ day: label, hours: progressData.sleep.data[i] }));
-
-  // In a real app, this progress would come from user data
-  const userProgress = {
-      streak: 12,
-      completedTasks: 5,
-      points: 245,
-      dailyPoints: 18,
-  };
+  // Get real user data instead of fake data
+  const userData = user || defaultUser;
+  const userProgress = getUserProgressData(userData);
   
-  const achievements = getAchievements(userProgress);
+  // Generate chart data from real user progress
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const waterChartData = days.map((day, i) => ({ 
+    day, 
+    glasses: userProgress.weeklyWaterData[i] 
+  }));
+  const sleepChartData = days.map((day, i) => ({ 
+    day, 
+    hours: userProgress.weeklySleepData[i] 
+  }));
+  
+  // Get achievements based on real progress
+  const achievements = getUserAchievements(userProgress);
   const unlockedAchievements = achievements.filter(a => a.unlocked).length;
   const totalAchievements = achievements.length;
   
@@ -133,7 +142,7 @@ export default function ProgressTrackerPage() {
   const handleShareReport = async () => {
     setIsExporting(true);
     try {
-      await shareReport('progress-report', `Check out my wellness progress! 🌟 ${userProgress.points} points earned and ${userProgress.streak} day streak! #HealthZen`);
+      await shareReport('progress-report', `Check out my wellness progress! 🌟 ${userProgress.totalPoints} points earned and ${userProgress.streak} day streak! #HealthZen`);
     } catch (error) {
       toast({
         title: 'Share Failed',
@@ -156,12 +165,16 @@ export default function ProgressTrackerPage() {
           <div className="flex items-center gap-4 mt-2">
             <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
               <Icons.points className="h-4 w-4" />
-              <span className="font-semibold">{userProgress.points} points</span>
+              <span className="font-semibold">{userProgress.totalPoints} points</span>
               <span className="text-muted-foreground">({userProgress.dailyPoints}/30 today)</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400">
               <Icons.streak className="h-4 w-4" />
               <span className="font-semibold">{userProgress.streak} day streak</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
+              <Icons.points className="h-4 w-4" />
+              <span className="font-semibold">{userProgress.completedTasks} tasks completed</span>
             </div>
           </div>
         </div>
@@ -197,7 +210,7 @@ export default function ProgressTrackerPage() {
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Water Intake</CardTitle>
-            <CardDescription>Last 7 days (Goal: {progressData.water.goal} glasses)</CardDescription>
+            <CardDescription>Last 7 days (Goal: {userProgress.waterGoal} glasses) | Today: {userProgress.waterIntake}/{userProgress.waterGoal}</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={waterChartConfig} className="h-64 w-full">
@@ -207,7 +220,7 @@ export default function ProgressTrackerPage() {
                 <YAxis hide />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar dataKey="glasses" fill="var(--color-glasses)" radius={4} />
-                <ReferenceLine y={progressData.water.goal} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
+                <ReferenceLine y={userProgress.waterGoal} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
               </BarChart>
             </ChartContainer>
           </CardContent>
@@ -218,7 +231,7 @@ export default function ProgressTrackerPage() {
             <Flame className="h-16 w-16 text-white" />
           </CardHeader>
           <CardContent>
-            <p className="text-6xl font-bold text-white animate-bounce-in">{progressData.streak}</p>
+            <p className="text-6xl font-bold text-white animate-bounce-in">{userProgress.streak}</p>
             <p className="text-center font-medium text-white/80">days</p>
           </CardContent>
         </Card>
@@ -227,7 +240,7 @@ export default function ProgressTrackerPage() {
       <Card>
           <CardHeader>
             <CardTitle>Sleep Duration</CardTitle>
-            <CardDescription>Last 7 days (Goal: {progressData.sleep.goal} hours)</CardDescription>
+            <CardDescription>Last 7 days (Goal: {userProgress.sleepGoal} hours) | Today: {userProgress.sleepHours}h</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={sleepChartConfig} className="h-64 w-full">
@@ -237,7 +250,7 @@ export default function ProgressTrackerPage() {
                 <YAxis hide />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Line type="monotone" dataKey="hours" stroke="var(--color-hours)" strokeWidth={2} dot={false} />
-                <ReferenceLine y={progressData.sleep.goal} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
+                <ReferenceLine y={userProgress.sleepGoal} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
               </LineChart>
             </ChartContainer>
           </CardContent>
