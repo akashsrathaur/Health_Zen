@@ -38,7 +38,7 @@ export async function getAllCommunityPosts(): Promise<CommunityPost[]> {
 }
 
 // Add a new community post (public)
-export async function addCommunityPost(newPost: Omit<CommunityPost, 'id'>) {
+export async function addCommunityPost(newPost: Omit<CommunityPost, 'id'>): Promise<{ success: boolean; id?: string; error?: string; details?: any }> {
   try {
     console.log('Adding community post:', newPost);
     const postsCollection = collection(db, COMMUNITY_POSTS_COLLECTION);
