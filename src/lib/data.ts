@@ -36,6 +36,34 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
+export const avatarOptions = [
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=felix&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=aneka&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=mila&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=oliver&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=emma&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=noah&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=sophia&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=liam&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=ava&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=william&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=isabella&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=james&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=charlotte&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=benjamin&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=mia&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=lucas&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=harper&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=henry&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=evelyn&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=alexander&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=abigail&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=michael&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=emily&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=daniel&backgroundColor=b6e3f4,c0aede,d1d4f9',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=elizabeth&backgroundColor=b6e3f4,c0aede,d1d4f9',
+];
+
 export const allVibeIcons = {
     Activity,
     Footprints,
@@ -112,13 +140,6 @@ export const initialDailyVibes: DailyVibe[] = [
     title: 'Sleep',
     value: '0h',
     icon: 'Bed',
-    progress: 0,
-  },
-  {
-    id: 'gym',
-    title: 'Gym Workout',
-    value: '0/60 minutes',
-    icon: 'Dumbbell',
     progress: 0,
   },
   {
@@ -233,24 +254,24 @@ export const communityPosts: CommunityPost[] = [
     user: {
       uid: 'akash-001',
       name: 'Akash',
-      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=akash-fitness&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=ffd93d&clothingColor=65c9ff&clothingGraphic=skullOutline',
+      avatarUrl: 'https://picsum.photos/seed/akash/100/100',
     },
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    content: 'Just completed my 30-day fitness transformation challenge! 💪 The journey wasn\'t easy, but consistency and dedication paid off. Lost 8kg and gained so much confidence. Health Fact: Regular strength training increases your metabolic rate for up to 24 hours post-workout! To anyone starting their fitness journey - you\'ve got this! #FitnessTransformation #HealthyLiving #HealthFacts',
-    imageUrl: 'https://picsum.photos/seed/fitness1/800/600',
-    imageHint: 'fitness transformation before after',
-    reactions: { '💪': 45, '🔥': 32, '❤️': 28, '🙏': 15 },
+    timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+    content: '🌅 Started my day with sunrise yoga! There\'s something magical about connecting with your body as the sun rises. 30 minutes of flow and I\'m ready to conquer anything today! Who else loves morning yoga? #morningyoga #wellness #mindfulness',
+    imageUrl: 'https://picsum.photos/seed/yoga-sunrise/800/600',
+    imageHint: 'yoga sunrise peaceful',
+    reactions: { '🔥': 45, '💪': 32, '🧘': 28, '❤️': 15 },
     userReactions: {},
     comments: [
       {
-        id: 'comment-akash-1',
+        id: 'comment-1',
         user: {
           uid: 'saumyaa-002',
           name: 'Saumyaa',
-          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=saumyaa-yoga&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=d4edda&clothingColor=721c24&clothingGraphic=skull'
+          avatarUrl: 'https://picsum.photos/seed/saumyaa/100/100'
         },
-        content: 'Wow Akash! This is so inspiring. What was your workout routine? I\'m just starting my fitness journey.',
-        timestamp: new Date(Date.now() - 1.5 * 60 * 60 * 1000).toISOString()
+        content: 'This is so inspiring! I usually do evening yoga but maybe I should try morning sessions too 🌅',
+        timestamp: new Date(Date.now() - 45 * 60 * 1000).toISOString()
       }
     ],
   },
@@ -259,100 +280,100 @@ export const communityPosts: CommunityPost[] = [
     user: {
       uid: 'saumyaa-002',
       name: 'Saumyaa',
-      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=saumyaa-yoga&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=d4edda&clothingColor=721c24&clothingGraphic=skull',
+      avatarUrl: 'https://picsum.photos/seed/saumyaa/100/100',
     },
-    timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-    content: 'Morning yoga session by the lake 🌅 Starting my day with gratitude and mindfulness. This peaceful routine has completely transformed my mental health and energy levels. Wellness Tip: Just 10 minutes of morning yoga can reduce cortisol levels by 23%! Nature truly is the best therapy! #YogaLife #MentalWellness #MorningRituals #WellnessTips',
-    imageUrl: 'https://picsum.photos/seed/yoga-lake/800/600',
-    imageHint: 'yoga by lake sunrise',
-    reactions: { '🧘': 38, '🌿': 25, '❤️': 22, '😊': 18 },
+    timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+    content: '🥗 Meal prep Sunday is here! Spent the afternoon preparing colorful Buddha bowls for the week. Quinoa, roasted veggies, chickpeas, and tahini dressing. Eating healthy doesn\'t have to be boring when you make it colorful! #mealprep #healthyfood #nutrition',
+    imageUrl: 'https://picsum.photos/seed/buddha-bowl/800/600',
+    imageHint: 'colorful healthy meal prep bowls',
+    reactions: { '🌿': 52, '😍': 38, '👏': 25, '💚': 18 },
     userReactions: {},
-    comments: [],
+    comments: [
+      {
+        id: 'comment-2',
+        user: {
+          uid: 'jaanvi-003',
+          name: 'Jaanvi',
+          avatarUrl: 'https://picsum.photos/seed/jaanvi/100/100'
+        },
+        content: 'These look amazing! Can you share the tahini dressing recipe? 🤤',
+        timestamp: new Date(Date.now() - 2.5 * 60 * 60 * 1000).toISOString()
+      }
+    ],
   },
   {
     id: 'post-3',
     user: {
-      uid: 'divyansh-003',
-      name: 'Divyansh',
-      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=divyansh-nutrition&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=bae1ff&clothingColor=25262b&clothingGraphic=selena',
+      uid: 'jaanvi-003',
+      name: 'Jaanvi',
+      avatarUrl: 'https://picsum.photos/seed/jaanvi/100/100',
     },
-    timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
-    content: 'Meal prep Sunday! 🥗 Preparing nutritious meals for the entire week. This colorful buddha bowl has quinoa, roasted vegetables, chickpeas, and homemade tahini dressing. Nutrition Fact: Eating a rainbow of colors ensures you get diverse antioxidants and phytonutrients! Meal prep saves 4 hours per week on average. Nutrition doesn\'t have to be boring when you add colors and flavors! #MealPrep #HealthyEating #Nutrition #HealthFacts',
-    imageUrl: 'https://picsum.photos/seed/mealprep/800/600',
-    imageHint: 'colorful buddha bowl meal prep',
-    reactions: { '🌿': 35, '😋': 28, '👍': 24, '🍎': 12 },
+    timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+    content: '🏃‍♀️ Just completed my first 10K run! Six months ago I could barely run 1K without stopping. Consistency is everything. Small steps every day lead to big achievements. To anyone starting their fitness journey - you\'ve got this! 💪 #10k #running #progress #nevergiveup',
+    imageUrl: 'https://picsum.photos/seed/running-finish/800/600',
+    imageHint: 'running achievement fitness milestone',
+    reactions: { '🔥': 67, '💪': 58, '👏': 45, '🏃‍♀️': 32 },
     userReactions: {},
     comments: [
       {
-        id: 'comment-divyansh-1',
+        id: 'comment-3',
         user: {
-          uid: 'jaanvi-005',
-          name: 'Jaanvi',
-          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jaanvi-wellness&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=d0f0c0&clothingColor=2d5016&clothingGraphic=pizza'
+          uid: 'deepanjana-004',
+          name: 'Deepanjana',
+          avatarUrl: 'https://picsum.photos/seed/deepanjana/100/100'
         },
-        content: 'This looks amazing! Can you share the tahini dressing recipe? I\'ve been looking for healthy dressing options.',
-        timestamp: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString()
+        content: 'Wow! That\'s incredible progress! You\'re such an inspiration 🌟',
+        timestamp: new Date(Date.now() - 5.5 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: 'comment-4',
+        user: {
+          uid: 'sarthak-005',
+          name: 'Sarthak',
+          avatarUrl: 'https://picsum.photos/seed/sarthak/100/100'
+        },
+        content: 'Amazing! What training plan did you follow? I\'m currently at the 3K mark 🏃‍♂️',
+        timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
       }
     ],
   },
   {
     id: 'post-4',
     user: {
-      uid: 'sarthak-004',
-      name: 'Sarthak',
-      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sarthak-running&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=e2e3e5&clothingColor=0c5460&clothingGraphic=skull',
+      uid: 'deepanjana-004',
+      name: 'Deepanjana',
+      avatarUrl: 'https://picsum.photos/seed/deepanjana/100/100',
     },
     timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-    content: 'Hit a new personal record today! 🏃‍♂️ Ran my first 10K in under 45 minutes. Six months ago, I couldn\'t even run 1K without stopping. Fitness Tip: The 80/20 rule - 80% of your runs should be at an easy, conversational pace for optimal improvement. The key was gradual progression and never giving up. Every step counts, no matter how small! #Running #PersonalRecord #NeverGiveUp #FitnessTips',
-    imageUrl: 'https://picsum.photos/seed/running/800/600',
-    imageHint: 'running track sunrise achievement',
-    reactions: { '🏃': 42, '💪': 38, '🔥': 31, '🏆': 19 },
+    content: '🧘‍♀️ Found my zen today with a 30-minute meditation session in the park. Sometimes we get so caught up in the hustle that we forget to pause and breathe. Mindfulness isn\'t just sitting in silence - it\'s about being present in every moment. How do you practice mindfulness? #meditation #mindfulness #innerpeace #wellness',
+    imageUrl: 'https://picsum.photos/seed/meditation-park/800/600',
+    imageHint: 'peaceful meditation in nature',
+    reactions: { '🧘': 41, '❤️': 33, '🌿': 27, '✨': 19 },
     userReactions: {},
-    comments: [
-      {
-        id: 'comment-sarthak-1',
-        user: {
-          uid: 'akash-001',
-          name: 'Akash',
-          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=akash-fitness&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=ffd93d&clothingColor=65c9ff&clothingGraphic=skullOutline'
-        },
-        content: 'Incredible progress Sarthak! Your dedication is truly inspiring. What training plan did you follow?',
-        timestamp: new Date(Date.now() - 11 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        id: 'comment-sarthak-2',
-        user: {
-          uid: 'deepanjana-006',
-          name: 'Deepanjana',
-          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=deepanjana-holistic&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=e8f4fd&clothingColor=0a58ca&clothingGraphic=bear'
-        },
-        content: 'Congratulations! This motivates me to start my running journey. Any tips for beginners?',
-        timestamp: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString()
-      }
-    ],
+    comments: [],
   },
   {
     id: 'post-5',
     user: {
-      uid: 'jaanvi-005',
-      name: 'Jaanvi',
-      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jaanvi-wellness&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=d0f0c0&clothingColor=2d5016&clothingGraphic=pizza',
+      uid: 'sarthak-005',
+      name: 'Sarthak',
+      avatarUrl: 'https://picsum.photos/seed/sarthak/100/100',
     },
     timestamp: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(),
-    content: 'Self-care Sunday ritual 🛌 Created my own spa day at home - face mask, meditation, journaling, and herbal tea. Mental Health Tip: Regular self-care practices can reduce anxiety by up to 68% and improve sleep quality by 42%. Taking time to recharge and reconnect with yourself is not selfish, it\'s necessary. How do you practice self-care? #SelfCare #MentalHealth #SelfLove #MentalHealthTips',
-    imageUrl: 'https://picsum.photos/seed/selfcare/800/600',
-    imageHint: 'home spa relaxation self care',
-    reactions: { '❤️': 48, '🧘': 35, '🌿': 29, '😌': 22 },
+    content: '💪 Leg day = best day! Just finished an intense lower body workout. Squats, deadlifts, lunges - my legs are jelly but my spirit is strong! Remember, the only workout you regret is the one you didn\'t do. What\'s your favorite muscle group to train? #legday #strength #fitness #workout',
+    imageUrl: 'https://picsum.photos/seed/gym-workout/800/600',
+    imageHint: 'intense gym workout session',
+    reactions: { '💪': 54, '🔥': 42, '😤': 31, '👏': 28 },
     userReactions: {},
     comments: [
       {
-        id: 'comment-jaanvi-1',
+        id: 'comment-5',
         user: {
-          uid: 'saumyaa-002',
-          name: 'Saumyaa',
-          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=saumyaa-yoga&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=d4edda&clothingColor=721c24&clothingGraphic=skull'
+          uid: 'divyansh-006',
+          name: 'Divyansh',
+          avatarUrl: 'https://picsum.photos/seed/divyansh/100/100'
         },
-        content: 'Love this! I do something similar every Sunday. It\'s amazing how much better we feel after taking care of ourselves.',
+        content: 'Leg day is brutal but so rewarding! What\'s your squat PR? 🏋️‍♂️',
         timestamp: new Date(Date.now() - 17 * 60 * 60 * 1000).toISOString()
       }
     ],
@@ -360,52 +381,36 @@ export const communityPosts: CommunityPost[] = [
   {
     id: 'post-6',
     user: {
-      uid: 'deepanjana-006',
-      name: 'Deepanjana',
-      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=deepanjana-holistic&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=e8f4fd&clothingColor=0a58ca&clothingGraphic=bear',
+      uid: 'divyansh-006',
+      name: 'Divyansh',
+      avatarUrl: 'https://picsum.photos/seed/divyansh/100/100',
     },
     timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    content: 'Growth mindset in action! 🌱 Started learning about holistic nutrition and it\'s fascinating how food can be medicine. Currently reading about Ayurvedic principles and how they can complement modern wellness practices. Health Education Tip: Studies show that turmeric (curcumin) has anti-inflammatory properties equivalent to ibuprofen, but without side effects! Never too late to expand your knowledge! #HolisticHealth #LifelongLearning #Ayurveda #HealthEducation',
-    imageUrl: 'https://picsum.photos/seed/holistic/800/600',
-    imageHint: 'books herbs holistic health learning',
-    reactions: { '🌱': 33, '📚': 28, '🌿': 25, '🧘': 20 },
+    content: '🌱 Week 3 of my plant-based journey and I\'m feeling incredible! More energy, better sleep, clearer skin. Made this amazing lentil curry with fresh turmeric and ginger. Nature really provides everything we need for optimal health. Anyone else on a plant-based path? #plantbased #wholefood #vegan #healthyeating #naturalhealing',
+    imageUrl: 'https://picsum.photos/seed/plant-based-meal/800/600',
+    imageHint: 'colorful plant based healthy meal',
+    reactions: { '🌱': 48, '🌿': 35, '😍': 29, '💚': 22 },
     userReactions: {},
     comments: [
       {
-        id: 'comment-deepanjana-1',
-        user: {
-          uid: 'divyansh-003',
-          name: 'Divyansh',
-          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=divyansh-nutrition&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=bae1ff&clothingColor=25262b&clothingGraphic=selena'
-        },
-        content: 'This is so interesting! I\'ve been exploring the connection between nutrition and mental health. Would love to hear more about what you\'re learning.',
-        timestamp: new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString()
-      }
-    ],
-  },
-  {
-    id: 'post-7',
-    user: {
-      uid: 'divyansh-007',
-      name: 'Divyansh',
-      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=divyansh-hydration&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=bae1ff&clothingColor=25262b&clothingGraphic=selena',
-    },
-    timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-    content: 'Hydration game strong today! 💧 Did you know your brain is 73% water? Even 2% dehydration can affect concentration, memory, and mood. I\'ve been tracking my water intake and the difference in energy levels is incredible! Hydration Hack: Add a pinch of sea salt and lemon to your water for better absorption. Stay hydrated, stay sharp! #Hydration #BrainHealth #WellnessTips #HealthFacts',
-    imageUrl: 'https://picsum.photos/seed/hydration/800/600',
-    imageHint: 'water bottle fresh fruits hydration',
-    reactions: { '💧': 41, '🧠': 28, '😊': 22, '👍': 18 },
-    userReactions: {},
-    comments: [
-      {
-        id: 'comment-divyansh-water-1',
+        id: 'comment-6',
         user: {
           uid: 'akash-001',
           name: 'Akash',
-          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=akash-fitness&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=ffd93d&clothingColor=65c9ff&clothingGraphic=skullOutline'
+          avatarUrl: 'https://picsum.photos/seed/akash/100/100'
         },
-        content: 'Great tip about the sea salt and lemon! I never knew about the brain being 73% water. Thanks for sharing!',
-        timestamp: new Date(Date.now() - 5.5 * 60 * 60 * 1000).toISOString()
+        content: 'That curry looks delicious! I\'ve been thinking about reducing meat in my diet. Any beginner tips?',
+        timestamp: new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: 'comment-7',
+        user: {
+          uid: 'saumyaa-002',
+          name: 'Saumyaa',
+          avatarUrl: 'https://picsum.photos/seed/saumyaa/100/100'
+        },
+        content: 'Love seeing this transformation! Plant-based eating has changed my life too 🌱✨',
+        timestamp: new Date(Date.now() - 22 * 60 * 60 * 1000).toISOString()
       }
     ],
   },

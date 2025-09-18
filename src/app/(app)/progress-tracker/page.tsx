@@ -9,7 +9,7 @@ import {
   ChartConfig,
 } from '@/components/ui/chart';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, ResponsiveContainer, ReferenceLine } from 'recharts';
-import { type Achievement } from '@/lib/data';
+import { getAchievements, type Achievement } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Download, Flame, Share2, Loader2 } from 'lucide-react';
 import { Icon } from '@/lib/icon-resolver';
@@ -22,7 +22,7 @@ import { useState } from 'react';
 import { Icons } from '@/components/icons';
 import { useAuth } from '@/context/auth-context';
 import { defaultUser } from '@/lib/user-store';
-import { getUserProgressData, getUserAchievements, type UserProgress } from '@/lib/user-progress';
+import { getUserProgressData, type UserProgress } from '@/lib/user-progress';
 
 const waterChartConfig = {
   glasses: {
@@ -111,12 +111,23 @@ export default function ProgressTrackerPage() {
   const { user } = useAuth();
   const [isExporting, setIsExporting] = useState(false);
   
-  // Get real user data instead of fake data
-  const userData = user || defaultUser;
+  // Get real user data instead of fake data - handle missing uid for defaultUser
+  const userData = user || { ...defaultUser, uid: 'default' };
   const userProgress = getUserProgressData(userData);
   
-  // Generate chart data from real user progress
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  // Generate proper date labels for the last 7 days
+  const generateLast7Days = () => {
+    const days = [];
+    const today = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      days.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+    }
+    return days;
+  };
+  
+  const days = generateLast7Days();
   const waterChartData = days.map((day, i) => ({ 
     day, 
     glasses: userProgress.weeklyWaterData[i] 
@@ -131,7 +142,7 @@ export default function ProgressTrackerPage() {
   }));
   
   // Get achievements based on real progress
-  const achievements = getUserAchievements(userProgress);
+  const achievements = getAchievements({ streak: userProgress.streak, completedTasks: userProgress.completedTasks });
   const unlockedAchievements = achievements.filter(a => a.unlocked).length;
   const totalAchievements = achievements.length;
   

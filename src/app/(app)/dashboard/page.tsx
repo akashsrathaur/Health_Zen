@@ -103,7 +103,7 @@ function ChallengeCard({ challenge, onMarkAsDone }: { challenge: Challenge, onMa
   );
 }
 
-function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: boolean, onClose: () => void, vibe: DailyVibe | null, onSave: (vibe: DailyVibe) => void, onDelete: (vibeId: string) => void}) {
+function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete, userData }: { isOpen: boolean, onClose: () => void, vibe: DailyVibe | null, onSave: (vibe: DailyVibe) => void, onDelete: (vibeId: string) => void, userData: any}) {
     const [currentVibe, setCurrentVibe] = useState<DailyVibe | null>(vibe);
 
     useEffect(() => {
@@ -113,7 +113,7 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
     if (!currentVibe) return null;
 
     const handleWaterChange = async (amount: number) => {
-        if (!user) return;
+        if (!userData) return;
         setCurrentVibe(prev => {
             if (!prev || prev.id !== 'water') return prev;
             const current = parseInt(prev.value.split('/')[0]);
@@ -122,7 +122,7 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
             const newProgress = Math.min((newValue / goal) * 100, 100);
             
             // Update the backend immediately
-            updateWaterIntake(user.uid, newValue);
+            updateWaterIntake(userData.uid, newValue);
             
             return { 
                 ...prev, 
@@ -1088,6 +1088,7 @@ export default function DashboardPage() {
         vibe={vibeToEdit}
         onSave={handleSaveVibe}
         onDelete={handleDeleteVibe}
+        userData={userData}
       />
       <CameraDialog
         isOpen={isCameraOpen}

@@ -33,7 +33,7 @@ export const defaultUser: Omit<User, 'uid'> = {
     age: 0,
     gender: 'Prefer not to say',
     avatarUrl: 'https://picsum.photos/seed/default-avatar/100/100',
-    streak: 0,
+    streak: 1,
     points: 0,
     dailyPoints: 0,
     lastActivityDate: new Date().toISOString().split('T')[0],

@@ -488,25 +488,25 @@ export default function CommunityPage() {
     } catch (error) {
       console.error('Error creating post:', error);
       console.error('Error details:', {
-        name: error?.name,
-        message: error?.message,
-        code: error?.code,
-        stack: error?.stack,
-        cause: error?.cause
+        name: (error as any)?.name,
+        message: (error as any)?.message,
+        code: (error as any)?.code,
+        stack: (error as any)?.stack,
+        cause: (error as any)?.cause
       });
       
       // Provide specific error messages based on error type
       let errorMessage = 'Unable to create post. Please try again.';
       let errorTitle = 'Post Failed';
       
-      if (error?.code === 'permission-denied') {
+      if ((error as any)?.code === 'permission-denied') {
         errorMessage = 'You don\'t have permission to create posts. Please check your authentication.';
         errorTitle = 'Permission Denied';
-      } else if (error?.code === 'unavailable') {
+      } else if ((error as any)?.code === 'unavailable') {
         errorMessage = 'Service temporarily unavailable. Please try again in a moment.';
         errorTitle = 'Service Unavailable';
-      } else if (error?.message?.includes('Firebase')) {
-        errorMessage = `Firebase error: ${error.message}`;
+      } else if ((error as any)?.message?.includes('Firebase')) {
+        errorMessage = `Firebase error: ${(error as any).message}`;
         errorTitle = 'Database Error';
       }
       
@@ -544,7 +544,6 @@ export default function CommunityPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            {/* Test Firebase button hidden for production */}
             <Button
               variant="outline"
               size="sm"

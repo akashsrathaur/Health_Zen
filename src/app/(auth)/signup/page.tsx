@@ -50,8 +50,14 @@ export default function SignupPage() {
                 gender: gender || 'Prefer not to say',
                 avatarUrl: `https://picsum.photos/seed/${nanoid()}/100/100`,
                 streak: 0,
+                points: 0,
+                dailyPoints: 0,
+                lastActivityDate: new Date().toISOString().split('T')[0],
+                totalTasksCompleted: 0,
                 phone: phone,
                 bio: 'New to the wellness journey!',
+                emailNotifications: true,
+                pushNotifications: false,
             });
 
             // Explicitly redirect to the dashboard after successful signup.
