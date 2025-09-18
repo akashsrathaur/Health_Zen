@@ -65,6 +65,24 @@ export async function updateDailyVibes(userId: string, vibes: any[]) {
     }
 }
 
+export async function removeDailyVibe(userId: string, vibeId: string) {
+    try {
+        const userDocRef = doc(db, 'userData', userId);
+        const userDoc = await getDoc(userDocRef);
+        
+        if (userDoc.exists()) {
+            const data = userDoc.data();
+            const dailyVibes = data.dailyVibes || [];
+            const filteredVibes = dailyVibes.filter((vibe: any) => vibe.id !== vibeId);
+            await setDoc(userDocRef, { ...data, dailyVibes: filteredVibes });
+        }
+        console.log('Successfully removed daily vibe for user:', userId);
+    } catch (error: any) {
+        console.error('Error removing daily vibe:', error);
+        throw new Error(`Failed to remove daily vibe: ${error?.message || 'Unknown error'}`);
+    }
+}
+
 export async function updateChallenge(userId: string, challenge: any) {
     try {
         const userDocRef = doc(db, 'userData', userId);
@@ -102,6 +120,24 @@ export async function addChallenge(userId: string, newChallenge: any) {
     } catch (error: any) {
         console.error('Error adding challenge:', error);
         throw new Error(`Failed to add challenge: ${error?.message || 'Unknown error'}`);
+    }
+}
+
+export async function removeChallenge(userId: string, challengeId: string) {
+    try {
+        const userDocRef = doc(db, 'userData', userId);
+        const userDoc = await getDoc(userDocRef);
+        
+        if (userDoc.exists()) {
+            const data = userDoc.data();
+            const challenges = data.challenges || [];
+            const filteredChallenges = challenges.filter((c: any) => c.id !== challengeId);
+            await setDoc(userDocRef, { ...data, challenges: filteredChallenges });
+        }
+        console.log('Successfully removed challenge for user:', userId);
+    } catch (error: any) {
+        console.error('Error removing challenge:', error);
+        throw new Error(`Failed to remove challenge: ${error?.message || 'Unknown error'}`);
     }
 }
 

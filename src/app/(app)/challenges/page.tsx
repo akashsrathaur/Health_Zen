@@ -7,8 +7,9 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription }
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { publicChallenges, type Challenge, type PublicChallenge } from '@/lib/data';
-import { Upload, Camera, RefreshCcw, CheckCircle, Video, XCircle, PlusCircle, Share2, Copy, Target, Users, TrendingUp, Calendar, Shield } from 'lucide-react';
+import { Upload, Camera, RefreshCcw, CheckCircle, Video, XCircle, PlusCircle, Share2, Copy, Target, Users, TrendingUp, Calendar, Shield, MoreVertical, LogOut } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -17,11 +18,16 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { nanoid } from 'nanoid';
-import { addChallenge as addChallengeAction, updateChallenge as updateChallengeAction } from '@/lib/user-utils';
+import { addChallenge as addChallengeAction, updateChallenge as updateChallengeAction, removeChallenge as removeChallengeAction } from '@/lib/user-utils';
 import { useAuth } from '@/context/auth-context';
 
 
-function ChallengeCard({ challenge, onUploadProof, onShare }: { challenge: Challenge, onUploadProof: (challengeId: string) => void, onShare: (challenge: Challenge) => void }) {
+function ChallengeCard({ challenge, onUploadProof, onShare, onQuit }: { 
+  challenge: Challenge, 
+  onUploadProof: (challengeId: string) => void, 
+  onShare: (challenge: Challenge) => void,
+  onQuit: (challenge: Challenge) => void
+}) {
   const progress = (challenge.currentDay / challenge.goalDays) * 100;
 
   return (
@@ -35,6 +41,33 @@ function ChallengeCard({ challenge, onUploadProof, onShare }: { challenge: Chall
           data-ai-hint={challenge.imageHint}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+        
+        {/* Options Menu */}
+        <div className="absolute top-2 right-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="icon" variant="ghost" className="h-8 w-8 text-white hover:bg-white/20">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {challenge.isCustom && (
+                <DropdownMenuItem onClick={() => onShare(challenge)}>
+                  <Share2 className="mr-2 h-4 w-4" />
+                  Share Challenge
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem 
+                onClick={() => onQuit(challenge)}
+                className="text-red-600 focus:text-red-600"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Quit Challenge
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        
         <div className="absolute bottom-0 left-0 p-4">
           <h3 className="text-xl font-bold text-white">{challenge.title}</h3>
           <p className="text-sm text-white/80">{challenge.description}</p>
@@ -52,7 +85,7 @@ function ChallengeCard({ challenge, onUploadProof, onShare }: { challenge: Chall
         </div>
         <Progress value={progress} />
       </CardContent>
-      <CardFooter className="p-4 pt-0 flex gap-2">
+      <CardFooter className="p-4 pt-0">
         <Button 
           className="w-full"
           onClick={() => onUploadProof(challenge.id)}
@@ -61,11 +94,6 @@ function ChallengeCard({ challenge, onUploadProof, onShare }: { challenge: Chall
           <Upload className="mr-2 h-4 w-4" />
           {challenge.isCompletedToday ? 'Completed' : 'Upload Proof'}
         </Button>
-        {challenge.isCustom && (
-          <Button variant="outline" size="icon" onClick={() => onShare(challenge)}>
-            <Share2 className="h-4 w-4" />
-          </Button>
-        )}
       </CardFooter>
     </Card>
   );
@@ -504,8 +532,10 @@ export default function ChallengesPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isJoinChallengeOpen, setIsJoinChallengeOpen] = useState(false);
+  const [isQuitDialogOpen, setIsQuitDialogOpen] = useState(false);
   const [activeChallengeId, setActiveChallengeId] = useState<string | null>(null);
   const [challengeToShare, setChallengeToShare] = useState<Challenge | null>(null);
+  const [challengeToQuit, setChallengeToQuit] = useState<Challenge | null>(null);
   const { toast } = useToast();
 
   const handleOpenUpload = (challengeId: string) => {
@@ -553,6 +583,29 @@ export default function ChallengesPage() {
     setChallengeToShare(challenge);
     setIsShareOpen(true);
   }
+
+  const handleQuit = (challenge: Challenge) => {
+    setChallengeToQuit(challenge);
+    setIsQuitDialogOpen(true);
+  }
+
+  const handleConfirmQuit = async () => {
+    if (user && challengeToQuit) {
+      // Remove from local state
+      setChallenges(prev => prev.filter(c => c.id !== challengeToQuit.id));
+      
+      // Remove from Firebase
+      await removeChallengeAction(user.uid, challengeToQuit.id);
+      
+      setIsQuitDialogOpen(false);
+      setChallengeToQuit(null);
+      
+      toast({
+        title: "Challenge Left",
+        description: `You've left ${challengeToQuit.title}. You can always join again later!`
+      });
+    }
+  };
 
   const handleJoinPublicChallenge = async (publicChallenge: PublicChallenge) => {
     if (user) {
@@ -672,6 +725,7 @@ export default function ChallengesPage() {
                     challenge={challenge}
                     onUploadProof={handleOpenUpload}
                     onShare={handleShare}
+                    onQuit={handleQuit}
                   />
                 </motion.div>
               ))}
@@ -717,6 +771,37 @@ export default function ChallengesPage() {
         onJoinChallenge={handleJoinPublicChallenge}
         userChallenges={challenges}
       />
+      
+      {/* Quit Challenge Confirmation Dialog */}
+      <Dialog open={isQuitDialogOpen} onOpenChange={setIsQuitDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <LogOut className="h-5 w-5 text-red-500" />
+              Quit Challenge?
+            </DialogTitle>
+            <DialogDescription>
+              {challengeToQuit && (
+                <>
+                  Are you sure you want to quit <strong>{challengeToQuit.title}</strong>? 
+                  <br />
+                  <br />
+                  Your progress will be lost, but you can always join this challenge again later.
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setIsQuitDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmQuit}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Yes, Quit Challenge
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

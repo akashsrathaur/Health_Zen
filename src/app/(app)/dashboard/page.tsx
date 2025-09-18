@@ -31,7 +31,7 @@ import { format } from 'date-fns';
 import { useAuth } from '@/context/auth-context';
 import { defaultUser } from '@/lib/user-store';
 import { useNotifications } from '@/hooks/use-notifications';
-import { updateDailyVibes as updateDailyVibesAction, updateChallenge as updateChallengeAction } from '@/lib/user-utils';
+import { updateDailyVibes as updateDailyVibesAction, updateChallenge as updateChallengeAction, removeDailyVibe as removeDailyVibeAction } from '@/lib/user-utils';
 import { updateWaterIntake, updateGymMinutes } from '@/actions/daily-activities';
 import { dailyResetService } from '@/lib/daily-reset-service';
 
@@ -176,9 +176,12 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete, userData }: {
         if (currentVibe) onDelete(currentVibe.id);
     }
 
-    const isStreakVibe = currentVibe.id === 'streak';
+    // Protected vibes that cannot be deleted
+    const protectedVibes = ['water', 'sleep', 'gym', 'streak'];
+    const isProtectedVibe = protectedVibes.includes(currentVibe.id);
     const isCompleted = currentVibe.id === 'medication' ? currentVibe.progress === 100 : !!currentVibe.completedAt;
-    const isEditable = !isCompleted && !isStreakVibe;
+    const isEditable = !isCompleted && !isProtectedVibe;
+    const canDelete = !isProtectedVibe && currentVibe.isCustom;
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -323,9 +326,16 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete, userData }: {
                     )}
                 </div>
                 <DialogFooter className='justify-between'>
-                    { !isStreakVibe ? (
-                        <Button variant="destructive" onClick={handleDelete} className="mr-auto" disabled={isCompleted && currentVibe.id !== 'medication'}><Trash2 /> Delete</Button>
-                    ) : <div /> }
+                    { canDelete ? (
+                        <Button variant="destructive" onClick={handleDelete} className="mr-auto">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                        </Button>
+                    ) : (
+                        <div className="text-xs text-muted-foreground mr-auto">
+                            {isProtectedVibe ? 'Core daily vibes cannot be deleted' : ''}
+                        </div>
+                    )}
                     <div className='flex gap-2'>
                         <Button variant="outline" onClick={onClose}>Cancel</Button>
                         <Button onClick={handleSaveChanges} disabled={isCompleted && currentVibe.id !== 'medication'}>Save Changes</Button>
