@@ -25,6 +25,8 @@ export type User = {
     buddyPersona?: BuddyPersona;
     emailNotifications?: boolean;
     pushNotifications?: boolean;
+    dosha?: 'Vata' | 'Pitta' | 'Kapha';
+    doshaIsBalanced?: boolean;
 };
 
 // Default user data for a logged-out or new user state.
@@ -41,6 +43,8 @@ export const defaultUser: Omit<User, 'uid'> = {
     bio: 'Passionate about holistic wellness and mindful living.',
     emailNotifications: true,
     pushNotifications: false,
+    dosha: undefined,
+    doshaIsBalanced: false,
     buddyPersona: {
         name: 'Zen',
         age: 25,

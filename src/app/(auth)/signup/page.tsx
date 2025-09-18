@@ -16,9 +16,14 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { createUserInFirestore } from '@/lib/user-utils';
 import { nanoid } from 'nanoid';
+import DoshaQuiz from '@/components/dosha-quiz';
+import type { DoshaResult } from '@/lib/dosha-quiz';
+
+type SignupStep = 'basic-info' | 'dosha-quiz' | 'completing';
 
 export default function SignupPage() {
     const router = useRouter();
+    const [currentStep, setCurrentStep] = useState<SignupStep>('basic-info');
     const [fullName, setFullName] = useState('');
     const [age, setAge] = useState('');
     const [gender, setGender] = useState<'Male' | 'Female' | 'Other' | 'Prefer not to say' | ''>('');
@@ -26,9 +31,11 @@ export default function SignupPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [doshaResult, setDoshaResult] = useState<DoshaResult | null>(null);
+    const [isCreatingAccount, setIsCreatingAccount] = useState(false);
     const [error, setError] = useState('');
 
-    const handleSignup = async (e: React.FormEvent) => {
+    const handleBasicInfoSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
@@ -36,6 +43,20 @@ export default function SignupPage() {
             setError("Passwords do not match.");
             return;
         }
+
+        // Move to dosha quiz step
+        setCurrentStep('dosha-quiz');
+    };
+
+    const handleDoshaComplete = (result: DoshaResult) => {
+        setDoshaResult(result);
+        handleCreateAccount(result);
+    };
+
+    const handleCreateAccount = async (dosha: DoshaResult) => {
+        setCurrentStep('completing');
+        setIsCreatingAccount(true);
+        setError('');
 
         // Email needs to be constructed for Firebase Auth, but can be based on phone
         const firebaseEmail = email || `${phone}@healthzen.app`;
@@ -58,12 +79,17 @@ export default function SignupPage() {
                 bio: 'New to the wellness journey!',
                 emailNotifications: true,
                 pushNotifications: false,
+                dosha: dosha.primary,
+                doshaIsBalanced: dosha.isBalanced,
             });
 
             // Explicitly redirect to the dashboard after successful signup.
             router.push('/dashboard');
 
         } catch (error: any) {
+            setIsCreatingAccount(false);
+            setCurrentStep('basic-info'); // Go back to basic info on error
+            
             switch (error.code) {
                 case 'auth/email-already-in-use':
                     setError('This phone number or email is already associated with an account.');
@@ -79,15 +105,53 @@ export default function SignupPage() {
                     console.error(error);
             }
         }
-    }
+    };
 
+    const handleBackToBasicInfo = () => {
+        setCurrentStep('basic-info');
+    };
+
+  // Render dosha quiz step
+  if (currentStep === 'dosha-quiz') {
+    return (
+      <div className="w-full max-w-4xl space-y-6">
+        <div className="flex flex-col items-center space-y-4 text-center mb-6">
+          <Icons.logo className="h-8 w-auto" />
+          <h1 className="text-2xl font-bold">Complete Your Wellness Profile</h1>
+        </div>
+        <DoshaQuiz onComplete={handleDoshaComplete} onBack={handleBackToBasicInfo} />
+      </div>
+    );
+  }
+
+  // Render completing step
+  if (currentStep === 'completing') {
+    return (
+      <div className="w-full max-w-sm space-y-6">
+        <div className="flex flex-col items-center space-y-4 text-center">
+          <Icons.logo className="h-8 w-auto" />
+          <h2 className="text-xl font-semibold">Creating Your Account...</h2>
+          {doshaResult && (
+            <div className="text-center">
+              <p className="text-muted-foreground mb-2">Your Dosha: <span className="font-semibold text-primary">{doshaResult.primary}</span></p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Render basic info step (default)
   return (
     <div className="w-full max-w-sm space-y-6">
         <div className="flex flex-col items-center space-y-4 text-center">
             <Icons.logo className="h-8 w-auto" />
+            <h1 className="text-xl font-bold">Create Your HealthZen Account</h1>
+            <p className="text-sm text-muted-foreground">Step 1 of 2: Basic Information</p>
         </div>
       <Card className="rounded-t-3xl border-t-4 border-primary bg-card/80 p-8 backdrop-blur-md">
-        <form onSubmit={handleSignup} className="animate-pop-in space-y-4" style={{ animationDelay: '0.2s' }}>
+        <form onSubmit={handleBasicInfoSubmit} className="animate-pop-in space-y-4" style={{ animationDelay: '0.2s' }}>
             <div className="grid gap-2 text-left">
                 <Label htmlFor="fullname">Full Name</Label>
                 <div className="relative">
@@ -174,7 +238,7 @@ export default function SignupPage() {
             {error && <p className="text-sm text-destructive text-center">{error}</p>}
 
             <Button size="lg" className="w-full bg-gradient-to-r from-primary to-red-400 text-lg font-bold" type="submit">
-                Sign Up
+                Next: Discover Your Dosha 🕉️
             </Button>
         </form>
       </Card>
