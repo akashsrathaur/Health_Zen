@@ -231,11 +231,8 @@ Disclaimer: This advice is for informational purposes only.
             </CardContent>
           </Card>
 
-           <div className="flex gap-2">
-            <Button variant="outline" className="w-full">
-                Add to My Streak
-            </Button>
-            <Button variant="outline" className="w-full" onClick={handleShare}>
+          <div className="flex justify-center">
+            <Button variant="outline" onClick={handleShare}>
                 <Share2 className="mr-2 h-4 w-4" /> Share
             </Button>
           </div>

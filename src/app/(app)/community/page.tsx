@@ -476,6 +476,10 @@ export default function CommunityPage() {
       const result = await addPostAction(newPost);
       console.log('Post creation result:', result);
       
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to create post');
+      }
+      
       toast({
         title: 'Post Created!',
         description: 'Your post has been shared with the community.',

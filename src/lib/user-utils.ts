@@ -124,22 +124,51 @@ export async function updateUserProfile(uid: string, updates: Partial<Omit<User,
 
 export async function uploadProfileImage(uid: string, file: File): Promise<string> {
     try {
+        console.log('Starting profile image upload for UID:', uid);
+        console.log('File details:', { name: file.name, size: file.size, type: file.type });
+        
+        // Check if storage is properly initialized
+        if (!storage || typeof storage !== 'object') {
+            throw new Error('Firebase Storage is not properly initialized');
+        }
+        
         // Create a reference to the storage location
         const imageRef = ref(storage, `profile-images/${uid}/${Date.now()}-${file.name}`);
+        console.log('Created storage reference:', imageRef.fullPath);
         
         // Upload the file
+        console.log('Uploading file to Firebase Storage...');
         const snapshot = await uploadBytes(imageRef, file);
+        console.log('Upload complete, snapshot:', snapshot.ref.fullPath);
         
         // Get the download URL
+        console.log('Getting download URL...');
         const downloadURL = await getDownloadURL(snapshot.ref);
+        console.log('Download URL obtained:', downloadURL);
         
         // Update user profile with new avatar URL
+        console.log('Updating user profile with new avatar URL...');
         await updateUserProfile(uid, { avatarUrl: downloadURL });
         
         console.log('Successfully uploaded profile image for UID:', uid);
         return downloadURL;
     } catch (error: any) {
         console.error('Error uploading profile image:', error);
+        console.error('Error details:', {
+            code: error?.code,
+            message: error?.message,
+            name: error?.name,
+            stack: error?.stack
+        });
+        
+        if (error?.code === 'storage/unauthorized') {
+            throw new Error('Permission denied: Unable to upload to Firebase Storage. Check storage security rules.');
+        }
+        
+        if (error?.code === 'storage/unknown') {
+            throw new Error('Storage service unavailable. Please try again later.');
+        }
+        
         throw new Error(`Failed to upload profile image: ${error?.message || 'Unknown error'}`);
     }
 }
