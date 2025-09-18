@@ -371,16 +371,49 @@ export default function CommunityPage() {
   const [refreshing, setRefreshing] = useState(false);
   const { toast } = useToast();
   
+  const testFirebaseConnection = async () => {
+    try {
+      console.log('Testing Firebase connection...');
+      console.log('Environment variables:', {
+        hasApiKey: typeof window !== 'undefined' ? !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY : 'server-side',
+        hasAuthDomain: typeof window !== 'undefined' ? !!process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN : 'server-side',
+        hasProjectId: typeof window !== 'undefined' ? !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID : 'server-side',
+        hasStorageBucket: typeof window !== 'undefined' ? !!process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET : 'server-side',
+        hasMessagingSenderId: typeof window !== 'undefined' ? !!process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID : 'server-side',
+        hasAppId: typeof window !== 'undefined' ? !!process.env.NEXT_PUBLIC_FIREBASE_APP_ID : 'server-side'
+      });
+      
+      console.log('Firebase Auth user:', user);
+      console.log('Current posts:', posts.length);
+      
+      // Test if we can read from Firestore by trying to get existing posts
+      const { getAllCommunityPosts } = await import('@/actions/community');
+      const testPosts = await getAllCommunityPosts();
+      console.log('Test read from Firestore:', testPosts.length, 'posts');
+      
+      toast({
+        title: 'Firebase Test Complete',
+        description: `Connection test done. Check console for details. Found ${testPosts.length} posts.`,
+      });
+    } catch (error) {
+      console.error('Firebase connection test failed:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Firebase Test Failed',
+        description: 'Check console for error details.',
+      });
+    }
+  };
+
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
       console.log('Manual refresh triggered');
       console.log('Current posts count:', posts.length);
       console.log('Current user:', user);
-      console.log('Firebase config check:', {
-        hasApiKey: typeof window !== 'undefined' ? !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY : 'server-side',
-        hasProjectId: typeof window !== 'undefined' ? !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID : 'server-side'
-      });
+      
+      // Test Firebase connection when refreshing
+      await testFirebaseConnection();
       
       // Instead of full page reload, just force re-fetch
       // The listener should automatically get new data
@@ -404,6 +437,7 @@ export default function CommunityPage() {
 
   const handleAddPost = async (content: string, imageUrl?: string, imageHint?: string) => {
     if (!user) {
+      console.log('Post creation failed: User not logged in');
       toast({
         variant: 'destructive',
         title: 'Not Logged In',
@@ -411,6 +445,16 @@ export default function CommunityPage() {
       });
       return;
     }
+
+    console.log('Starting post creation...', {
+      user: {
+        uid: user.uid,
+        name: user.name,
+        authenticated: !!user.uid
+      },
+      content: content.slice(0, 50) + '...',
+      hasImage: !!imageUrl
+    });
 
     try {
       const newPost: Omit<CommunityPost, 'id'> = {
@@ -428,7 +472,9 @@ export default function CommunityPage() {
         comments: []
       };
 
-      await addPostAction(newPost);
+      console.log('Attempting to save post:', newPost);
+      const result = await addPostAction(newPost);
+      console.log('Post creation result:', result);
       
       toast({
         title: 'Post Created!',
@@ -436,10 +482,33 @@ export default function CommunityPage() {
       });
     } catch (error) {
       console.error('Error creating post:', error);
+      console.error('Error details:', {
+        name: error?.name,
+        message: error?.message,
+        code: error?.code,
+        stack: error?.stack,
+        cause: error?.cause
+      });
+      
+      // Provide specific error messages based on error type
+      let errorMessage = 'Unable to create post. Please try again.';
+      let errorTitle = 'Post Failed';
+      
+      if (error?.code === 'permission-denied') {
+        errorMessage = 'You don\'t have permission to create posts. Please check your authentication.';
+        errorTitle = 'Permission Denied';
+      } else if (error?.code === 'unavailable') {
+        errorMessage = 'Service temporarily unavailable. Please try again in a moment.';
+        errorTitle = 'Service Unavailable';
+      } else if (error?.message?.includes('Firebase')) {
+        errorMessage = `Firebase error: ${error.message}`;
+        errorTitle = 'Database Error';
+      }
+      
       toast({
         variant: 'destructive',
-        title: 'Post Failed',
-        description: 'Unable to create post. Please try again.',
+        title: errorTitle,
+        description: errorMessage,
       });
     }
   };
@@ -469,16 +538,26 @@ export default function CommunityPage() {
               </Balancer>
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className="flex items-center gap-2"
-          >
-            <RotateCcw className={cn("h-4 w-4", refreshing && "animate-spin")} />
-            {refreshing ? 'Refreshing...' : 'Refresh'}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={testFirebaseConnection}
+              className="flex items-center gap-2"
+            >
+              🔧 Test Firebase
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="flex items-center gap-2"
+            >
+              <RotateCcw className={cn("h-4 w-4", refreshing && "animate-spin")} />
+              {refreshing ? 'Refreshing...' : 'Refresh'}
+            </Button>
+          </div>
         </div>
       </div>
 
