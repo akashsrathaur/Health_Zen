@@ -9,6 +9,7 @@ import type { User, BuddyPersona } from '@/lib/user-store';
 import { defaultUser } from '@/lib/user-store';
 import { doc, onSnapshot, setDoc, collection, query, orderBy } from 'firebase/firestore';
 import { initialChallenges, initialDailyVibes, type Challenge, type DailyVibe, type CommunityPost } from '@/lib/data';
+import { dailyResetService } from '@/lib/daily-reset-service';
 
 type ProgressState = {
     streak: number;
@@ -67,6 +68,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setFirebaseUser(fbUser);
         const userProfile = await getUserFromFirestore(fbUser.uid);
         setUser(userProfile || { ...defaultUser, uid: fbUser.uid, name: "New User" });
+        // Initialize daily reset service for this user
+        dailyResetService.setUserId(fbUser.uid);
         // The data snapshot listener will handle the rest
       } else {
         setFirebaseUser(null);

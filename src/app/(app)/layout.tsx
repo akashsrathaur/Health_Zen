@@ -13,9 +13,13 @@ import { UserNav } from '@/components/user-nav';
 import { Icons } from '@/components/icons';
 import Link from 'next/link';
 import { ChatBuddy } from '@/components/chat-buddy';
+import { useAppServices } from '@/hooks/use-app-services';
 
 function AppContent({ children }: { children: React.ReactNode }) {
   const { state, isMobile } = useSidebar();
+  
+  // Initialize app services (notifications, daily reset)
+  useAppServices();
   
   const mainContentStyle: React.CSSProperties = !isMobile ? {
     marginLeft: state === 'collapsed' ? 'var(--sidebar-width-icon)' : 'var(--sidebar-width)',

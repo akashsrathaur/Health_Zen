@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -17,11 +17,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useAuth } from "@/context/auth-context";
 import { defaultUser } from "@/lib/user-store";
 import { useToast } from "@/hooks/use-toast";
-import { Flame, Upload, Loader2, User, Bot, Check } from "lucide-react";
+import { Flame, Upload, Loader2, User, Bot, Check, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BuddyPersona } from "@/lib/user-store";
 import { updateNotificationSettings } from "@/actions/notifications";
 import { avatarOptions } from "@/lib/data";
+import { notificationClient } from "@/lib/notification-client";
+import DoshaDisplay from "@/components/dosha-display";
 
 const profileFormSchema = z.object({
   name: z.string().min(1, 'Name is required').max(50, 'Name must be less than 50 characters'),
@@ -53,6 +55,7 @@ export default function SettingsPage() {
     // Notification settings state
     const [emailNotifications, setEmailNotifications] = useState(userData.emailNotifications ?? true);
     const [pushNotifications, setPushNotifications] = useState(userData.pushNotifications ?? false);
+    const [hasNotificationPermission, setHasNotificationPermission] = useState(false);
 
     // Profile form
     const profileForm = useForm<ProfileFormData>({
@@ -82,6 +85,21 @@ export default function SettingsPage() {
     const profileFormState = profileForm.watch();
     const buddyFormState = buddyForm.watch();
 
+    // Initialize notification client and load settings from localStorage
+    useEffect(() => {
+        const initializeNotifications = async () => {
+            await notificationClient.initialize();
+            setHasNotificationPermission(notificationClient.hasPermission());
+            
+            // Load settings from localStorage (client-side)
+            const clientSettings = notificationClient.getSettings();
+            setEmailNotifications(clientSettings.emailNotifications);
+            setPushNotifications(clientSettings.pushNotifications);
+        };
+        
+        initializeNotifications();
+    }, []);
+
     // Check if there are unsaved changes
     React.useEffect(() => {
         const profileChanged = 
@@ -100,6 +118,37 @@ export default function SettingsPage() {
         
         setHasUnsavedChanges(profileChanged || buddyChanged || notificationsChanged);
     }, [profileFormState, buddyFormState, userData, emailNotifications, pushNotifications]);
+
+    const handleNotificationPermissionRequest = async () => {
+        try {
+            const granted = await notificationClient.requestPermission();
+            setHasNotificationPermission(granted);
+            
+            if (granted) {
+                toast({
+                    title: 'Permission Granted!',
+                    description: 'You can now receive push notifications.',
+                });
+                // Send a test notification
+                notificationClient.sendNotification('HealthZen Notifications Enabled!', {
+                    body: 'You will now receive wellness reminders and updates.',
+                });
+            } else {
+                toast({
+                    title: 'Permission Denied',
+                    description: 'Push notifications will not work without permission.',
+                    variant: 'destructive',
+                });
+                setPushNotifications(false);
+            }
+        } catch (error) {
+            toast({
+                title: 'Error',
+                description: 'Failed to request notification permission.',
+                variant: 'destructive',
+            });
+        }
+    };
 
     const handleAvatarSelect = async (avatarUrl: string) => {
         setSelectedAvatar(avatarUrl);
@@ -161,14 +210,21 @@ export default function SettingsPage() {
                 errors.push(`Buddy: ${error.message}`);
             }
             
-            // Save notification settings
+            // Save notification settings to localStorage (client-side)
             try {
-                const result = await updateNotificationSettings(user?.uid || '', {
+                notificationClient.saveSettings({
                     emailNotifications,
                     pushNotifications
                 });
-                if (!result.success) {
-                    errors.push(`Notifications: ${result.error}`);
+                
+                // Also try to save to Firebase (optional, can fail without breaking the UI)
+                try {
+                    await updateNotificationSettings(user?.uid || '', {
+                        emailNotifications,
+                        pushNotifications
+                    });
+                } catch (firebaseError) {
+                    console.warn('Firebase notification settings save failed (continuing with localStorage):', firebaseError);
                 }
             } catch (error: any) {
                 errors.push(`Notifications: ${error.message}`);
@@ -452,6 +508,11 @@ export default function SettingsPage() {
                 </CardContent>
             </Card>
 
+            {/* Dosha Profile */}
+            {userData.dosha && (
+                <DoshaDisplay user={userData} className="" />
+            )}
+
             {/* Contact Information */}
             <Card>
                 <CardHeader>
@@ -491,17 +552,43 @@ export default function SettingsPage() {
                         />
                     </div>
                     <div className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-secondary/50">
-                        <div className="space-y-0.5">
+                        <div className="space-y-0.5 flex-1">
                             <Label htmlFor="push-notifications" className="text-base font-normal cursor-pointer">Push Notifications</Label>
                             <p className="text-sm text-muted-foreground">
                                 Get real-time alerts for tasks and motivation on your device.
                             </p>
+                            {!hasNotificationPermission && (
+                                <p className="text-xs text-amber-600 flex items-center gap-1">
+                                    <Bell className="h-3 w-3" />
+                                    Browser permission required
+                                </p>
+                            )}
                         </div>
-                        <Switch 
-                            id="push-notifications" 
-                            checked={pushNotifications}
-                            onCheckedChange={setPushNotifications}
-                        />
+                        <div className="flex items-center gap-2">
+                            {!hasNotificationPermission && (
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={handleNotificationPermissionRequest}
+                                    className="text-xs"
+                                >
+                                    <Bell className="h-3 w-3 mr-1" />
+                                    Allow
+                                </Button>
+                            )}
+                            <Switch 
+                                id="push-notifications" 
+                                checked={pushNotifications && hasNotificationPermission}
+                                onCheckedChange={(checked) => {
+                                    if (checked && !hasNotificationPermission) {
+                                        handleNotificationPermissionRequest();
+                                        return;
+                                    }
+                                    setPushNotifications(checked);
+                                }}
+                                disabled={!hasNotificationPermission}
+                            />
+                        </div>
                     </div>
                 </CardContent>
             </Card>

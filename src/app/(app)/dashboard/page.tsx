@@ -33,6 +33,7 @@ import { defaultUser } from '@/lib/user-store';
 import { useNotifications } from '@/hooks/use-notifications';
 import { updateDailyVibes as updateDailyVibesAction, updateChallenge as updateChallengeAction } from '@/lib/user-utils';
 import { updateWaterIntake, updateGymMinutes } from '@/actions/daily-activities';
+import { dailyResetService } from '@/lib/daily-reset-service';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -791,6 +792,24 @@ export default function DashboardPage() {
             const newUserProgress = { ...userProgress, completedTasks: userProgress.completedTasks + 1 };
             checkAchievements(newUserProgress);
         });
+    }
+  };
+
+  const handleManualReset = async () => {
+    if (!user) return;
+    
+    try {
+      await dailyResetService.manualReset(user.uid);
+      toast({
+        title: "Manual Reset Complete",
+        description: "Daily data has been saved and metrics reset for testing.",
+      });
+    } catch (error) {
+      toast({
+        title: "Reset Failed",
+        description: "Failed to perform manual reset.",
+        variant: "destructive",
+      });
     }
   };
 
