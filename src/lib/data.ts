@@ -422,41 +422,119 @@ export const getAchievements = (progress: { streak: number, completedTasks: numb
 };
 
 
-export const initialChallenges: Challenge[] = [
+export const publicChallenges: PublicChallenge[] = [
     {
-      id: 'challenge-1',
-      title: '7-Day Meditation',
-      description: 'Commit to 7 days of mindfulness meditation for at least 10 minutes a day.',
+      id: 'public-challenge-1',
+      title: '7-Day Mindfulness Meditation',
+      description: 'Join thousands in practicing mindfulness meditation for 10 minutes daily to reduce stress and improve focus.',
       icon: 'Brain',
-      currentDay: 0,
       goalDays: 7,
-      imageUrl: 'https://picsum.photos/seed/challenge1/800/600',
-      imageHint: 'meditation calm',
-      isCompletedToday: false,
+      imageUrl: 'https://picsum.photos/seed/meditation-public/800/600',
+      imageHint: 'meditation calm peaceful',
+      createdBy: {
+        uid: 'wellness-master-1',
+        name: 'HealthZen Team',
+        streak: 365
+      },
+      createdAt: new Date('2024-01-01').toISOString(),
+      participantCount: 12840,
+      category: 'mindfulness',
+      isPublic: true
     },
     {
-      id: 'challenge-2',
-      title: '30-Day Yoga Journey',
-      description: 'Practice yoga every day for 30 days to improve flexibility and reduce stress.',
+      id: 'public-challenge-2',
+      title: '30-Day Yoga Transformation',
+      description: 'Transform your body and mind with daily yoga practice. Perfect for all skill levels!',
       icon: 'Dumbbell',
-      currentDay: 0,
       goalDays: 30,
-      imageUrl: 'https://picsum.photos/seed/challenge2/800/600',
-      imageHint: 'yoga pose',
-      isCompletedToday: false,
+      imageUrl: 'https://picsum.photos/seed/yoga-public/800/600',
+      imageHint: 'yoga pose flexibility',
+      createdBy: {
+        uid: 'yoga-instructor-1',
+        name: 'Maya Wellness',
+        streak: 180
+      },
+      createdAt: new Date('2024-02-01').toISOString(),
+      participantCount: 8965,
+      category: 'fitness',
+      isPublic: true
     },
     {
-      id: 'challenge-3',
-      title: 'Hydration Challenge',
-      description: 'Drink 8 glasses of water every day for 21 days for better skin and energy.',
+      id: 'public-challenge-3',
+      title: 'Ultimate Hydration Challenge',
+      description: 'Achieve glowing skin and boost energy with proper hydration. 8 glasses daily for 21 days!',
       icon: 'Droplets',
-      currentDay: 0,
       goalDays: 21,
-      imageUrl: 'https://picsum.photos/seed/challenge3/800/600',
-      imageHint: 'glass water',
-      isCompletedToday: false,
+      imageUrl: 'https://picsum.photos/seed/hydration-public/800/600',
+      imageHint: 'water glass hydration',
+      createdBy: {
+        uid: 'nutrition-expert-1',
+        name: 'Dr. Sarah Chen',
+        streak: 95
+      },
+      createdAt: new Date('2024-02-15').toISOString(),
+      participantCount: 15230,
+      category: 'wellness',
+      isPublic: true
     },
+    {
+      id: 'public-challenge-4',
+      title: '14-Day Digital Detox',
+      description: 'Reclaim your life from screens. Limit social media and focus on real connections.',
+      icon: 'Brain',
+      goalDays: 14,
+      imageUrl: 'https://picsum.photos/seed/digital-detox/800/600',
+      imageHint: 'peaceful no phone nature',
+      createdBy: {
+        uid: 'mindfulness-coach-1',
+        name: 'Alex Mindful',
+        streak: 45
+      },
+      createdAt: new Date('2024-03-01').toISOString(),
+      participantCount: 7824,
+      category: 'mindfulness',
+      isPublic: true
+    },
+    {
+      id: 'public-challenge-5',
+      title: '21-Day Plant-Based Power',
+      description: 'Discover the energy of plant-based eating. Boost health while helping the planet!',
+      icon: 'Leaf',
+      goalDays: 21,
+      imageUrl: 'https://picsum.photos/seed/plant-based/800/600',
+      imageHint: 'healthy vegetables plant food',
+      createdBy: {
+        uid: 'nutrition-coach-1',
+        name: 'Green Health Co',
+        streak: 120
+      },
+      createdAt: new Date('2024-03-10').toISOString(),
+      participantCount: 6543,
+      category: 'nutrition',
+      isPublic: true
+    },
+    {
+      id: 'public-challenge-6',
+      title: '10,000 Steps Daily',
+      description: 'Walk your way to better health! Achieve 10,000 steps every day for 30 days.',
+      icon: 'Footprints',
+      goalDays: 30,
+      imageUrl: 'https://picsum.photos/seed/walking-steps/800/600',
+      imageHint: 'walking steps outdoor fitness',
+      createdBy: {
+        uid: 'fitness-walker-1',
+        name: 'Step Master John',
+        streak: 78
+      },
+      createdAt: new Date('2024-03-15').toISOString(),
+      participantCount: 11456,
+      category: 'fitness',
+      isPublic: true
+    }
 ];
+
+// Legacy export for backward compatibility
+export const initialChallenges: Challenge[] = [];
 
 export type CommunityPost = {
   id: string;
@@ -495,8 +573,28 @@ export type Achievement = {
 };
 
 export type Remedy = (typeof remedies)[0];
-export type Challenge = {
+export type PublicChallenge = {
   id: string;
+  title: string;
+  description: string;
+  icon: string;
+  goalDays: number;
+  imageUrl: string;
+  imageHint: string;
+  createdBy: {
+    uid: string;
+    name: string;
+    streak: number;
+  };
+  createdAt: string;
+  participantCount: number;
+  category: 'fitness' | 'wellness' | 'mindfulness' | 'nutrition' | 'lifestyle';
+  isPublic: true;
+};
+
+export type UserChallenge = {
+  id: string;
+  challengeId: string; // References PublicChallenge.id
   title: string;
   description: string;
   icon: string;
@@ -505,7 +603,27 @@ export type Challenge = {
   imageUrl: string;
   imageHint: string;
   isCompletedToday: boolean;
+  joinedAt: string;
+  category: 'fitness' | 'wellness' | 'mindfulness' | 'nutrition' | 'lifestyle';
+};
+
+// Legacy type for backward compatibility
+export type Challenge = {
+  id: string;
+  challengeId?: string; // References PublicChallenge.id for joined public challenges
+  title: string;
+  description: string;
+  icon: string;
+  currentDay: number;
+  goalDays: number;
+  imageUrl: string;
+  imageHint: string;
+  isCompletedToday: boolean;
+  joinedAt?: string;
+  category?: 'fitness' | 'wellness' | 'mindfulness' | 'nutrition' | 'lifestyle';
   isCustom?: boolean;
+  completedDays?: string[];
+  totalTasksCompleted?: number;
 };
 
 export type DailyVibe = {

@@ -6,8 +6,8 @@ import { Balancer } from 'react-wrap-balancer';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { initialChallenges, type Challenge } from '@/lib/data';
-import { Upload, Camera, RefreshCcw, CheckCircle, Video, XCircle, PlusCircle, Share2, Copy, Target } from 'lucide-react';
+import { publicChallenges, type Challenge, type PublicChallenge } from '@/lib/data';
+import { Upload, Camera, RefreshCcw, CheckCircle, Video, XCircle, PlusCircle, Share2, Copy, Target, Users, TrendingUp, Calendar, Shield } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -185,16 +185,26 @@ function CameraDialog({ isOpen, onClose, onImageCaptured }: { isOpen: boolean, o
     );
 }
 
-function CreateChallengeDialog({ isOpen, onClose, onChallengeCreate }: { isOpen: boolean, onClose: () => void, onChallengeCreate: (challenge: Challenge) => void}) {
+function CreateChallengeDialog({ isOpen, onClose, onChallengeCreate, userStreak }: { 
+    isOpen: boolean, 
+    onClose: () => void, 
+    onChallengeCreate: (challenge: Challenge) => void,
+    userStreak: number
+}) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [goalDays, setGoalDays] = useState(30);
+    const [category, setCategory] = useState('wellness');
+    
+    const canCreate = userStreak >= 7;
+    const categories = ['fitness', 'wellness', 'mindfulness', 'nutrition', 'lifestyle'];
 
     const handleCreate = () => {
-        if (!title || !description || !goalDays) return;
+        if (!canCreate || !title || !description || !goalDays) return;
 
         const newChallenge: Challenge = {
             id: `custom-${nanoid()}`,
+            challengeId: `public-${nanoid()}`,
             title,
             description,
             icon: 'Target',
@@ -204,38 +214,113 @@ function CreateChallengeDialog({ isOpen, onClose, onChallengeCreate }: { isOpen:
             imageHint: 'custom challenge',
             isCompletedToday: false,
             isCustom: true,
+            completedDays: [],
+            totalTasksCompleted: 0
         };
         onChallengeCreate(newChallenge);
         setTitle('');
         setDescription('');
         setGoalDays(30);
+        setCategory('wellness');
     }
     
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                    <DialogTitle>Create a New Challenge</DialogTitle>
+                    <DialogTitle className="flex items-center gap-2">
+                        <Shield className="h-5 w-5" />
+                        Create Public Challenge
+                    </DialogTitle>
                     <DialogDescription>
-                        Define your own wellness challenge and invite your friends to join.
+                        {canCreate ? (
+                            "Design your own wellness challenge and share it with the community!"
+                        ) : (
+                            <div className="flex items-center gap-2 text-amber-600">
+                                <TrendingUp className="h-4 w-4" />
+                                You need a 7+ day streak to create challenges. Current streak: {userStreak} days
+                            </div>
+                        )}
                     </DialogDescription>
                 </DialogHeader>
-                <div className='space-y-4 py-4'>
-                    <div className='space-y-2'>
-                        <Label htmlFor="challenge-title">Title</Label>
-                        <Input id="challenge-title" placeholder="e.g., Daily Morning Yoga" value={title} onChange={(e) => setTitle(e.target.value)} />
+                
+                {!canCreate ? (
+                    <div className="py-8 text-center">
+                        <div className="mb-4">
+                            <Shield className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                            <h3 className="text-lg font-semibold mb-2">Build Your Streak First!</h3>
+                            <p className="text-muted-foreground mb-4">
+                                Complete daily tasks for 7 consecutive days to unlock challenge creation.
+                            </p>
+                            <div className="flex items-center justify-center gap-2 text-sm">
+                                <TrendingUp className="h-4 w-4" />
+                                <span>Current streak: <strong>{userStreak} days</strong></span>
+                                <span className="text-muted-foreground">• Need: <strong>7 days</strong></span>
+                            </div>
+                        </div>
                     </div>
-                    <div className='space-y-2'>
-                        <Label htmlFor="challenge-description">Description</Label>
-                        <Textarea id="challenge-description" placeholder="A brief description of your challenge" value={description} onChange={(e) => setDescription(e.target.value)} />
+                ) : (
+                    <div className='space-y-4 py-4'>
+                        <div className='space-y-2'>
+                            <Label htmlFor="challenge-title">Challenge Title</Label>
+                            <Input 
+                                id="challenge-title" 
+                                placeholder="e.g., 30-Day Morning Meditation" 
+                                value={title} 
+                                onChange={(e) => setTitle(e.target.value)} 
+                            />
+                        </div>
+                        <div className='space-y-2'>
+                            <Label htmlFor="challenge-description">Description</Label>
+                            <Textarea 
+                                id="challenge-description" 
+                                placeholder="Describe your challenge and what participants will accomplish" 
+                                value={description} 
+                                onChange={(e) => setDescription(e.target.value)} 
+                                rows={3}
+                            />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className='space-y-2'>
+                                <Label htmlFor="challenge-goal">Duration (days)</Label>
+                                <Input 
+                                    id="challenge-goal" 
+                                    type="number" 
+                                    min={7}
+                                    max={365}
+                                    value={goalDays} 
+                                    onChange={(e) => setGoalDays(parseInt(e.target.value, 10))} 
+                                />
+                            </div>
+                            <div className='space-y-2'>
+                                <Label htmlFor="challenge-category">Category</Label>
+                                <select 
+                                    id="challenge-category"
+                                    value={category}
+                                    onChange={(e) => setCategory(e.target.value)}
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    {categories.map(cat => (
+                                        <option key={cat} value={cat} className="capitalize">
+                                            {cat}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div className='space-y-2'>
-                        <Label htmlFor="challenge-goal">Goal (in days)</Label>
-                        <Input id="challenge-goal" type="number" value={goalDays} onChange={(e) => setGoalDays(parseInt(e.target.value, 10))} />
-                    </div>
-                </div>
+                )}
+                
                 <DialogFooter>
-                    <Button onClick={handleCreate} disabled={!title || !description || !goalDays}>Create and Share</Button>
+                    <Button variant="outline" onClick={onClose}>Cancel</Button>
+                    {canCreate && (
+                        <Button 
+                            onClick={handleCreate} 
+                            disabled={!title || !description || !goalDays || goalDays < 7}
+                        >
+                            Create Challenge
+                        </Button>
+                    )}
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -285,53 +370,128 @@ function ShareDialog({ isOpen, onClose, challenge }: { isOpen: boolean, onClose:
     )
 }
 
-function JoinChallengeDialog({ isOpen, onClose, onJoinChallenge }: { isOpen: boolean, onClose: () => void, onJoinChallenge: (challenge: Challenge) => void }) {
-  const availableChallenges = initialChallenges; // Use the initial challenges as browsable options
+function PublicChallengeCard({ challenge, onJoin, userChallenges }: { challenge: PublicChallenge, onJoin: (challenge: PublicChallenge) => void, userChallenges: Challenge[] }) {
+  const isAlreadyJoined = userChallenges.some(uc => uc.challengeId === challenge.id);
+  
+  return (
+    <Card key={challenge.id} className="overflow-hidden">
+      <div className="relative h-40 w-full">
+        <Image
+          src={challenge.imageUrl}
+          alt={challenge.title}
+          fill
+          className="object-cover"
+          data-ai-hint={challenge.imageHint}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+        <div className="absolute top-2 right-2">
+          <div className="bg-black/50 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white flex items-center gap-1">
+            <Users className="h-3 w-3" />
+            {challenge.participantCount.toLocaleString()}
+          </div>
+        </div>
+        <div className="absolute bottom-2 left-2 right-2">
+          <h4 className="text-white font-semibold text-lg mb-1">{challenge.title}</h4>
+          <div className="flex items-center gap-2 text-white/80 text-sm">
+            <Calendar className="h-3 w-3" />
+            <span>{challenge.goalDays} days</span>
+            <span>•</span>
+            <span className="capitalize">{challenge.category}</span>
+          </div>
+        </div>
+      </div>
+      <CardContent className="p-4">
+        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{challenge.description}</p>
+        
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-xs text-muted-foreground">
+            Created by <span className="font-medium text-foreground">{challenge.createdBy.name}</span>
+            <div className="flex items-center gap-1 mt-1">
+              <TrendingUp className="h-3 w-3" />
+              <span>{challenge.createdBy.streak} day streak</span>
+            </div>
+          </div>
+        </div>
+        
+        <Button 
+          size="sm" 
+          className="w-full"
+          onClick={() => onJoin(challenge)}
+          disabled={isAlreadyJoined}
+          variant={isAlreadyJoined ? "secondary" : "default"}
+        >
+          {isAlreadyJoined ? (
+            <>
+              <CheckCircle className="mr-2 h-4 w-4" />
+              Already Joined
+            </>
+          ) : (
+            <>
+              <Target className="mr-2 h-4 w-4" />
+              Join Challenge
+            </>
+          )}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+function JoinChallengeDialog({ isOpen, onClose, onJoinChallenge, userChallenges }: { 
+  isOpen: boolean, 
+  onClose: () => void, 
+  onJoinChallenge: (challenge: PublicChallenge) => void,
+  userChallenges: Challenge[]
+}) {
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const categories = ['all', 'fitness', 'wellness', 'mindfulness', 'nutrition', 'lifestyle'];
+  
+  const filteredChallenges = selectedCategory === 'all' 
+    ? publicChallenges 
+    : publicChallenges.filter(c => c.category === selectedCategory);
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-hidden">
+      <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-hidden">
         <DialogHeader>
-          <DialogTitle>Join a Wellness Challenge</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Public Wellness Challenges
+          </DialogTitle>
           <DialogDescription>
-            Choose from popular challenges to kickstart your wellness journey.
+            Join thousands of people in these popular wellness challenges!
           </DialogDescription>
         </DialogHeader>
+        
+        <div className="flex gap-2 mb-4 flex-wrap">
+          {categories.map(category => (
+            <Button
+              key={category}
+              variant={selectedCategory === category ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedCategory(category)}
+              className="capitalize"
+            >
+              {category === 'all' ? 'All Categories' : category}
+            </Button>
+          ))}
+        </div>
+        
         <div className="overflow-y-auto max-h-[500px] pr-2">
-          <div className="grid gap-4">
-            {availableChallenges.map((challenge) => (
-              <Card key={challenge.id} className="overflow-hidden">
-                <div className="relative h-32 w-full">
-                  <Image
-                    src={challenge.imageUrl}
-                    alt={challenge.title}
-                    fill
-                    className="object-cover"
-                    data-ai-hint={challenge.imageHint}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-2 left-2">
-                    <h4 className="text-white font-semibold">{challenge.title}</h4>
-                    <p className="text-white/80 text-sm">{challenge.goalDays} day challenge</p>
-                  </div>
-                </div>
-                <CardContent className="p-4">
-                  <p className="text-sm text-muted-foreground mb-3">{challenge.description}</p>
-                  <Button 
-                    size="sm" 
-                    className="w-full"
-                    onClick={() => onJoinChallenge(challenge)}
-                  >
-                    <Target className="mr-2 h-4 w-4" />
-                    Join This Challenge
-                  </Button>
-                </CardContent>
-              </Card>
+          <div className="grid gap-4 md:grid-cols-2">
+            {filteredChallenges.map((challenge) => (
+              <PublicChallengeCard 
+                key={challenge.id} 
+                challenge={challenge} 
+                onJoin={onJoinChallenge}
+                userChallenges={userChallenges}
+              />
             ))}
           </div>
         </div>
+        
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>Close</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -339,7 +499,7 @@ function JoinChallengeDialog({ isOpen, onClose, onJoinChallenge }: { isOpen: boo
 }
 
 export default function ChallengesPage() {
-  const { user, challenges, setChallenges, loading } = useAuth();
+  const { user, challenges, setChallenges, loading, streak } = useAuth();
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
@@ -393,6 +553,39 @@ export default function ChallengesPage() {
     setChallengeToShare(challenge);
     setIsShareOpen(true);
   }
+
+  const handleJoinPublicChallenge = async (publicChallenge: PublicChallenge) => {
+    if (user) {
+      // Create user challenge from public challenge
+      const joinedChallenge: Challenge = {
+        id: `user-${nanoid()}`,
+        challengeId: publicChallenge.id,
+        title: publicChallenge.title,
+        description: publicChallenge.description,
+        icon: 'Target',
+        currentDay: 0,
+        goalDays: publicChallenge.goalDays,
+        imageUrl: publicChallenge.imageUrl,
+        imageHint: publicChallenge.imageHint,
+        isCompletedToday: false,
+        isCustom: false,
+        completedDays: [],
+        totalTasksCompleted: 0
+      };
+      
+      // Add to user's challenges
+      setChallenges(prev => [joinedChallenge, ...prev]);
+      
+      await addChallengeAction(user.uid, joinedChallenge);
+      
+      setIsJoinChallengeOpen(false);
+      
+      toast({
+        title: `Welcome to ${publicChallenge.title}! 🎯`,
+        description: `You've joined the challenge. Start today and build your streak!`
+      });
+    }
+  };
 
   const handleJoinChallenge = async (challenge: Challenge) => {
     if (user) {
@@ -496,6 +689,7 @@ export default function ChallengesPage() {
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
         onChallengeCreate={handleChallengeCreate}
+        userStreak={streak || 0}
       />
        <ShareDialog
         isOpen={isShareOpen}
@@ -505,7 +699,8 @@ export default function ChallengesPage() {
       <JoinChallengeDialog
         isOpen={isJoinChallengeOpen}
         onClose={() => setIsJoinChallengeOpen(false)}
-        onJoinChallenge={handleJoinChallenge}
+        onJoinChallenge={handleJoinPublicChallenge}
+        userChallenges={challenges}
       />
     </div>
   );
