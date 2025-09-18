@@ -68,8 +68,8 @@ export const quickActions = [
     icon: HeartPulse,
   },
   {
-    title: 'Symptom Check',
-    description: 'AI-powered advice',
+    title: 'Dr. Cure',
+    description: 'AI-powered diagnosis',
     href: '/symptom-check',
     icon: Bot,
   },

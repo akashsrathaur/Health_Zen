@@ -6,7 +6,7 @@ A comprehensive wellness platform built with Next.js, featuring AI-powered healt
 ## ✨ Features
 
 - **🤖 HealthSnap AI**: AI-powered image analysis for health suggestions using Gemini AI
-- **💬 Symptom Checker**: Intelligent symptom analysis with personalized recommendations  
+- **💬 Dr Cure**: Intelligent symptom analysis with personalized recommendations
 - **👥 Community Feed**: Social wellness sharing with emoji reactions and community support
 - **📊 Progress Tracker**: Daily streaks, water intake, sleep tracking with visual charts
 - **🎯 Gamified Dashboard**: Achievements, progress bars, and motivational streaks

@@ -48,7 +48,7 @@ firebase deploy --only firestore:rules  # Deploy Firestore security rules
 
 ### AI Architecture
 The app uses Google Genkit for AI-powered features:
-- **Symptom Checker**: Analyzes user symptoms and provides homeopathic, Ayurvedic, and modern remedies
+- **Dr Cure**: Analyzes user symptoms and provides homeopathic, Ayurvedic, and modern remedies
 - **HealthSnap AI**: Processes uploaded images to suggest wellness tips
 - **Chat Buddy**: Interactive AI assistant for health questions
 - All AI flows are defined in `src/ai/flows/` with structured input/output schemas using Zod

@@ -30,7 +30,7 @@ function SubmitButton() {
       ) : (
         <>
           <Sparkles className="mr-2 h-4 w-4" />
-          Check Symptoms
+          Get Dr Cure Advice
         </>
       )}
     </Button>
@@ -107,7 +107,7 @@ export default function SymptomCheckPage() {
     if (!state.data) return;
 
     const shareText = `
-Symptom Check Results:
+Dr Cure Results:
 Symptoms: ${state.form.symptoms}
 
 Homeopathy Advice:
@@ -158,10 +158,10 @@ Disclaimer: This advice is for informational purposes only.
       <div className="text-center mb-8">
         <Bot className="mx-auto h-12 w-12 text-primary" />
         <h1 className="mt-4 font-headline text-3xl font-bold tracking-tight">
-          Symptom Check
+          Dr Cure
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Describe your symptoms to receive Homeopathy and Ayurvedic advice.
+          Describe your symptoms and let Dr Cure provide personalized Homeopathy and Ayurvedic advice.
         </p>
       </div>
 
