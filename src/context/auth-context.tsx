@@ -7,7 +7,7 @@ import { auth, db } from '@/lib/firebase';
 import { getUserFromFirestore } from '@/lib/user-utils';
 import type { User } from '@/lib/user-store';
 import { defaultUser } from '@/lib/user-store';
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, collection, query, orderBy } from 'firebase/firestore';
 import { initialChallenges, initialDailyVibes, type Challenge, type DailyVibe, type CommunityPost } from '@/lib/data';
 
 type ProgressState = {
@@ -96,7 +96,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
             setChallenges(serverChallenges);
             setDailyVibes(serverDailyVibes);
-            setPosts(data.posts?.sort((a: CommunityPost, b: CommunityPost) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()) || []);
             
             const completedTasks = serverDailyVibes.filter((v: DailyVibe) => {
               if (v.id === 'medication') return v.progress === 100;
@@ -114,8 +113,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             try {
               await setDoc(userDataRef, {
                   dailyVibes: initialDailyVibes,
-                  challenges: initialChallenges,
-                  posts: []
+                  challenges: initialChallenges
               });
               // The state will be updated by the next snapshot trigger automatically after creation
             } catch (error) {
@@ -133,6 +131,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   }, [user, firebaseUser]);
 
+  // Separate effect for listening to global community posts
+  useEffect(() => {
+    const communityPostsRef = collection(db, 'communityPosts');
+    const q = query(communityPostsRef, orderBy('timestamp', 'desc'));
+    
+    const unsubscribePosts = onSnapshot(q, (snapshot) => {
+      const postsData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as CommunityPost[];
+      setPosts(postsData);
+    }, (error) => {
+      console.error('Error listening to community posts:', error);
+    });
+
+    return () => unsubscribePosts();
+  }, []); // No dependencies - this should always be listening
 
   const contextValue = {
     user,

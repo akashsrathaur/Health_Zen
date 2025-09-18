@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { communityPosts as initialCommunityPosts, type CommunityPost } from '@/lib/data';
 import { Textarea } from '@/components/ui/textarea';
-import { Camera, Send, CircleUser, Video, RefreshCcw, CheckCircle, XCircle } from 'lucide-react';
+import { Camera, Send, CircleUser, Video, RefreshCcw, CheckCircle, XCircle, MessageCircle, Heart, ThumbsUp } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useState, useRef, useEffect } from 'react';
 import { nanoid } from 'nanoid';
@@ -21,12 +21,49 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/auth-context';
-import { defaultUser } from '@/lib/user-store';
-import { addCommunityPost as addPostAction } from '@/actions/community';
+import { defaultUser, type User } from '@/lib/user-store';
+import { addCommunityPost as addPostAction, togglePostReaction, addCommentToPost } from '@/actions/community';
 import { formatDistanceToNow } from 'date-fns';
 
 
-function PostCard({ post }: { post: CommunityPost }) {
+function PostCard({ post, currentUser }: { post: CommunityPost; currentUser: User | null }) {
+  const [showComments, setShowComments] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [isAddingComment, setIsAddingComment] = useState(false);
+
+  const handleReaction = async (emoji: string) => {
+    if (!currentUser) return;
+    try {
+      await togglePostReaction(post.id, currentUser.uid, emoji);
+    } catch (error) {
+      console.error('Error toggling reaction:', error);
+    }
+  };
+
+  const handleAddComment = async () => {
+    if (!currentUser || !newComment.trim()) return;
+    
+    setIsAddingComment(true);
+    try {
+      await addCommentToPost(post.id, {
+        user: {
+          uid: currentUser.uid,
+          name: currentUser.name,
+          avatarUrl: currentUser.avatarUrl
+        },
+        content: newComment.trim()
+      });
+      setNewComment('');
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    } finally {
+      setIsAddingComment(false);
+    }
+  };
+
+  const commonReactions = ['❤️', '👍', '😊', '🔥', '💪', '🌿'];
+  const userReaction = currentUser ? post.userReactions?.[currentUser.uid] : null;
+
   return (
     <Card className="overflow-hidden">
       <CardHeader className="flex flex-row items-center gap-3">
@@ -36,7 +73,9 @@ function PostCard({ post }: { post: CommunityPost }) {
         </Avatar>
         <div className="grid gap-0.5">
           <p className="font-semibold">{post.user.name}</p>
-          <p className="text-sm text-muted-foreground">{formatDistanceToNow(new Date(post.timestamp), { addSuffix: true })}</p>
+          <p className="text-sm text-muted-foreground">
+            {formatDistanceToNow(new Date(post.timestamp), { addSuffix: true })}
+          </p>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -53,13 +92,99 @@ function PostCard({ post }: { post: CommunityPost }) {
           </div>
         )}
       </CardContent>
-      <CardFooter className="flex items-center gap-2">
-        {Object.entries(post.reactions).map(([emoji, count]) => (
-          <Button key={emoji} variant="outline" size="sm" className="rounded-full">
-            {emoji} <span className="ml-2 text-xs text-muted-foreground">{count}</span>
+      
+      {/* Reaction Bar */}
+      <div className="px-6 pb-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {commonReactions.map((emoji) => {
+              const count = post.reactions[emoji] || 0;
+              const isActive = userReaction === emoji;
+              return (
+                <Button
+                  key={emoji}
+                  variant={isActive ? "default" : "ghost"}
+                  size="sm"
+                  className={cn("rounded-full h-8 px-2", isActive && "bg-primary text-primary-foreground")}
+                  onClick={() => handleReaction(emoji)}
+                  disabled={!currentUser}
+                >
+                  {emoji}
+                  {count > 0 && <span className="ml-1 text-xs">{count}</span>}
+                </Button>
+              );
+            })}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowComments(!showComments)}
+            className="flex items-center gap-1"
+          >
+            <MessageCircle className="h-4 w-4" />
+            {post.comments?.length || 0}
           </Button>
-        ))}
-      </CardFooter>
+        </div>
+      </div>
+
+      {/* Comments Section */}
+      {showComments && (
+        <CardFooter className="flex-col space-y-4">
+          <Separator />
+          
+          {/* Existing Comments */}
+          <div className="w-full space-y-3">
+            {post.comments?.map((comment) => (
+              <div key={comment.id} className="flex gap-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={comment.user.avatarUrl} alt={comment.user.name} />
+                  <AvatarFallback>{comment.user.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <div className="bg-muted rounded-lg p-3">
+                    <p className="font-semibold text-sm">{comment.user.name}</p>
+                    <p className="text-sm">{comment.content}</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Add Comment */}
+          {currentUser && (
+            <div className="w-full flex gap-3">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
+                <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div className="flex-1 flex gap-2">
+                <Textarea
+                  placeholder="Write a comment..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  className="min-h-[60px] resize-none"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleAddComment();
+                    }
+                  }}
+                />
+                <Button
+                  size="sm"
+                  onClick={handleAddComment}
+                  disabled={!newComment.trim() || isAddingComment}
+                >
+                  {isAddingComment ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardFooter>
+      )}
     </Card>
   );
 }
@@ -246,9 +371,9 @@ export default function CommunityPage() {
   
   const handleAddPost = async (content: string, imageUrl?: string, imageHint?: string) => {
     if (!user) return;
-    const newPost: CommunityPost = {
-      id: nanoid(),
+    const newPost: Omit<CommunityPost, 'id'> = {
       user: {
+        uid: user.uid,
         name: user.name,
         avatarUrl: user.avatarUrl,
       },
@@ -257,12 +382,11 @@ export default function CommunityPage() {
       imageUrl: imageUrl,
       imageHint: imageHint,
       reactions: {},
+      userReactions: {},
+      comments: []
     };
 
-    // Optimistic update
-    setPosts(prevPosts => [newPost, ...prevPosts]);
-
-    await addPostAction(user.uid, newPost);
+    await addPostAction(newPost);
   };
 
   if (loading) {
@@ -286,7 +410,7 @@ export default function CommunityPage() {
         {user && <CreatePost onAddPost={handleAddPost} userData={userData} />}
         <Separator />
         {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+          <PostCard key={post.id} post={post} currentUser={user} />
         ))}
       </div>
     </div>

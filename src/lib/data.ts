@@ -219,38 +219,79 @@ export const communityPosts: CommunityPost[] = [
   {
     id: 'post-1',
     user: {
+      uid: 'demo-user-1',
       name: 'Community Member',
       avatarUrl: 'https://picsum.photos/seed/avatar2/100/100',
     },
-    timestamp: '2h ago',
+    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     content: 'Started my day with some sunrise yoga! Feeling so energized and ready to take on the day. What are your favorite morning rituals? ☀️',
     imageUrl: 'https://picsum.photos/seed/comm1/800/600',
     imageHint: 'yoga sunrise',
     reactions: { '💪': 25, '🔥': 18, '🌿': 12 },
+    userReactions: {},
+    comments: [
+      {
+        id: 'comment-1',
+        user: {
+          uid: 'demo-user-2',
+          name: 'Wellness Guru',
+          avatarUrl: 'https://picsum.photos/seed/avatar3/100/100'
+        },
+        content: 'Love this! I start with meditation and then yoga. Such a peaceful way to begin the day 🧘‍♀️',
+        timestamp: new Date(Date.now() - 1.5 * 60 * 60 * 1000).toISOString()
+      }
+    ],
   },
   {
     id: 'post-2',
     user: {
+      uid: 'demo-user-2',
       name: 'Wellness Guru',
       avatarUrl: 'https://picsum.photos/seed/avatar3/100/100',
     },
-    timestamp: '5h ago',
+    timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
     content: 'My go-to lunch for a productivity boost! A colorful salad packed with nutrients. Healthy eating doesn\'t have to be boring. #healthyeating #wellness',
     imageUrl: 'https://picsum.photos/seed/comm2/800/600',
     imageHint: 'salad bowl',
     reactions: { '🌿': 42, '👍': 30 },
+    userReactions: {},
+    comments: [],
   },
   {
     id: 'post-3',
     user: {
+      uid: 'demo-user-3',
       name: 'Zen Master',
       avatarUrl: 'https://picsum.photos/seed/avatar4/100/100',
     },
-    timestamp: '1d ago',
+    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
     content: 'Found the perfect spot to meditate today. Taking even 10 minutes to connect with nature and quiet the mind makes a huge difference.',
     imageUrl: 'https://picsum.photos/seed/comm3/800/600',
     imageHint: 'meditation nature',
     reactions: { '🧘': 55, '❤️': 40, '🌿': 25 },
+    userReactions: {},
+    comments: [
+      {
+        id: 'comment-2',
+        user: {
+          uid: 'demo-user-1',
+          name: 'Community Member',
+          avatarUrl: 'https://picsum.photos/seed/avatar2/100/100'
+        },
+        content: 'Beautiful spot! Where is this? I\'d love to find similar places in my area.',
+        timestamp: new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: 'comment-3',
+        user: {
+          uid: 'demo-user-3',
+          name: 'Zen Master',
+          avatarUrl: 'https://picsum.photos/seed/avatar4/100/100'
+        },
+        content: 'This is at the local botanical garden! They have a dedicated meditation area that\'s open to the public.',
+        timestamp: new Date(Date.now() - 22 * 60 * 60 * 1000).toISOString()
+      }
+    ],
   },
 ];
 
@@ -325,6 +366,7 @@ export const initialChallenges: Challenge[] = [
 export type CommunityPost = {
   id: string;
   user: {
+    uid: string;
     name: string;
     avatarUrl: string;
   };
@@ -333,6 +375,19 @@ export type CommunityPost = {
   imageUrl?: string;
   imageHint?: string;
   reactions: { [key: string]: number };
+  userReactions: { [userId: string]: string }; // userId -> emoji
+  comments: Comment[];
+};
+
+export type Comment = {
+  id: string;
+  user: {
+    uid: string;
+    name: string;
+    avatarUrl: string;
+  };
+  content: string;
+  timestamp: string;
 };
 
 export type Achievement = {
