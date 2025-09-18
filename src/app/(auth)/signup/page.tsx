@@ -45,12 +45,13 @@ export default function SignupPage() {
             const firebaseUser = userCredential.user;
 
             await createUserInFirestore(firebaseUser.uid, {
-                uid: firebaseUser.uid,
                 name: fullName,
                 age: parseInt(age, 10) || 0,
                 gender: gender || 'Prefer not to say',
                 avatarUrl: `https://picsum.photos/seed/${nanoid()}/100/100`,
                 streak: 0,
+                phone: phone,
+                bio: 'New to the wellness journey!',
             });
 
             // Explicitly redirect to the dashboard after successful signup.

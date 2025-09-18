@@ -431,7 +431,7 @@ export default function SettingsPage() {
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="mobile">Mobile Number</Label>
-                        <Input id="mobile" type="tel" readOnly value={firebaseUser?.phoneNumber || "No phone provided"} />
+                        <Input id="mobile" type="tel" readOnly value={userData.phone || "No phone provided"} />
                     </div>
                 </CardContent>
             </Card>

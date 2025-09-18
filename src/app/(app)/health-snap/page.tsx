@@ -1,6 +1,5 @@
 'use client';
-import { useActionState } from 'react';
-import { healthSnapAction } from '@/actions/health-snap';
+
 import {
   Card,
   CardContent,
@@ -13,22 +12,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useRef, useState, useTransition } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Camera,
-  Heart,
-  Lightbulb,
   Share2,
-  Save,
-  Loader2,
   X,
-  Tag,
   Users,
   ImageIcon,
+  Download,
+  Facebook,
+  Twitter,
+  Instagram,
+  Loader2,
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth-context';
 import { addCommunityPost } from '@/actions/community';
@@ -36,17 +33,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Separator } from '@/components/ui/separator';
 
 function HealthSnapUploader() {
-  const [state, formAction] = useActionState(healthSnapAction, {
-    data: null,
-    error: null,
-  });
-  const [pending, startTransition] = useTransition();
   const [preview, setPreview] = useState<string | null>(null);
+  const [caption, setCaption] = useState('');
   const [showCamera, setShowCamera] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -56,28 +48,32 @@ function HealthSnapUploader() {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: 'Invalid file type',
+          description: 'Please select an image file.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: 'File too large',
+          description: 'Please select an image smaller than 5MB.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result as string);
-        if (state.data || state.error) {
-           // Reset state if a new file is chosen
-           formRef.current?.reset();
-           // How to reset useFormState? A key on the component is one way.
-           // For now, let's just clear preview and let user resubmit.
-        }
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!preview) return;
-    const formData = new FormData(event.currentTarget);
-    formData.set('photoDataUri', preview);
-    startTransition(() => {
-        formAction(formData);
-    });
   };
 
   const startCamera = async () => {
@@ -140,10 +136,10 @@ function HealthSnapUploader() {
       return;
     }
 
-    if (!state.data || !preview) {
+    if (!preview) {
       toast({
-        title: 'No Content to Share',
-        description: 'Please analyze a photo first.',
+        title: 'No Photo to Share',
+        description: 'Please take or select a photo first.',
         variant: 'destructive',
       });
       return;
@@ -151,9 +147,19 @@ function HealthSnapUploader() {
 
     setIsSharing(true);
     try {
-      const shareContent = `🌿 My HealthSnap Insights\n\n💡 Modern Tip: ${state.data.modernTip}\n\n❤️ Ayurvedic Tip: ${state.data.ayurvedicTip}\n\n🏷️ Categories: ${state.data.categoryTags.join(', ')}\n\n#HealthZen #Wellness`;
+      const shareContent = caption.trim() || '📸 Sharing a moment from my wellness journey! #HealthZen #Wellness';
       
-      await addCommunityPost({
+      console.log('About to create community post with data:', {
+        user: {
+          uid: user.uid,
+          name: user.name,
+          avatarUrl: user.avatarUrl,
+        },
+        content: shareContent,
+        hasImage: !!preview
+      });
+      
+      const result = await addCommunityPost({
         user: {
           uid: user.uid,
           name: user.name,
@@ -162,161 +168,204 @@ function HealthSnapUploader() {
         timestamp: new Date().toISOString(),
         content: shareContent,
         imageUrl: preview,
-        imageHint: 'HealthSnap wellness analysis',
+        imageHint: 'HealthSnap photo',
         reactions: {},
         userReactions: {},
         comments: []
       });
       
-      toast({
-        title: 'Shared to Community!',
-        description: 'Your HealthSnap insights have been shared with the community.',
-      });
-      setShowShareDialog(false);
-    } catch (error) {
+      console.log('Community post result:', result);
+      
+      // Check if the result indicates success
+      if (result && typeof result === 'object' && 'success' in result) {
+        if (result.success) {
+          toast({
+            title: 'Shared to Community!',
+            description: 'Your photo has been shared with the community.',
+          });
+          setShowShareDialog(false);
+        } else {
+          throw new Error(result.error || 'Failed to create post');
+        }
+      } else {
+        // Assume success if no error was thrown
+        toast({
+          title: 'Shared to Community!',
+          description: 'Your photo has been shared with the community.',
+        });
+        setShowShareDialog(false);
+      }
+    } catch (error: any) {
       console.error('Error sharing to community:', error);
+      let errorMessage = 'Unable to share to community. Please try again.';
+      
+      if (error.message) {
+        if (error.message.includes('permission')) {
+          errorMessage = 'Permission denied. Please make sure you are logged in.';
+        } else if (error.message.includes('network') || error.message.includes('offline')) {
+          errorMessage = 'Network error. Please check your internet connection.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: 'Share Failed',
-        description: 'Unable to share to community. Please try again.',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
       setIsSharing(false);
     }
   };
+  
+  const handleSocialShare = (platform: string) => {
+    if (!preview) {
+      toast({
+        title: 'No Photo to Share',
+        description: 'Please take or select a photo first.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const shareText = caption.trim() || 'Check out my wellness moment! #HealthZen #Wellness';
+    const appUrl = window.location.origin;
+    
+    switch (platform) {
+      case 'twitter':
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`, '_blank');
+        break;
+      case 'facebook':
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}&quote=${encodeURIComponent(shareText)}`, '_blank');
+        break;
+      case 'download':
+        // Create download link
+        const link = document.createElement('a');
+        link.download = `healthzen-snap-${Date.now()}.jpg`;
+        link.href = preview;
+        link.click();
+        toast({
+          title: 'Photo Downloaded',
+          description: 'Your photo has been saved to your device.',
+        });
+        break;
+    }
+  };
 
   const handleReset = () => {
     setPreview(null);
+    setCaption('');
     if(fileInputRef.current) fileInputRef.current.value = "";
-    formRef.current?.reset();
     stopCamera();
     setShowShareDialog(false);
-    // This doesn't reset useFormState, need a different approach for full reset
   };
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
-      <form onSubmit={handleFormSubmit} ref={formRef}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Camera /> HealthSnap
-          </CardTitle>
-          <CardDescription>
-            Upload a snap of your meal, skin, or just yourself to get a personalized wellness tip.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {preview ? (
-            <div className="relative group">
-              <Image
-                src={preview}
-                alt="Image preview"
-                width={800}
-                height={600}
-                className="rounded-lg object-contain"
-              />
-              <Button type="button" variant="destructive" size="icon" onClick={handleReset} className="absolute top-2 right-2 opacity-50 group-hover:opacity-100 transition-opacity">
-                <X className="h-4 w-4" />
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Camera /> HealthSnap
+        </CardTitle>
+        <CardDescription>
+          Take a photo and share your wellness moment with the community or on social media.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {preview ? (
+          <div className="relative group">
+            <Image
+              src={preview}
+              alt="Image preview"
+              width={800}
+              height={600}
+              className="rounded-lg object-contain w-full"
+            />
+            <Button 
+              type="button" 
+              variant="destructive" 
+              size="icon" 
+              onClick={handleReset} 
+              className="absolute top-2 right-2 opacity-50 group-hover:opacity-100 transition-opacity"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex items-center justify-center w-full">
+              <Label htmlFor="picture" className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-secondary hover:bg-muted">
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <ImageIcon className="w-10 h-10 mb-3 text-muted-foreground" />
+                  <p className="mb-2 text-sm text-muted-foreground">
+                    <span className="font-semibold">Click to upload</span> or drag and drop
+                  </p>
+                  <p className="text-xs text-muted-foreground">PNG, JPG, or GIF (max 5MB)</p>
+                </div>
+                <Input 
+                  id="picture" 
+                  type="file" 
+                  className="hidden" 
+                  onChange={handleFileChange} 
+                  ref={fileInputRef} 
+                  accept="image/*" 
+                />
+              </Label>
+            </div>
+            <div className="flex justify-center">
+              <Button type="button" variant="outline" onClick={startCamera} className="flex items-center gap-2">
+                <Camera className="h-4 w-4" />
+                Use Camera
               </Button>
             </div>
-          ) : (
-             <div className="space-y-4">
-                <div className="flex items-center justify-center w-full">
-                    <Label htmlFor="picture" className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-secondary hover:bg-muted">
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <ImageIcon className="w-10 h-10 mb-3 text-muted-foreground" />
-                            <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                            <p className="text-xs text-muted-foreground">PNG, JPG, or GIF</p>
-                        </div>
-                        <Input id="picture" name="picture" type="file" className="hidden" onChange={handleFileChange} ref={fileInputRef} accept="image/*" />
-                    </Label>
-                </div>
-                <div className="flex justify-center">
-                    <Button type="button" variant="outline" onClick={startCamera} className="flex items-center gap-2">
-                        <Camera className="h-4 w-4" />
-                        Use Camera
-                    </Button>
-                </div>
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="caption">Optional Caption</Label>
-            <Textarea
-              id="caption"
-              name="caption"
-              placeholder="e.g., 'Feeling a bit tired today...'"
-              disabled={pending || !!state.data}
-            />
           </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-4 items-stretch">
-          {!state.data && (
-            <Button type="submit" disabled={!preview || pending}>
-              {pending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Analyzing...
-                </>
-              ) : (
-                'Get My Health Tip'
-              )}
-            </Button>
-          )}
+        )}
 
-          {state.error && (
-            <Alert variant="destructive">
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{state.error}</AlertDescription>
-            </Alert>
-          )}
+        <div className="space-y-2">
+          <Label htmlFor="caption">Caption</Label>
+          <Textarea
+            id="caption"
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            placeholder="Write something about your wellness moment... (optional)"
+            className="min-h-[80px]"
+            maxLength={300}
+          />
+          <p className="text-xs text-muted-foreground text-right">{caption.length}/300</p>
+        </div>
+      </CardContent>
+      
+      {preview && (
+        <CardFooter className="flex flex-col gap-4">
+          <div className="grid grid-cols-2 gap-3 w-full">
+            <Button 
+              onClick={() => setShowShareDialog(true)}
+              className="flex items-center gap-2"
+            >
+              <Users className="h-4 w-4" />
+              Share to Community
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => {
+                setShowShareDialog(true);
+              }}
+              className="flex items-center gap-2"
+            >
+              <Share2 className="h-4 w-4" />
+              Share Socially
+            </Button>
+          </div>
           
-          {state.data && (
-             <div className="space-y-4 animate-pop-in">
-                <Card className="bg-secondary/50">
-                    <CardHeader>
-                        <CardTitle className="text-lg">Your AI-Powered Suggestions</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="flex items-start gap-3">
-                            <div className="flex-shrink-0 mt-1"><Lightbulb className="h-5 w-5 text-primary" /></div>
-                            <div>
-                                <h4 className="font-semibold">Modern Tip</h4>
-                                <p className="text-sm text-muted-foreground">{state.data.modernTip}</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-3">
-                            <div className="flex-shrink-0 mt-1"><Heart className="h-5 w-5 text-accent" /></div>
-                            <div>
-                                <h4 className="font-semibold">Ayurvedic Tip</h4>
-                                <p className="text-sm text-muted-foreground">{state.data.ayurvedicTip}</p>
-                            </div>
-                        </div>
-                         <div className="flex items-start gap-3">
-                             <div className="flex-shrink-0 mt-1"><Tag className="h-5 w-5 text-muted-foreground" /></div>
-                             <div>
-                                <h4 className="font-semibold">Categories</h4>
-                                <div className="flex flex-wrap gap-2 mt-1">
-                                {state.data.categoryTags.map(tag => (
-                                    <Badge key={tag} variant="secondary">{tag}</Badge>
-                                ))}
-                                </div>
-                            </div>
-                        </div>
-                    </CardContent>
-                    <CardFooter className="flex-col items-stretch gap-2 sm:flex-row">
-                        <Button variant="outline" onClick={() => setShowShareDialog(true)}><Users className="mr-2 h-4 w-4" /> Share to Community</Button>
-                        <Button variant="outline"><Share2 className="mr-2 h-4 w-4" /> Share Story</Button>
-                        <Button><Save className="mr-2 h-4 w-4" /> Save to Tracker</Button>
-                    </CardFooter>
-                </Card>
-                <Button variant="outline" onClick={handleReset} className="w-full">
-                    Snap Another
-                </Button>
-            </div>
-          )}
+          <Button 
+            variant="outline" 
+            onClick={handleReset} 
+            className="w-full"
+          >
+            Take Another Photo
+          </Button>
         </CardFooter>
-      </form>
+      )}
       
       {/* Camera Dialog */}
       <Dialog open={showCamera} onOpenChange={setShowCamera}>
@@ -350,69 +399,84 @@ function HealthSnapUploader() {
         </DialogContent>
       </Dialog>
       
-      {/* Community Share Dialog */}
+      {/* Share Dialog */}
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-        <DialogContent>
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Share to Community</DialogTitle>
+            <DialogTitle>Share Your Photo</DialogTitle>
             <DialogDescription>
-              Share your HealthSnap insights with the HealthZen community to inspire others on their wellness journey.
+              Share your wellness moment with the community or on social media.
             </DialogDescription>
           </DialogHeader>
           
-          {state.data && (
+          {preview && (
             <div className="space-y-4">
-              <div className="aspect-video relative rounded-lg overflow-hidden border">
+              <div className="aspect-square relative rounded-lg overflow-hidden border">
                 <Image
-                  src={preview!}
+                  src={preview}
                   alt="Preview"
                   fill
                   className="object-cover"
                 />
               </div>
               
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-sm">
-                  <Lightbulb className="h-4 w-4 text-primary" />
-                  <span className="font-medium">Modern Tip:</span>
-                  <span className="text-muted-foreground">{state.data.modernTip.slice(0, 50)}...</span>
+              {caption && (
+                <div className="p-3 bg-secondary rounded-lg">
+                  <p className="text-sm">{caption}</p>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Heart className="h-4 w-4 text-accent" />
-                  <span className="font-medium">Ayurvedic Tip:</span>
-                  <span className="text-muted-foreground">{state.data.ayurvedicTip.slice(0, 50)}...</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Tag className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">Categories:</span>
-                  <span className="text-muted-foreground">{state.data.categoryTags.join(', ')}</span>
-                </div>
+              )}
+              
+              <div className="grid grid-cols-2 gap-3">
+                <Button 
+                  onClick={handleShareToCommunity}
+                  disabled={isSharing}
+                  className="flex items-center gap-2"
+                >
+                  {isSharing ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Users className="h-4 w-4" />
+                  )}
+                  Community
+                </Button>
+                
+                <Button 
+                  variant="outline"
+                  onClick={() => handleSocialShare('download')}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Download
+                </Button>
               </div>
               
               <Separator />
               
-              <p className="text-sm text-muted-foreground">
-                This will create a community post with your photo and wellness insights.
-              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <Button 
+                  variant="outline"
+                  onClick={() => handleSocialShare('twitter')}
+                  className="flex items-center gap-2"
+                >
+                  <Twitter className="h-4 w-4" />
+                  Twitter
+                </Button>
+                
+                <Button 
+                  variant="outline"
+                  onClick={() => handleSocialShare('facebook')}
+                  className="flex items-center gap-2"
+                >
+                  <Facebook className="h-4 w-4" />
+                  Facebook
+                </Button>
+              </div>
             </div>
           )}
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowShareDialog(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleShareToCommunity} disabled={isSharing}>
-              {isSharing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Sharing...
-                </>
-              ) : (
-                <>
-                  <Users className="mr-2 h-4 w-4" />
-                  Share to Community
-                </>
-              )}
+            <Button variant="outline" onClick={() => setShowShareDialog(false)} className="w-full">
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -429,7 +493,7 @@ export default function HealthSnapPage() {
                 HealthSnap
                 </h1>
                 <p className="text-muted-foreground">
-                    A picture is worth a thousand words... and a wellness tip!
+                    Capture and share your wellness moments with the community and social media.
                 </p>
             </div>
             <HealthSnapUploader />

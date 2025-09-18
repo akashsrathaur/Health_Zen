@@ -17,8 +17,9 @@ export type User = {
     avatarUrl: string;
     streak: number;
     bio?: string;
+    phone?: string;
     buddyPersona?: BuddyPersona;
-}
+};
 
 // Default user data for a logged-out or new user state.
 export const defaultUser: Omit<User, 'uid'> = {
