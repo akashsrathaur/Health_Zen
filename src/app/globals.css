@@ -4,83 +4,85 @@
 
 @layer base {
   :root {
-    --background: 0 0% 96.1%; /* #F5F5F5 */
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 340 82% 52%; /* #E91E63 */
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 15% 15%; /* Darker card elements */
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 93%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 340 82% 52%; /* Same as primary */
-    --accent-foreground: 0 0% 98%;
+    /* Light theme (default) - Wellness focused colors */
+    --background: 33 15% 96%; /* #FFFBF4 - Pure light background */
+    --foreground: 22 20% 12%; /* #161614 - Dark text */
+    --card: 33 25% 92%; /* #F7E4D2 - Cream cards */
+    --card-foreground: 22 20% 12%;
+    --popover: 33 15% 96%;
+    --popover-foreground: 22 20% 12%;
+    --primary: 15 55% 55%; /* #CC6A4C - Coral primary */
+    --primary-foreground: 33 15% 96%;
+    --secondary: 35 28% 44%; /* #93784E - Earth tone */
+    --secondary-foreground: 33 15% 96%;
+    --muted: 33 20% 88%; /* Soft muted background */
+    --muted-foreground: 22 15% 40%;
+    --accent: 15 55% 55%; /* Same as primary coral */
+    --accent-foreground: 33 15% 96%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 10% 20%;
-    --input: 240 10% 18%;
-    --ring: 340 82% 52%;
-    --chart-1: 280 50% 60%;
-    --chart-2: 140 50% 60%;
-    --chart-3: 30 80% 65%;
+    --border: 33 20% 80%; /* Subtle borders */
+    --input: 33 25% 90%; /* Input backgrounds */
+    --ring: 15 55% 55%; /* Focus rings */
+    --chart-1: 15 55% 55%;
+    --chart-2: 35 28% 44%;
+    --chart-3: 33 25% 75%;
     --chart-4: 200 70% 60%;
-    --chart-5: 340 75% 65%;
-    --radius: 0.8rem;
+    --chart-5: 280 50% 60%;
+    --radius: 1rem; /* Slightly more rounded for soft feel */
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-border: 0 0% 90%;
-    --sidebar-accent: 280 37% 92%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-ring: 280 44% 65%;
+    --sidebar-background: 33 25% 92%;
+    --sidebar-foreground: 22 20% 15%;
+    --sidebar-border: 33 20% 85%;
+    --sidebar-accent: 15 55% 55%;
+    --sidebar-accent-foreground: 33 15% 96%;
+    --sidebar-ring: 15 55% 55%;
   }
 
   .dark {
-    --background: 240 10% 4%; /* #08080a */
-    --foreground: 0 0% 98%; /* #FAFAFA */
+    /* Dark theme - Maintains wellness feel with warmer tones */
+    --background: 22 15% 8%; /* Deep warm dark */
+    --foreground: 33 15% 92%; /* Light cream text */
     
-    --card: 240 15% 9%; /* #141419 */
-    --card-foreground: 0 0% 98%;
+    --card: 22 20% 12%; /* Dark cards with warmth */
+    --card-foreground: 33 15% 92%;
     
-    --popover: 240 15% 5%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 22 15% 10%;
+    --popover-foreground: 33 15% 92%;
     
-    --primary: 340 82% 52%; /* #E91E63 */
-    --primary-foreground: 0 0% 98%;
+    --primary: 15 60% 60%; /* Brighter coral for dark mode */
+    --primary-foreground: 22 15% 8%;
     
-    --secondary: 240 15% 15%; /* #212126 */
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 35 30% 35%; /* Darker earth tone */
+    --secondary-foreground: 33 15% 92%;
     
-    --muted: 240 10% 12%;
-    --muted-foreground: 0 0% 63.9%;
+    --muted: 22 15% 15%;
+    --muted-foreground: 33 10% 65%;
     
-    --accent: 340_82%_52%; /* #E91E63 */
-    --accent-foreground: 0 0% 98%;
+    --accent: 15 60% 60%; /* Bright coral accent */
+    --accent-foreground: 22 15% 8%;
     
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62.8% 50%;
     --destructive-foreground: 0 0% 98%;
     
-    --border: 240 10% 20%;
-    --input: 240 10% 18%;
-    --ring: 340 82% 52%;
+    --border: 22 15% 20%; /* Warm borders */
+    --input: 22 20% 15%; /* Input backgrounds */
+    --ring: 15 60% 60%; /* Focus rings */
     
-    --chart-1: 340 82% 52%;
-    --chart-2: 255 70% 65%;
-    --chart-3: 5 100% 70%;
-    --chart-4: 51 98% 63%;
-    --chart-5: 200 70% 60%;
+    --chart-1: 15 60% 60%;
+    --chart-2: 35 30% 50%;
+    --chart-3: 33 25% 40%;
+    --chart-4: 200 50% 50%;
+    --chart-5: 280 40% 50%;
 
-    --radius: 0.8rem;
+    --radius: 1rem;
 
-    --sidebar-background: 240 15% 9%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-border: 240 10% 20%;
-    --sidebar-accent: 240 15% 18%;
-    --sidebar-accent-foreground: 340 82% 60%;
-    --sidebar-ring: 340 82% 52%;
+    --sidebar-background: 22 20% 10%;
+    --sidebar-foreground: 33 15% 90%;
+    --sidebar-border: 22 15% 18%;
+    --sidebar-accent: 15 60% 60%;
+    --sidebar-accent-foreground: 22 15% 8%;
+    --sidebar-ring: 15 60% 60%;
   }
 }
 
@@ -94,19 +96,53 @@
 }
 
 @layer utilities {
+  /* Wellness-themed utility classes */
   .text-glow {
     text-shadow: 0 0 8px hsl(var(--primary) / 0.8), 0 0 20px hsl(var(--primary) / 0.5);
   }
 
   .button-glow {
-      box-shadow: 0 0 10px hsl(var(--primary)), 0 0 20px hsl(var(--primary) / 0.7);
+    box-shadow: 0 0 10px hsl(var(--primary)), 0 0 20px hsl(var(--primary) / 0.7);
   }
 
-  .text-glow-purple {
+  .text-glow-earth {
     text-shadow: 0 0 8px hsl(var(--secondary) / 0.8), 0 0 20px hsl(var(--secondary) / 0.5);
   }
 
-  @keyframes-glow {
+  .soft-shadow {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .warm-shadow {
+    box-shadow: 0 4px 20px rgba(204, 106, 76, 0.15), 0 2px 8px rgba(204, 106, 76, 0.1);
+  }
+
+  .gentle-border {
+    border: 1px solid hsl(var(--border));
+    transition: border-color 0.3s ease;
+  }
+
+  .gentle-border:hover {
+    border-color: hsl(var(--primary) / 0.5);
+  }
+
+  .smooth-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .wellness-gradient {
+    background: linear-gradient(135deg, 
+      hsl(var(--card)) 0%, 
+      hsl(var(--muted)) 100%);
+  }
+
+  .coral-gradient {
+    background: linear-gradient(135deg, 
+      hsl(var(--primary) / 0.1) 0%, 
+      hsl(var(--primary) / 0.05) 100%);
+  }
+
+  @keyframes wellness-glow {
     from {
       text-shadow: 0 0 4px hsl(var(--primary) / 0.5);
     }
@@ -114,7 +150,21 @@
       text-shadow: 0 0 8px hsl(var(--primary) / 0.8);
     }
   }
-  .animate-text-glow {
-      animation: keyframes-glow 1.5s ease-in-out infinite alternate;
+  
+  .animate-wellness-glow {
+    animation: wellness-glow 2s ease-in-out infinite alternate;
+  }
+
+  /* Responsive text sizes for mobile-first design */
+  .text-responsive-xl {
+    @apply text-xl sm:text-2xl lg:text-3xl;
+  }
+  
+  .text-responsive-lg {
+    @apply text-lg sm:text-xl lg:text-2xl;
+  }
+  
+  .text-responsive-base {
+    @apply text-sm sm:text-base lg:text-lg;
   }
 }

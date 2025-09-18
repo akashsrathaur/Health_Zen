@@ -15,6 +15,7 @@ export default {
         code: ['monospace'],
       },
       colors: {
+        // Base system colors
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
@@ -48,6 +49,16 @@ export default {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
+        
+        // Yoga/Wellness brand colors from design
+        wellness: {
+          coral: '#CC6A4C',     // Primary action color
+          earth: '#93784E',     // Secondary earth tone
+          cream: '#F7E4D2',     // Light background
+          dark: '#161614',      // Dark text/elements
+          light: '#FFFBF4',     // Pure light background
+        },
+        
         chart: {
           '1': 'hsl(var(--chart-1))',
           '2': 'hsl(var(--chart-2))',
@@ -97,12 +108,49 @@ export default {
           '0%': { transform: 'scale(0.95)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
         },
+        'gentle-bounce': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-4px)' },
+        },
+        'soft-glow': {
+          '0%, 100%': { boxShadow: '0 0 5px rgba(204, 106, 76, 0.3)' },
+          '50%': { boxShadow: '0 0 15px rgba(204, 106, 76, 0.5)' },
+        },
+        'fade-in-up': {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(10px)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0)',
+          },
+        },
+        'scale-in': {
+          '0%': {
+            opacity: '0',
+            transform: 'scale(0.8)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'scale(1)',
+          },
+        },
+        'breathe': {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.02)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'bounce-in': 'bounce-in 0.5s ease-out',
         'pop-in': 'pop-in 0.3s ease-out',
+        'gentle-bounce': 'gentle-bounce 2s ease-in-out infinite',
+        'soft-glow': 'soft-glow 3s ease-in-out infinite',
+        'fade-in-up': 'fade-in-up 0.6s ease-out',
+        'scale-in': 'scale-in 0.4s ease-out',
+        'breathe': 'breathe 4s ease-in-out infinite',
       },
     },
   },

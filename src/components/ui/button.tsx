@@ -6,25 +6,27 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 smooth-transition",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 dark:shadow-[0_0_15px_hsl(var(--primary)/0.4)] dark:hover:shadow-[0_0_25px_hsl(var(--primary)/0.6)]",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] warm-shadow hover:shadow-lg",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:scale-95",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:scale-[1.02] active:scale-[0.98] soft-shadow",
         outline:
-          "border border-input bg-background hover:bg-secondary hover:text-secondary-foreground active:scale-95",
+          "border border-input bg-background hover:bg-secondary hover:text-secondary-foreground hover:scale-[1.02] active:scale-[0.98] gentle-border",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 active:scale-95",
-        ghost: "hover:bg-secondary hover:text-secondary-foreground active:scale-95",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:scale-[1.02] active:scale-[0.98] soft-shadow",
+        ghost: "hover:bg-secondary hover:text-secondary-foreground hover:scale-[1.02] active:scale-[0.98]",
+        link: "text-primary underline-offset-4 hover:underline hover:text-primary/80",
+        wellness: "bg-wellness-coral text-white hover:bg-wellness-coral/90 hover:scale-[1.02] active:scale-[0.98] warm-shadow hover:shadow-lg",
+        earth: "bg-wellness-earth text-white hover:bg-wellness-earth/90 hover:scale-[1.02] active:scale-[0.98] soft-shadow",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
+        default: "h-11 px-6 py-2.5",
+        sm: "h-9 rounded-lg px-4 text-xs",
+        lg: "h-12 rounded-xl px-10 text-base",
+        icon: "h-11 w-11",
       },
     },
     defaultVariants: {
