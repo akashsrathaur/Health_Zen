@@ -7,190 +7,218 @@ export type AvatarOption = {
 };
 
 export const avatarOptions: AvatarOption[] = [
-  // Male Avatars
+  // Male Avatars - Smiling & Friendly
   {
     id: 'male-1',
-    name: 'Alex Professional',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=alex-pro&gender=male&backgroundColor=b6e3f4&clothingColor=262e33',
+    name: 'Alex Happy',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=alex-smile&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=b6e3f4&clothingColor=262e33&clothingGraphic=bear',
     gender: 'male',
-    style: 'Professional'
+    style: 'Happy'
   },
   {
     id: 'male-2',
-    name: 'Ryan Casual',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ryan-casual&gender=male&backgroundColor=c0aede&clothingColor=3c4f5c',
+    name: 'Ryan Joyful',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ryan-joy&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=c0aede&clothingColor=3c4f5c&clothingGraphic=pizza',
     gender: 'male',
-    style: 'Casual'
+    style: 'Joyful'
   },
   {
     id: 'male-3',
-    name: 'Jake Sporty',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jake-sporty&gender=male&backgroundColor=ffd93d&clothingColor=65c9ff',
+    name: 'Jake Cheerful',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jake-cheer&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=ffd93d&clothingColor=65c9ff&clothingGraphic=skullOutline',
     gender: 'male',
-    style: 'Sporty'
+    style: 'Cheerful'
   },
   {
     id: 'male-4',
-    name: 'Marcus Cool',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=marcus-cool&gender=male&backgroundColor=ffb3ba&clothingColor=2c1b18',
+    name: 'Marcus Bright',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=marcus-bright&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=ffb3ba&clothingColor=2c1b18&clothingGraphic=diamond',
     gender: 'male',
-    style: 'Cool'
+    style: 'Bright'
   },
   {
     id: 'male-5',
-    name: 'David Smart',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=david-smart&gender=male&backgroundColor=bae1ff&clothingColor=25262b',
+    name: 'David Warm',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=david-warm&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=bae1ff&clothingColor=25262b&clothingGraphic=selena',
     gender: 'male',
-    style: 'Smart'
+    style: 'Warm'
   },
   {
     id: 'male-6',
     name: 'Lucas Friendly',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=lucas-friendly&gender=male&backgroundColor=d4edda&clothingColor=721c24',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=lucas-friend&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=d4edda&clothingColor=721c24&clothingGraphic=bear',
     gender: 'male',
     style: 'Friendly'
   },
   {
     id: 'male-7',
-    name: 'Sam Trendy',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sam-trendy&gender=male&backgroundColor=fff3cd&clothingColor=495057',
+    name: 'Sam Radiant',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sam-radiant&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=fff3cd&clothingColor=495057&clothingGraphic=resist',
     gender: 'male',
-    style: 'Trendy'
+    style: 'Radiant'
   },
   {
     id: 'male-8',
-    name: 'Ben Active',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ben-active&gender=male&backgroundColor=e2e3e5&clothingColor=0c5460',
+    name: 'Ben Energetic',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ben-energy&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=e2e3e5&clothingColor=0c5460&clothingGraphic=skull',
     gender: 'male',
-    style: 'Active'
+    style: 'Energetic'
   },
   {
     id: 'male-9',
-    name: 'Chris Modern',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=chris-modern&gender=male&backgroundColor=f8d7da&clothingColor=155724',
+    name: 'Chris Positive',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=chris-positive&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=f8d7da&clothingColor=155724&clothingGraphic=pizza',
     gender: 'male',
-    style: 'Modern'
+    style: 'Positive'
   },
   {
     id: 'male-10',
-    name: 'Tyler Creative',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=tyler-creative&gender=male&backgroundColor=d1ecf1&clothingColor=842029',
+    name: 'Tyler Vibrant',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=tyler-vibrant&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=d1ecf1&clothingColor=842029&clothingGraphic=diamond',
     gender: 'male',
-    style: 'Creative'
+    style: 'Vibrant'
   },
   {
     id: 'male-11',
-    name: 'Noah Zen',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=noah-zen&gender=male&backgroundColor=e7e8ea&clothingColor=0f5132',
+    name: 'Noah Peaceful',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=noah-peace&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=e7e8ea&clothingColor=0f5132&clothingGraphic=selena',
     gender: 'male',
-    style: 'Zen'
+    style: 'Peaceful'
   },
   {
     id: 'male-12',
-    name: 'Ethan Bold',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ethan-bold&gender=male&backgroundColor=fff2cc&clothingColor=664d03',
+    name: 'Ethan Confident',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ethan-confident&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=fff2cc&clothingColor=664d03&clothingGraphic=bear',
     gender: 'male',
-    style: 'Bold'
+    style: 'Confident'
+  },
+  {
+    id: 'male-13',
+    name: 'Liam Optimistic',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=liam-optimist&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=d0f0c0&clothingColor=2d5016&clothingGraphic=resist',
+    gender: 'male',
+    style: 'Optimistic'
+  },
+  {
+    id: 'male-14',
+    name: 'Oliver Sunny',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=oliver-sunny&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=ffe4e1&clothingColor=6c757d&clothingGraphic=skull',
+    gender: 'male',
+    style: 'Sunny'
   },
 
-  // Female Avatars
+  // Female Avatars - Smiling & Friendly
   {
     id: 'female-1',
-    name: 'Emma Professional',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=emma-pro&gender=female&backgroundColor=b6e3f4&clothingColor=262e33',
+    name: 'Emma Radiant',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=emma-radiant&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=b6e3f4&clothingColor=262e33&clothingGraphic=pizza',
     gender: 'female',
-    style: 'Professional'
+    style: 'Radiant'
   },
   {
     id: 'female-2',
-    name: 'Sophia Elegant',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sophia-elegant&gender=female&backgroundColor=c0aede&clothingColor=3c4f5c',
+    name: 'Sophia Bright',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sophia-bright&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=c0aede&clothingColor=3c4f5c&clothingGraphic=bear',
     gender: 'female',
-    style: 'Elegant'
+    style: 'Bright'
   },
   {
     id: 'female-3',
-    name: 'Mia Sporty',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=mia-sporty&gender=female&backgroundColor=ffd93d&clothingColor=65c9ff',
+    name: 'Mia Cheerful',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=mia-cheerful&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=ffd93d&clothingColor=65c9ff&clothingGraphic=selena',
     gender: 'female',
-    style: 'Sporty'
+    style: 'Cheerful'
   },
   {
     id: 'female-4',
-    name: 'Olivia Chic',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=olivia-chic&gender=female&backgroundColor=ffb3ba&clothingColor=2c1b18',
+    name: 'Olivia Joyful',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=olivia-joyful&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=ffb3ba&clothingColor=2c1b18&clothingGraphic=diamond',
     gender: 'female',
-    style: 'Chic'
+    style: 'Joyful'
   },
   {
     id: 'female-5',
-    name: 'Isabella Smart',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=isabella-smart&gender=female&backgroundColor=bae1ff&clothingColor=25262b',
+    name: 'Isabella Happy',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=isabella-happy&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=bae1ff&clothingColor=25262b&clothingGraphic=resist',
     gender: 'female',
-    style: 'Smart'
+    style: 'Happy'
   },
   {
     id: 'female-6',
-    name: 'Charlotte Friendly',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=charlotte-friendly&gender=female&backgroundColor=d4edda&clothingColor=721c24',
+    name: 'Charlotte Warm',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=charlotte-warm&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=d4edda&clothingColor=721c24&clothingGraphic=skull',
     gender: 'female',
-    style: 'Friendly'
+    style: 'Warm'
   },
   {
     id: 'female-7',
-    name: 'Amelia Trendy',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=amelia-trendy&gender=female&backgroundColor=fff3cd&clothingColor=495057',
+    name: 'Amelia Sunny',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=amelia-sunny&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=fff3cd&clothingColor=495057&clothingGraphic=pizza',
     gender: 'female',
-    style: 'Trendy'
+    style: 'Sunny'
   },
   {
     id: 'female-8',
-    name: 'Harper Active',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=harper-active&gender=female&backgroundColor=e2e3e5&clothingColor=0c5460',
+    name: 'Harper Vibrant',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=harper-vibrant&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=e2e3e5&clothingColor=0c5460&clothingGraphic=bear',
     gender: 'female',
-    style: 'Active'
+    style: 'Vibrant'
   },
   {
     id: 'female-9',
-    name: 'Evelyn Modern',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=evelyn-modern&gender=female&backgroundColor=f8d7da&clothingColor=155724',
+    name: 'Evelyn Positive',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=evelyn-positive&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=f8d7da&clothingColor=155724&clothingGraphic=selena',
     gender: 'female',
-    style: 'Modern'
+    style: 'Positive'
   },
   {
     id: 'female-10',
-    name: 'Luna Creative',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=luna-creative&gender=female&backgroundColor=d1ecf1&clothingColor=842029',
+    name: 'Luna Glowing',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=luna-glowing&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=d1ecf1&clothingColor=842029&clothingGraphic=diamond',
     gender: 'female',
-    style: 'Creative'
+    style: 'Glowing'
   },
   {
     id: 'female-11',
-    name: 'Grace Zen',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=grace-zen&gender=female&backgroundColor=e7e8ea&clothingColor=0f5132',
+    name: 'Grace Peaceful',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=grace-peaceful&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=e7e8ea&clothingColor=0f5132&clothingGraphic=resist',
     gender: 'female',
-    style: 'Zen'
+    style: 'Peaceful'
   },
   {
     id: 'female-12',
-    name: 'Zoe Bold',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=zoe-bold&gender=female&backgroundColor=fff2cc&clothingColor=664d03',
+    name: 'Zoe Confident',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=zoe-confident&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=fff2cc&clothingColor=664d03&clothingGraphic=skull',
     gender: 'female',
-    style: 'Bold'
+    style: 'Confident'
   },
   {
     id: 'female-13',
-    name: 'Aria Wellness',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=aria-wellness&gender=female&backgroundColor=d0f0c0&clothingColor=2d5016',
+    name: 'Aria Serene',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=aria-serene&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=d0f0c0&clothingColor=2d5016&clothingGraphic=pizza',
     gender: 'female',
-    style: 'Wellness'
+    style: 'Serene'
   },
   {
     id: 'female-14',
-    name: 'Maya Calm',
-    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=maya-calm&gender=female&backgroundColor=e8f4fd&clothingColor=0a58ca',
+    name: 'Maya Gentle',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=maya-gentle&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=e8f4fd&clothingColor=0a58ca&clothingGraphic=bear',
     gender: 'female',
-    style: 'Calm'
+    style: 'Gentle'
+  },
+  {
+    id: 'female-15',
+    name: 'Lily Optimistic',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=lily-optimist&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=fce4ec&clothingColor=880e4f&clothingGraphic=selena',
+    gender: 'female',
+    style: 'Optimistic'
+  },
+  {
+    id: 'female-16',
+    name: 'Chloe Energetic',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=chloe-energy&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=f3e5f5&clothingColor=4a148c&clothingGraphic=diamond',
+    gender: 'female',
+    style: 'Energetic'
   },
 ];
 

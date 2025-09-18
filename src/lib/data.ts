@@ -226,7 +226,7 @@ export const communityPosts: CommunityPost[] = [
     user: {
       uid: 'akash-001',
       name: 'Akash',
-      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=akash-fitness&gender=male&backgroundColor=ffd93d&clothingColor=65c9ff',
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=akash-fitness&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=ffd93d&clothingColor=65c9ff&clothingGraphic=skullOutline',
     },
     timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     content: 'Just completed my 30-day fitness transformation challenge! 💪 The journey wasn\'t easy, but consistency and dedication paid off. Lost 8kg and gained so much confidence. To anyone starting their fitness journey - you\'ve got this! #FitnessTransformation #HealthyLiving',
@@ -240,7 +240,7 @@ export const communityPosts: CommunityPost[] = [
         user: {
           uid: 'saumyaa-002',
           name: 'Saumyaa',
-          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=saumyaa-yoga&gender=female&backgroundColor=d4edda&clothingColor=721c24'
+          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=saumyaa-yoga&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=d4edda&clothingColor=721c24&clothingGraphic=skull'
         },
         content: 'Wow Akash! This is so inspiring. What was your workout routine? I\'m just starting my fitness journey.',
         timestamp: new Date(Date.now() - 1.5 * 60 * 60 * 1000).toISOString()
@@ -252,7 +252,7 @@ export const communityPosts: CommunityPost[] = [
     user: {
       uid: 'saumyaa-002',
       name: 'Saumyaa',
-      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=saumyaa-yoga&gender=female&backgroundColor=d4edda&clothingColor=721c24',
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=saumyaa-yoga&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=d4edda&clothingColor=721c24&clothingGraphic=skull',
     },
     timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
     content: 'Morning yoga session by the lake 🌅 Starting my day with gratitude and mindfulness. This peaceful routine has completely transformed my mental health and energy levels. Nature truly is the best therapy! #YogaLife #MentalWellness #MorningRituals',
@@ -267,7 +267,7 @@ export const communityPosts: CommunityPost[] = [
     user: {
       uid: 'divyansh-003',
       name: 'Divyansh',
-      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=divyansh-nutrition&gender=male&backgroundColor=bae1ff&clothingColor=25262b',
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=divyansh-nutrition&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=bae1ff&clothingColor=25262b&clothingGraphic=selena',
     },
     timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
     content: 'Meal prep Sunday! 🥗 Preparing nutritious meals for the entire week. This colorful buddha bowl has quinoa, roasted vegetables, chickpeas, and homemade tahini dressing. Nutrition doesn\'t have to be boring when you add colors and flavors! #MealPrep #HealthyEating #Nutrition',
@@ -281,7 +281,7 @@ export const communityPosts: CommunityPost[] = [
         user: {
           uid: 'jaanvi-005',
           name: 'Jaanvi',
-          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jaanvi-wellness&gender=female&backgroundColor=d0f0c0&clothingColor=2d5016'
+          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jaanvi-wellness&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=d0f0c0&clothingColor=2d5016&clothingGraphic=pizza'
         },
         content: 'This looks amazing! Can you share the tahini dressing recipe? I\'ve been looking for healthy dressing options.',
         timestamp: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString()
@@ -293,7 +293,7 @@ export const communityPosts: CommunityPost[] = [
     user: {
       uid: 'sarthak-004',
       name: 'Sarthak',
-      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sarthak-running&gender=male&backgroundColor=e2e3e5&clothingColor=0c5460',
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sarthak-running&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=e2e3e5&clothingColor=0c5460&clothingGraphic=skull',
     },
     timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
     content: 'Hit a new personal record today! 🏃‍♂️ Ran my first 10K in under 45 minutes. Six months ago, I couldn\'t even run 1K without stopping. The key was gradual progression and never giving up. Every step counts, no matter how small! #Running #PersonalRecord #NeverGiveUp',
@@ -307,7 +307,7 @@ export const communityPosts: CommunityPost[] = [
         user: {
           uid: 'akash-001',
           name: 'Akash',
-          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=akash-fitness&gender=male&backgroundColor=ffd93d&clothingColor=65c9ff'
+          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=akash-fitness&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=ffd93d&clothingColor=65c9ff&clothingGraphic=skullOutline'
         },
         content: 'Incredible progress Sarthak! Your dedication is truly inspiring. What training plan did you follow?',
         timestamp: new Date(Date.now() - 11 * 60 * 60 * 1000).toISOString()
@@ -317,7 +317,7 @@ export const communityPosts: CommunityPost[] = [
         user: {
           uid: 'deepanjana-006',
           name: 'Deepanjana',
-          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=deepanjana-holistic&gender=female&backgroundColor=e8f4fd&clothingColor=0a58ca'
+          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=deepanjana-holistic&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=e8f4fd&clothingColor=0a58ca&clothingGraphic=bear'
         },
         content: 'Congratulations! This motivates me to start my running journey. Any tips for beginners?',
         timestamp: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString()
@@ -329,7 +329,7 @@ export const communityPosts: CommunityPost[] = [
     user: {
       uid: 'jaanvi-005',
       name: 'Jaanvi',
-      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jaanvi-wellness&gender=female&backgroundColor=d0f0c0&clothingColor=2d5016',
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jaanvi-wellness&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=d0f0c0&clothingColor=2d5016&clothingGraphic=pizza',
     },
     timestamp: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(),
     content: 'Self-care Sunday ritual 🛌 Created my own spa day at home - face mask, meditation, journaling, and herbal tea. Taking time to recharge and reconnect with yourself is not selfish, it\'s necessary. How do you practice self-care? #SelfCare #MentalHealth #SelfLove',
@@ -343,7 +343,7 @@ export const communityPosts: CommunityPost[] = [
         user: {
           uid: 'saumyaa-002',
           name: 'Saumyaa',
-          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=saumyaa-yoga&gender=female&backgroundColor=d4edda&clothingColor=721c24'
+          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=saumyaa-yoga&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=d4edda&clothingColor=721c24&clothingGraphic=skull'
         },
         content: 'Love this! I do something similar every Sunday. It\'s amazing how much better we feel after taking care of ourselves.',
         timestamp: new Date(Date.now() - 17 * 60 * 60 * 1000).toISOString()
@@ -355,7 +355,7 @@ export const communityPosts: CommunityPost[] = [
     user: {
       uid: 'deepanjana-006',
       name: 'Deepanjana',
-      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=deepanjana-holistic&gender=female&backgroundColor=e8f4fd&clothingColor=0a58ca',
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=deepanjana-holistic&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=e8f4fd&clothingColor=0a58ca&clothingGraphic=bear',
     },
     timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
     content: 'Growth mindset in action! 🌱 Started learning about holistic nutrition and it\'s fascinating how food can be medicine. Currently reading about Ayurvedic principles and how they can complement modern wellness practices. Never too late to expand your knowledge! #HolisticHealth #LifelongLearning #Ayurveda',
@@ -369,7 +369,7 @@ export const communityPosts: CommunityPost[] = [
         user: {
           uid: 'divyansh-003',
           name: 'Divyansh',
-          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=divyansh-nutrition&gender=male&backgroundColor=bae1ff&clothingColor=25262b'
+          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=divyansh-nutrition&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=bae1ff&clothingColor=25262b&clothingGraphic=selena'
         },
         content: 'This is so interesting! I\'ve been exploring the connection between nutrition and mental health. Would love to hear more about what you\'re learning.',
         timestamp: new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString()
