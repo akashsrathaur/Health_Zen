@@ -131,39 +131,96 @@ export default function ProgressTrackerPage() {
     return days;
   };
   
-  // Generate sample data based on selected date (in real app, this would fetch from backend)
-  const generateDataForDate = (fromDate: Date) => {
-    const seed = fromDate.getTime();
-    const generateRandomData = (min: number, max: number, count: number) => {
-      const data = [];
-      for (let i = 0; i < count; i++) {
-        const random = ((seed + i * 1000) % 100) / 100; // Deterministic "random" based on date
-        data.push(Math.floor(min + random * (max - min)));
+  // Get real historical data for the selected week
+  const getRealHistoricalData = (fromDate: Date) => {
+    const today = new Date();
+    const weekStart = new Date(fromDate);
+    weekStart.setDate(weekStart.getDate() - 6); // Start of the 7-day period
+    
+    // Check if this week contains today
+    const weekEnd = new Date(fromDate);
+    const isCurrentWeekRange = today >= weekStart && today <= weekEnd;
+    
+    if (!isCurrentWeekRange) {
+      // Past or future weeks - show empty data since user hasn't been active then
+      return {
+        water: [0, 0, 0, 0, 0, 0, 0],
+        sleep: [0, 0, 0, 0, 0, 0, 0], 
+        gym: [0, 0, 0, 0, 0, 0, 0]
+      };
+    }
+    
+    // Current week range - calculate which day index today falls on
+    const daysDiff = Math.floor((today.getTime() - weekStart.getTime()) / (1000 * 60 * 60 * 24));
+    const todayIndex = Math.max(0, Math.min(6, daysDiff));
+    
+    // Initialize arrays with zeros
+    const waterData = [0, 0, 0, 0, 0, 0, 0];
+    const sleepData = [0, 0, 0, 0, 0, 0, 0];
+    const gymData = [0, 0, 0, 0, 0, 0, 0];
+    
+    // Get actual daily vibes data from user if available
+    const dailyVibes = user?.dailyVibes || [];
+    const waterVibe = dailyVibes.find(vibe => vibe.id === 'water');
+    const sleepVibe = dailyVibes.find(vibe => vibe.id === 'sleep');
+    const gymVibe = dailyVibes.find(vibe => vibe.id === 'gym');
+    
+    // Set today's actual data at the correct position if it exists
+    if (todayIndex >= 0 && todayIndex < 7) {
+      // Water data - parse from "X/8 glasses" format
+      if (waterVibe?.value) {
+        const waterMatch = waterVibe.value.match(/^(\d+)/);
+        const waterCount = waterMatch ? parseInt(waterMatch[1]) : 0;
+        waterData[todayIndex] = Math.max(0, Math.min(waterCount, 8));
       }
-      return data;
-    };
+      
+      // Sleep data - parse from "X.Xh" format
+      if (sleepVibe?.value) {
+        const sleepMatch = sleepVibe.value.match(/^([\d.]+)/);
+        const sleepHours = sleepMatch ? parseFloat(sleepMatch[1]) : 0;
+        sleepData[todayIndex] = Math.max(0, Math.min(sleepHours, 12));
+      }
+      
+      // Gym data - parse from "X/60 minutes" format
+      if (gymVibe?.value) {
+        const gymMatch = gymVibe.value.match(/^(\d+)/);
+        const gymMinutes = gymMatch ? parseInt(gymMatch[1]) : 0;
+        gymData[todayIndex] = Math.max(0, Math.min(gymMinutes, 120));
+      }
+    }
     
     return {
-      water: generateRandomData(4, 8, 7),
-      sleep: generateRandomData(6, 9, 7),
-      gym: generateRandomData(0, 90, 7)
+      water: waterData,
+      sleep: sleepData,
+      gym: gymData
     };
   };
   
   const days = generateLast7Days(selectedDate);
-  const dateData = generateDataForDate(selectedDate);
+  const dateData = getRealHistoricalData(selectedDate);
+  
+  // Get current values from daily vibes for display
+  const dailyVibes = user?.dailyVibes || [];
+  const waterVibe = dailyVibes.find(vibe => vibe.id === 'water');
+  const sleepVibe = dailyVibes.find(vibe => vibe.id === 'sleep');
+  const gymVibe = dailyVibes.find(vibe => vibe.id === 'gym');
+  
+  // Parse current values
+  const currentWater = waterVibe?.value ? parseInt(waterVibe.value.match(/^(\d+)/)?.[1] || '0') : 0;
+  const currentSleep = sleepVibe?.value ? parseFloat(sleepVibe.value.match(/^([\d.]+)/)?.[1] || '0') : 0;
+  const currentGym = gymVibe?.value ? parseInt(gymVibe.value.match(/^(\d+)/)?.[1] || '0') : 0;
   
   const waterChartData = days.map((day, i) => ({ 
     day, 
-    glasses: dateData.water[i]
+    glasses: dateData.water[i] || 0
   }));
   const sleepChartData = days.map((day, i) => ({ 
     day, 
-    hours: dateData.sleep[i] 
+    hours: dateData.sleep[i] || 0
   }));
   const gymChartData = days.map((day, i) => ({ 
     day, 
-    minutes: dateData.gym[i] 
+    minutes: dateData.gym[i] || 0
   }));
   
   // Get achievements based on real progress
@@ -295,7 +352,7 @@ export default function ProgressTrackerPage() {
             </div>
             <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
               <Icon name="Dumbbell" className="h-4 w-4" />
-              <span className="font-semibold">{userProgress.gymMinutes} min gym today</span>
+              <span className="font-semibold">{currentGym} min gym today</span>
             </div>
           </div>
         </div>
@@ -331,7 +388,7 @@ export default function ProgressTrackerPage() {
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Water Intake</CardTitle>
-            <CardDescription>Last 7 days (Goal: {userProgress.waterGoal} glasses) | Today: {userProgress.waterIntake}/{userProgress.waterGoal}</CardDescription>
+            <CardDescription>Last 7 days (Goal: 8 glasses) | Today: {currentWater}/8</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={waterChartConfig} className="h-64 w-full">
@@ -341,7 +398,7 @@ export default function ProgressTrackerPage() {
                 <YAxis hide />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar dataKey="glasses" fill="var(--color-glasses)" radius={4} maxBarSize={24} />
-                <ReferenceLine y={userProgress.waterGoal} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
+                <ReferenceLine y={8} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
               </BarChart>
             </ChartContainer>
           </CardContent>
@@ -362,7 +419,7 @@ export default function ProgressTrackerPage() {
         <Card>
           <CardHeader>
             <CardTitle>Sleep Duration</CardTitle>
-            <CardDescription>Last 7 days (Goal: {userProgress.sleepGoal} hours) | Today: {userProgress.sleepHours}h</CardDescription>
+            <CardDescription>Last 7 days (Goal: 8 hours) | Today: {currentSleep}h</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={sleepChartConfig} className="h-64 w-full">
@@ -372,7 +429,7 @@ export default function ProgressTrackerPage() {
                 <YAxis hide />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Line type="monotone" dataKey="hours" stroke="var(--color-hours)" strokeWidth={2} dot={false} />
-                <ReferenceLine y={userProgress.sleepGoal} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
+                <ReferenceLine y={8} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
               </LineChart>
             </ChartContainer>
           </CardContent>
@@ -381,7 +438,7 @@ export default function ProgressTrackerPage() {
         <Card>
           <CardHeader>
             <CardTitle>Gym Workouts</CardTitle>
-            <CardDescription>Last 7 days (Goal: {userProgress.gymGoal} minutes) | Today: {userProgress.gymMinutes} min</CardDescription>
+            <CardDescription>Last 7 days (Goal: 60 minutes) | Today: {currentGym} min</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={gymChartConfig} className="h-64 w-full">
@@ -391,7 +448,7 @@ export default function ProgressTrackerPage() {
                 <YAxis hide />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar dataKey="minutes" fill="var(--color-minutes)" radius={4} maxBarSize={24} />
-                <ReferenceLine y={userProgress.gymGoal} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
+                <ReferenceLine y={60} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
               </BarChart>
             </ChartContainer>
           </CardContent>
