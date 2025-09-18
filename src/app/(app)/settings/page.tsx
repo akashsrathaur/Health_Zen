@@ -21,7 +21,7 @@ import { Flame, Upload, Loader2, User, Bot, Check, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BuddyPersona } from "@/lib/user-store";
 import { updateNotificationSettings } from "@/actions/notifications";
-import { avatarOptions } from "@/lib/data";
+import { AvatarSelector } from "@/components/ui/avatar-selector";
 import { notificationClient } from "@/lib/notification-client";
 import DoshaDisplay from "@/components/dosha-display";
 
@@ -48,8 +48,6 @@ export default function SettingsPage() {
     const { toast } = useToast();
     const [isSaving, setIsSaving] = useState(false);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-    const [selectedAvatar, setSelectedAvatar] = useState(userData.avatarUrl);
-    const [showAvatarSelection, setShowAvatarSelection] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
 
     // Notification settings state
@@ -150,12 +148,10 @@ export default function SettingsPage() {
         }
     };
 
-    const handleAvatarSelect = async (avatarUrl: string) => {
-        setSelectedAvatar(avatarUrl);
+    const handleAvatarSelect = async (avatarUrl: string, avatarId: string) => {
         setIsUploading(true);
         try {
             await updateProfile({ avatarUrl });
-            setShowAvatarSelection(false);
             toast({
                 title: 'Avatar updated!',
                 description: 'Your profile avatar has been successfully updated.',
@@ -311,63 +307,13 @@ export default function SettingsPage() {
                             </div>
                         </div>
                         <div className="ml-auto">
-                            <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={() => setShowAvatarSelection(!showAvatarSelection)}
+                            <AvatarSelector
+                                currentAvatarUrl={userData.avatarUrl}
+                                onAvatarSelect={handleAvatarSelect}
                                 disabled={isUploading}
-                            >
-                                {isUploading ? (
-                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                ) : (
-                                    <User className="h-4 w-4 mr-2" />
-                                )}
-                                Choose Avatar
-                            </Button>
+                            />
                         </div>
                     </div>
-                    
-                    {showAvatarSelection && (
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <h4 className="font-medium">Choose Your Avatar</h4>
-                                <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    onClick={() => setShowAvatarSelection(false)}
-                                >
-                                    Cancel
-                                </Button>
-                            </div>
-                            <div className="grid grid-cols-6 gap-3 max-h-64 overflow-y-auto p-2 border rounded-lg">
-                                {avatarOptions.map((avatarUrl, index) => (
-                                    <div key={index} className="relative">
-                                        <button
-                                            onClick={() => handleAvatarSelect(avatarUrl)}
-                                            className={cn(
-                                                "w-12 h-12 rounded-full overflow-hidden border-2 transition-all hover:scale-105",
-                                                userData.avatarUrl === avatarUrl 
-                                                    ? "border-primary ring-2 ring-primary/20" 
-                                                    : "border-muted hover:border-primary/50"
-                                            )}
-                                            disabled={isUploading}
-                                        >
-                                            <img 
-                                                src={avatarUrl} 
-                                                alt={`Avatar option ${index + 1}`} 
-                                                className="w-full h-full object-cover"
-                                            />
-                                        </button>
-                                        {userData.avatarUrl === avatarUrl && (
-                                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
-                                                <Check className="w-2.5 h-2.5 text-white" />
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
                     
                     <Form {...profileForm}>
                         <div className="space-y-4">

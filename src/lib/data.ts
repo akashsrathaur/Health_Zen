@@ -36,33 +36,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
-export const avatarOptions = [
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=felix&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=aneka&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=mila&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=oliver&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=emma&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=noah&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=sophia&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=liam&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=ava&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=william&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=isabella&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=james&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=charlotte&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=benjamin&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=mia&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=lucas&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=harper&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=henry&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=evelyn&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=alexander&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=abigail&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=michael&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=emily&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=daniel&backgroundColor=b6e3f4,c0aede,d1d4f9',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=elizabeth&backgroundColor=b6e3f4,c0aede,d1d4f9',
-];
+// Avatar options moved to src/lib/avatars.ts for better organization
 
 export const allVibeIcons = {
     Activity,
