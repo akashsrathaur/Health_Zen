@@ -11,7 +11,9 @@ import {
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { getAchievements, type Achievement } from '@/lib/data';
 import { Button } from '@/components/ui/button';
-import { Download, Flame, Share2, Loader2 } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Download, Flame, Share2, Loader2, CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Icon } from '@/lib/icon-resolver';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -23,6 +25,7 @@ import { Icons } from '@/components/icons';
 import { useAuth } from '@/context/auth-context';
 import { defaultUser } from '@/lib/user-store';
 import { getUserProgressData, type UserProgress } from '@/lib/user-progress';
+import { format } from 'date-fns';
 
 const waterChartConfig = {
   glasses: {
@@ -110,35 +113,57 @@ export default function ProgressTrackerPage() {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isExporting, setIsExporting] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   
   // Get real user data instead of fake data - handle missing uid for defaultUser
   const userData = user || { ...defaultUser, uid: 'default' };
   const userProgress = getUserProgressData(userData);
   
-  // Generate proper date labels for the last 7 days
-  const generateLast7Days = () => {
+  // Generate date labels for the last 7 days from selected date
+  const generateLast7Days = (fromDate: Date = selectedDate) => {
     const days = [];
-    const today = new Date();
     for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
+      const date = new Date(fromDate);
       date.setDate(date.getDate() - i);
       days.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
     }
     return days;
   };
   
-  const days = generateLast7Days();
+  // Generate sample data based on selected date (in real app, this would fetch from backend)
+  const generateDataForDate = (fromDate: Date) => {
+    const seed = fromDate.getTime();
+    const generateRandomData = (min: number, max: number, count: number) => {
+      const data = [];
+      for (let i = 0; i < count; i++) {
+        const random = ((seed + i * 1000) % 100) / 100; // Deterministic "random" based on date
+        data.push(Math.floor(min + random * (max - min)));
+      }
+      return data;
+    };
+    
+    return {
+      water: generateRandomData(4, 8, 7),
+      sleep: generateRandomData(6, 9, 7),
+      gym: generateRandomData(0, 90, 7)
+    };
+  };
+  
+  const days = generateLast7Days(selectedDate);
+  const dateData = generateDataForDate(selectedDate);
+  
   const waterChartData = days.map((day, i) => ({ 
     day, 
-    glasses: userProgress.weeklyWaterData[i] 
+    glasses: dateData.water[i]
   }));
   const sleepChartData = days.map((day, i) => ({ 
     day, 
-    hours: userProgress.weeklySleepData[i] 
+    hours: dateData.sleep[i] 
   }));
   const gymChartData = days.map((day, i) => ({ 
     day, 
-    minutes: userProgress.weeklyGymData[i] 
+    minutes: dateData.gym[i] 
   }));
   
   // Get achievements based on real progress
@@ -184,9 +209,75 @@ export default function ProgressTrackerPage() {
     <div className="flex flex-col gap-8" id="progress-report">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-headline text-3xl font-bold tracking-tight text-glow">Progress Tracker</h1>
+          <div className="flex items-center gap-4 mb-2">
+            <h1 className="font-headline text-3xl font-bold tracking-tight text-glow">Progress Tracker</h1>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const newDate = new Date(selectedDate);
+                  newDate.setDate(selectedDate.getDate() - 7);
+                  setSelectedDate(newDate);
+                }}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-[240px] justify-start text-left font-normal",
+                      !selectedDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => {
+                      if (date) {
+                        setSelectedDate(date);
+                        setIsDatePickerOpen(false);
+                      }
+                    }}
+                    disabled={(date) => date > new Date() || date < new Date("2024-01-01")}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const newDate = new Date(selectedDate);
+                  newDate.setDate(selectedDate.getDate() + 7);
+                  if (newDate <= new Date()) {
+                    setSelectedDate(newDate);
+                  }
+                }}
+                disabled={(() => {
+                  const nextWeek = new Date(selectedDate);
+                  nextWeek.setDate(selectedDate.getDate() + 7);
+                  return nextWeek > new Date();
+                })()}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
           <p className="text-muted-foreground">
             <Balancer>Visualize your wellness journey and celebrate your milestones.</Balancer>
+          </p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Viewing data for week ending: {format(selectedDate, "MMMM d, yyyy")}
           </p>
           <div className="flex items-center gap-4 mt-2">
             <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">

@@ -285,11 +285,65 @@ function ShareDialog({ isOpen, onClose, challenge }: { isOpen: boolean, onClose:
     )
 }
 
+function JoinChallengeDialog({ isOpen, onClose, onJoinChallenge }: { isOpen: boolean, onClose: () => void, onJoinChallenge: (challenge: Challenge) => void }) {
+  const availableChallenges = initialChallenges; // Use the initial challenges as browsable options
+  
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-hidden">
+        <DialogHeader>
+          <DialogTitle>Join a Wellness Challenge</DialogTitle>
+          <DialogDescription>
+            Choose from popular challenges to kickstart your wellness journey.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="overflow-y-auto max-h-[500px] pr-2">
+          <div className="grid gap-4">
+            {availableChallenges.map((challenge) => (
+              <Card key={challenge.id} className="overflow-hidden">
+                <div className="relative h-32 w-full">
+                  <Image
+                    src={challenge.imageUrl}
+                    alt={challenge.title}
+                    fill
+                    className="object-cover"
+                    data-ai-hint={challenge.imageHint}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-2 left-2">
+                    <h4 className="text-white font-semibold">{challenge.title}</h4>
+                    <p className="text-white/80 text-sm">{challenge.goalDays} day challenge</p>
+                  </div>
+                </div>
+                <CardContent className="p-4">
+                  <p className="text-sm text-muted-foreground mb-3">{challenge.description}</p>
+                  <Button 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => onJoinChallenge(challenge)}
+                  >
+                    <Target className="mr-2 h-4 w-4" />
+                    Join This Challenge
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function ChallengesPage() {
   const { user, challenges, setChallenges, loading } = useAuth();
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isJoinChallengeOpen, setIsJoinChallengeOpen] = useState(false);
   const [activeChallengeId, setActiveChallengeId] = useState<string | null>(null);
   const [challengeToShare, setChallengeToShare] = useState<Challenge | null>(null);
   const { toast } = useToast();
@@ -340,6 +394,25 @@ export default function ChallengesPage() {
     setIsShareOpen(true);
   }
 
+  const handleJoinChallenge = async (challenge: Challenge) => {
+    if (user) {
+      // Reset challenge to start from day 0 for new participant
+      const joinedChallenge = { ...challenge, currentDay: 0, isCompletedToday: false };
+      
+      // Add to user's challenges
+      setChallenges(prev => [joinedChallenge, ...prev]);
+      
+      await addChallengeAction(user.uid, joinedChallenge);
+      
+      setIsJoinChallengeOpen(false);
+      
+      toast({
+        title: `Welcome to ${challenge.title}! 🎯`,
+        description: `You've joined the challenge. Start today and build your streak!`
+      });
+    }
+  };
+
   if (loading) {
       return <div>Loading challenges...</div>
   }
@@ -357,32 +430,62 @@ export default function ChallengesPage() {
             </Balancer>
             </p>
         </div>
-        <Button onClick={() => setIsCreateOpen(true)}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Create New Challenge
-        </Button>
+        <div className="flex gap-2">
+          {challenges.length === 0 && (
+            <Button variant="outline" onClick={() => setIsJoinChallengeOpen(true)}>
+              <Target className="mr-2 h-4 w-4" />
+              Join Challenge
+            </Button>
+          )}
+          <Button onClick={() => setIsCreateOpen(true)}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Create New Challenge
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-        <AnimatePresence>
-          {challenges.map((challenge, index) => (
-             <motion.div
-                key={challenge.id}
-                layout
-                initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -50, scale: 0.9 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <ChallengeCard 
-                challenge={challenge}
-                onUploadProof={handleOpenUpload}
-                onShare={handleShare}
-              />
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+      {challenges.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="mx-auto w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
+            <Target className="h-12 w-12 text-muted-foreground" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">No Challenges Yet</h3>
+          <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
+            Get started on your wellness journey by joining a challenge or creating your own!
+          </p>
+          <div className="flex justify-center gap-4">
+            <Button onClick={() => setIsJoinChallengeOpen(true)}>
+              <Target className="mr-2 h-4 w-4" />
+              Browse & Join Challenges
+            </Button>
+            <Button variant="outline" onClick={() => setIsCreateOpen(true)}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Create New Challenge
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <AnimatePresence>
+            {challenges.map((challenge, index) => (
+               <motion.div
+                  key={challenge.id}
+                  layout
+                  initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -50, scale: 0.9 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <ChallengeCard 
+                  challenge={challenge}
+                  onUploadProof={handleOpenUpload}
+                  onShare={handleShare}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      )}
 
       <CameraDialog 
         isOpen={isCameraOpen}
@@ -398,6 +501,11 @@ export default function ChallengesPage() {
         isOpen={isShareOpen}
         onClose={() => setIsShareOpen(false)}
         challenge={challengeToShare}
+      />
+      <JoinChallengeDialog
+        isOpen={isJoinChallengeOpen}
+        onClose={() => setIsJoinChallengeOpen(false)}
+        onJoinChallenge={handleJoinChallenge}
       />
     </div>
   );

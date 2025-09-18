@@ -106,6 +106,48 @@ export const avatarOptions: AvatarOption[] = [
     gender: 'male',
     style: 'Sunny'
   },
+  {
+    id: 'male-15',
+    name: 'Mason Gentle',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=mason-gentle&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=e8f5e8&clothingColor=2d5a27&clothingGraphic=bear',
+    gender: 'male',
+    style: 'Gentle'
+  },
+  {
+    id: 'male-16',
+    name: 'Leo Serene',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=leo-serene&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=e7f3ff&clothingColor=0c5460&clothingGraphic=selena',
+    gender: 'male',
+    style: 'Serene'
+  },
+  {
+    id: 'male-17',
+    name: 'Felix Balanced',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=felix-balanced&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=f8d7da&clothingColor=721c24&clothingGraphic=pizza',
+    gender: 'male',
+    style: 'Balanced'
+  },
+  {
+    id: 'male-18',
+    name: 'Miles Pleasant',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=miles-pleasant&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=fff2cc&clothingColor=664d03&clothingGraphic=resist',
+    gender: 'male',
+    style: 'Pleasant'
+  },
+  {
+    id: 'male-19',
+    name: 'Kai Mellow',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=kai-mellow&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=e2e3e5&clothingColor=495057&clothingGraphic=diamond',
+    gender: 'male',
+    style: 'Mellow'
+  },
+  {
+    id: 'male-20',
+    name: 'River Tranquil',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=river-tranquil&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=d1ecf1&clothingColor=0c5460&clothingGraphic=skull',
+    gender: 'male',
+    style: 'Tranquil'
+  },
 
   // Female Avatars - Smiling & Friendly
   {
@@ -219,6 +261,34 @@ export const avatarOptions: AvatarOption[] = [
     url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=chloe-energy&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=f3e5f5&clothingColor=4a148c&clothingGraphic=diamond',
     gender: 'female',
     style: 'Energetic'
+  },
+  {
+    id: 'female-17',
+    name: 'Ruby Sweet',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ruby-sweet&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=ffe0e6&clothingColor=6f42c1&clothingGraphic=resist',
+    gender: 'female',
+    style: 'Sweet'
+  },
+  {
+    id: 'female-18',
+    name: 'Willow Calm',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=willow-calm&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=e9ecef&clothingColor=495057&clothingGraphic=selena',
+    gender: 'female',
+    style: 'Calm'
+  },
+  {
+    id: 'female-19',
+    name: 'Sage Balanced',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sage-balanced&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=d4edda&clothingColor=155724&clothingGraphic=bear',
+    gender: 'female',
+    style: 'Balanced'
+  },
+  {
+    id: 'female-20',
+    name: 'Nova Bright',
+    url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=nova-bright&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=fff3cd&clothingColor=856404&clothingGraphic=pizza',
+    gender: 'female',
+    style: 'Bright'
   },
 ];
 

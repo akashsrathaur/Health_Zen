@@ -119,18 +119,53 @@ class NotificationClientImpl implements NotificationClientService {
 
   // Helper method to check if we should ask for permission
   shouldRequestPermission(): boolean {
+    if (Notification.permission === 'granted') {
+      return false; // Already granted
+    }
+    
+    if (Notification.permission === 'denied') {
+      return false; // User explicitly denied, don't ask again
+    }
+    
     const stored = this.getStoredSettings();
     const lastRequest = stored.lastPermissionRequest;
-    const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+    const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000); // Reduced from 1 week to 1 day
     
-    // Only ask again if it's been more than a week since last request
-    return !stored.browserPermissionGranted && (!lastRequest || lastRequest < oneWeekAgo);
+    // Ask if we haven't asked before, or if it's been more than a day since last request
+    return !stored.browserPermissionGranted && (!lastRequest || lastRequest < oneDayAgo);
   }
 
   // Initialize service and optionally request permission
-  async initialize(autoRequestPermission: boolean = false): Promise<void> {
+  async initialize(autoRequestPermission: boolean = true): Promise<void> {
+    console.log('🔔 Initializing notification service...');
+    
+    if (!('Notification' in window)) {
+      console.warn('⚠️ This browser does not support notifications');
+      return;
+    }
+
+    // Check current permission status
+    console.log(`📋 Current notification permission: ${Notification.permission}`);
+    
     if (autoRequestPermission && this.shouldRequestPermission()) {
-      await this.requestPermission();
+      console.log('🔔 Requesting notification permission...');
+      const granted = await this.requestPermission();
+      
+      if (granted) {
+        console.log('✅ Notification permission granted!');
+        // Send a test notification to confirm it's working
+        setTimeout(() => {
+          this.sendNotification('Health Zen Notifications', {
+            body: 'Notifications are now enabled! We\'ll help you stay on track with your wellness goals.',
+            icon: '/favicon.ico',
+            tag: 'welcome'
+          });
+        }, 1000);
+      } else {
+        console.log('❌ Notification permission denied');
+      }
+    } else if (Notification.permission === 'granted') {
+      console.log('✅ Notifications already enabled');
     }
   }
 }
