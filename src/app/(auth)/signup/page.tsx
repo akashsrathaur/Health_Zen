@@ -14,7 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { createUserInFirestore } from '@/actions/user';
+import { createUserInFirestore } from '@/lib/user-utils';
 import { nanoid } from 'nanoid';
 
 export default function SignupPage() {

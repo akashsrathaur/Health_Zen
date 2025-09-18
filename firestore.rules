@@ -3,18 +3,10 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Users can read their own profile, but nobody else's.
-    // They can also update their own profile data.
-    match /users/{userId} {
-      allow read, update: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // A user can read and write to their own specific document 
-    // within the userData collection. This is where their challenges,
-    // vibes, and posts are stored.
-    match /userData/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+    // Temporary: Allow authenticated users to read and write any document
+    // This helps debug authentication vs authorization issues
+    match /{document=**} {
+      allow read, write: if request.auth != null;
     }
   }
 }

@@ -197,7 +197,7 @@ function CreateChallengeDialog({ isOpen, onClose, onChallengeCreate }: { isOpen:
             id: `custom-${nanoid()}`,
             title,
             description,
-            icon: Target,
+            icon: 'Target',
             currentDay: 0,
             goalDays: Number(goalDays),
             imageUrl: `https://picsum.photos/seed/${nanoid()}/800/600`,

@@ -104,28 +104,28 @@ export const initialDailyVibes: DailyVibe[] = [
     id: 'water',
     title: 'Water Intake',
     value: '0/8 glasses',
-    icon: Droplets,
+    icon: 'Droplets',
     progress: 0,
   },
   {
     id: 'sleep',
     title: 'Sleep',
     value: '0h',
-    icon: Bed,
+    icon: 'Bed',
     progress: 0,
   },
   {
     id: 'medication',
     title: 'Medication',
     value: 'Pending',
-    icon: Pill,
+    icon: 'Pill',
     progress: 0,
   },
   {
     id: 'streak',
     title: 'Streak',
     value: '0 days',
-    icon: Flame,
+    icon: 'Flame',
   },
 ];
 
@@ -269,12 +269,12 @@ export const progressData = {
 };
 
 const allAchievements: Omit<Achievement, 'unlocked'>[] = [
-    { id: 'first-snap', name: 'First Snap', icon: HeartPulse, description: "Use the HealthSnap feature for the first time.", condition: (progress) => progress.completedTasks >= 1, },
-    { id: 'streak-1', name: '1-Day Streak', icon: Star, description: "Complete your daily tasks for 1 day in a row.", condition: (progress) => progress.streak >= 1, },
-    { id: 'streak-3', name: '3-Day Streak', icon: Medal, description: "Keep the momentum going for 3 consecutive days.", condition: (progress) => progress.streak >= 3, },
-    { id: 'streak-7', name: '7-Day Streak', icon: Award, description: "You've made it a full week! That's commitment.", condition: (progress) => progress.streak >= 7, },
-    { id: 'streak-15', name: '15-Day Streak', icon: Flame, description: "You're on fire! Half a month of consistency.", condition: (progress) => progress.streak >= 15, },
-    { id: 'streak-30', name: '30-Day Streak', icon: Trophy, description: "A full month of healthy habits. Incredible!", condition: (progress) => progress.streak >= 30, },
+    { id: 'first-snap', name: 'First Snap', icon: 'HeartPulse', description: "Use the HealthSnap feature for the first time.", condition: (progress) => progress.completedTasks >= 1, },
+    { id: 'streak-1', name: '1-Day Streak', icon: 'Star', description: "Complete your daily tasks for 1 day in a row.", condition: (progress) => progress.streak >= 1, },
+    { id: 'streak-3', name: '3-Day Streak', icon: 'Medal', description: "Keep the momentum going for 3 consecutive days.", condition: (progress) => progress.streak >= 3, },
+    { id: 'streak-7', name: '7-Day Streak', icon: 'Award', description: "You've made it a full week! That's commitment.", condition: (progress) => progress.streak >= 7, },
+    { id: 'streak-15', name: '15-Day Streak', icon: 'Flame', description: "You're on fire! Half a month of consistency.", condition: (progress) => progress.streak >= 15, },
+    { id: 'streak-30', name: '30-Day Streak', icon: 'Trophy', description: "A full month of healthy habits. Incredible!", condition: (progress) => progress.streak >= 30, },
 ];
 
 // This function calculates which achievements are unlocked based on user progress.
@@ -291,7 +291,7 @@ export const initialChallenges: Challenge[] = [
       id: 'challenge-1',
       title: '7-Day Meditation',
       description: 'Commit to 7 days of mindfulness meditation for at least 10 minutes a day.',
-      icon: Brain,
+      icon: 'Brain',
       currentDay: 0,
       goalDays: 7,
       imageUrl: 'https://picsum.photos/seed/challenge1/800/600',
@@ -302,7 +302,7 @@ export const initialChallenges: Challenge[] = [
       id: 'challenge-2',
       title: '30-Day Yoga Journey',
       description: 'Practice yoga every day for 30 days to improve flexibility and reduce stress.',
-      icon: Dumbbell,
+      icon: 'Dumbbell',
       currentDay: 0,
       goalDays: 30,
       imageUrl: 'https://picsum.photos/seed/challenge2/800/600',
@@ -313,7 +313,7 @@ export const initialChallenges: Challenge[] = [
       id: 'challenge-3',
       title: 'Hydration Challenge',
       description: 'Drink 8 glasses of water every day for 21 days for better skin and energy.',
-      icon: Droplets,
+      icon: 'Droplets',
       currentDay: 0,
       goalDays: 21,
       imageUrl: 'https://picsum.photos/seed/challenge3/800/600',
@@ -338,7 +338,7 @@ export type CommunityPost = {
 export type Achievement = {
   id: string;
   name: string;
-  icon: LucideIcon;
+  icon: string;
   unlocked: boolean;
   description: string;
   condition: (progress: { streak: number; completedTasks: number }) => boolean;
@@ -349,7 +349,7 @@ export type Challenge = {
   id: string;
   title: string;
   description: string;
-  icon: LucideIcon;
+  icon: string;
   currentDay: number;
   goalDays: number;
   imageUrl: string;
@@ -362,7 +362,7 @@ export type DailyVibe = {
     id: string;
     title: string;
     value: string;
-    icon: LucideIcon | keyof typeof allVibeIcons;
+    icon: string | keyof typeof allVibeIcons;
     progress?: number;
     isCustom?: boolean;
     completedAt?: string;

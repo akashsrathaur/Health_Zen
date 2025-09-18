@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { getUserFromFirestore } from '@/actions/user';
+import { getUserFromFirestore } from '@/lib/user-utils';
 import type { User } from '@/lib/user-store';
 import { defaultUser } from '@/lib/user-store';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';

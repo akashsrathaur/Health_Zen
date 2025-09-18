@@ -15,6 +15,7 @@ import { initialDailyVibes, type Challenge, type DailyVibe, allVibeIcons, getAch
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle, Edit, Minus, Plus, Camera, RefreshCcw, XCircle, Pill, PlusCircle, Trash2, Clock, Info } from 'lucide-react';
+import { Icon } from '@/lib/icon-resolver';
 import { useState, useRef, useEffect, useTransition } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -63,7 +64,7 @@ function ChallengeCard({ challenge, onMarkAsDone }: { challenge: Challenge, onMa
         <Card className="flex flex-col h-full transition-all duration-200 hover:bg-secondary/10">
           <Link href={`/challenges`} className='flex flex-col flex-grow'>
             <CardHeader className="flex flex-row items-start gap-4 space-y-0 pb-4">
-                <challenge.icon className="h-8 w-8 text-primary" />
+                <Icon name={challenge.icon} className="h-8 w-8 text-primary" />
                 <div className="flex-1 space-y-1">
                     <CardTitle className="text-base font-semibold">{challenge.title}</CardTitle>
                     <CardDescription className='text-xs line-clamp-2'>{challenge.description}</CardDescription>
@@ -705,7 +706,6 @@ export default function DashboardPage() {
                   animate="visible"
                 >
                     {dailyVibes.map((vibe) => {
-                      const Icon = typeof vibe.icon === 'string' ? allVibeIcons[vibe.icon as keyof typeof allVibeIcons] : vibe.icon;
                       const isTask = !nonSnapVibeIds.includes(vibe.id);
                       const isSleepCard = vibe.id === 'sleep';
                       const isWaterCard = vibe.id === 'water';
@@ -735,7 +735,7 @@ export default function DashboardPage() {
                             onClick={() => !isVibeDisabled && handleEditVibe(vibe)}
                           >
                               <div className='flex items-center'>
-                                  <Icon className={cn("mr-4 h-8 w-8 text-primary", isCompleted && !isWaterLocked && 'text-green-500')} />
+                                  <Icon name={vibe.icon} className={cn("mr-4 h-8 w-8 text-primary", isCompleted && !isWaterLocked && 'text-green-500')} />
                                   <div className="flex-1">
                                       <p className={cn("font-medium", isCompleted && !isWaterLocked && 'text-green-600 dark:text-green-400')}>{vibe.title}</p>
                                       {isSleepCard && !isSleepLoggingActive ? (

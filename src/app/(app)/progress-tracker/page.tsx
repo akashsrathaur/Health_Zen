@@ -12,6 +12,7 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Responsive
 import { getAchievements, progressData, type Achievement } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Download, Flame } from 'lucide-react';
+import { Icon } from '@/lib/icon-resolver';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
@@ -74,7 +75,7 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
                 ? 'bg-gradient-to-br from-secondary to-background/50 border-primary/20'
                 : 'opacity-60 grayscale hover:opacity-80 hover:grayscale-0'
             )}>
-              <achievement.icon className={cn("h-8 w-8 mb-2 transition-all duration-300", iconColor, iconGlow)} />
+              <Icon name={achievement.icon} className={cn("h-8 w-8 mb-2 transition-all duration-300", iconColor, iconGlow)} />
               <p className="text-sm font-semibold">{achievement.name}</p>
               {!achievement.unlocked && <p className="text-xs text-muted-foreground">Locked</p>}
             </Card>
