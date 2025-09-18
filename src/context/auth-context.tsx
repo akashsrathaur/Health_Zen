@@ -4,8 +4,8 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { getUserFromFirestore } from '@/lib/user-utils';
-import type { User } from '@/lib/user-store';
+import { getUserFromFirestore, updateUserProfile, uploadProfileImage, updateBuddyPersona } from '@/lib/user-utils';
+import type { User, BuddyPersona } from '@/lib/user-store';
 import { defaultUser } from '@/lib/user-store';
 import { doc, onSnapshot, setDoc, collection, query, orderBy } from 'firebase/firestore';
 import { initialChallenges, initialDailyVibes, type Challenge, type DailyVibe, type CommunityPost } from '@/lib/data';
@@ -27,6 +27,9 @@ interface AuthContextType {
   setPosts: React.Dispatch<React.SetStateAction<CommunityPost[]>>;
   userProgress: ProgressState | null;
   setUserProgress: React.Dispatch<React.SetStateAction<ProgressState | null>>;
+  updateProfile: (updates: Partial<Omit<User, 'uid'>>) => Promise<void>;
+  uploadAvatar: (file: File) => Promise<string>;
+  updateBuddy: (buddyPersona: BuddyPersona) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -41,6 +44,9 @@ const AuthContext = createContext<AuthContextType>({
   setPosts: () => {},
   userProgress: null,
   setUserProgress: () => {},
+  updateProfile: async () => {},
+  uploadAvatar: async () => '',
+  updateBuddy: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -163,6 +169,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []); // No dependencies - this should always be listening
 
+  // Profile update functions
+  const handleUpdateProfile = useCallback(async (updates: Partial<Omit<User, 'uid'>>) => {
+    if (!user) throw new Error('No user logged in');
+    
+    await updateUserProfile(user.uid, updates);
+    // Update local user state
+    setUser(current => current ? { ...current, ...updates } : null);
+  }, [user]);
+
+  const handleUploadAvatar = useCallback(async (file: File): Promise<string> => {
+    if (!user) throw new Error('No user logged in');
+    
+    const avatarUrl = await uploadProfileImage(user.uid, file);
+    // Update local user state
+    setUser(current => current ? { ...current, avatarUrl } : null);
+    return avatarUrl;
+  }, [user]);
+
+  const handleUpdateBuddy = useCallback(async (buddyPersona: BuddyPersona) => {
+    if (!user) throw new Error('No user logged in');
+    
+    await updateBuddyPersona(user.uid, buddyPersona);
+    // Update local user state
+    setUser(current => current ? { ...current, buddyPersona } : null);
+  }, [user]);
+
   const contextValue = {
     user,
     firebaseUser,
@@ -174,7 +206,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     posts,
     setPosts,
     userProgress,
-    setUserProgress
+    setUserProgress,
+    updateProfile: handleUpdateProfile,
+    uploadAvatar: handleUploadAvatar,
+    updateBuddy: handleUpdateBuddy
   };
 
   return (

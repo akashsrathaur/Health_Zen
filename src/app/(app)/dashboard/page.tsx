@@ -30,7 +30,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { format } from 'date-fns';
 import { useAuth } from '@/context/auth-context';
 import { defaultUser } from '@/lib/user-store';
-import { useNotifications } from '@/hooks/use-notifications.tsx';
+import { useNotifications } from '@/hooks/use-notifications';
 import { updateDailyVibes as updateDailyVibesAction, updateChallenge as updateChallengeAction } from '@/lib/user-utils';
 
 const containerVariants = {

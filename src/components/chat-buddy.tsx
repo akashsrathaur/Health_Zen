@@ -6,11 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Loader2, MessageCircle, Send, Settings, Trash2, Upload, Share, X, Bot, User, Save, Check, CheckCheck, Maximize2, Lock } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
+import { MessageCircle, Send, X, Bot, User, Check, CheckCheck, Maximize2, Lock } from 'lucide-react';
 import { chatBuddyAction, type Message } from '@/actions/chat-buddy';
 import { nanoid } from 'nanoid';
 import { ScrollArea } from './ui/scroll-area';
@@ -22,22 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import React from 'react';
 import { useAuth } from '@/context/auth-context';
-import { defaultUser } from '@/lib/user-store';
-
-
-type BuddyPersona = {
-    name: string;
-    age: number;
-    gender: string;
-    relationship: string;
-};
-
-const initialPersona: BuddyPersona = {
-    name: 'Zen',
-    age: 25,
-    gender: 'Non-binary',
-    relationship: 'Friend',
-};
+import { defaultUser, type BuddyPersona } from '@/lib/user-store';
 
 const MessageStatus = ({ status }: { status: Message['status'] }) => {
     if (status === 'read') {
@@ -54,11 +35,10 @@ const MessageStatus = ({ status }: { status: Message['status'] }) => {
 
 export function ChatBuddy() {
     const [isOpen, setIsOpen] = useState(false);
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const [persona, setPersona] = useState<BuddyPersona>(initialPersona);
     const [isMaximized, setIsMaximized] = useState(false);
     const { user } = useAuth();
     const userData = user || defaultUser;
+    const persona = userData.buddyPersona || defaultUser.buddyPersona!;
     
     const formRef = useRef<HTMLFormElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -186,7 +166,6 @@ export function ChatBuddy() {
                                 </div>
                                 <div className='flex items-center gap-1'>
                                     <Button variant="ghost" size="icon" onClick={() => setIsMaximized(p => !p)}><Maximize2 className="h-4 w-4" /></Button>
-                                    <Button variant="ghost" size="icon" onClick={() => setIsSettingsOpen(true)}><Settings className="h-4 w-4" /></Button>
                                     <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}><X className="h-4 w-4" /></Button>
                                 </div>
                             </CardHeader>
@@ -319,96 +298,7 @@ export function ChatBuddy() {
             </TooltipProvider>
 
 
-            <BuddySettingsDialog
-                isOpen={isSettingsOpen}
-                setIsOpen={setIsSettingsOpen}
-                persona={persona}
-                setPersona={setPersona}
-            />
         </>
     );
 }
 
-function BuddySettingsDialog({ isOpen, setIsOpen, persona, setPersona }: { isOpen: boolean, setIsOpen: (open: boolean) => void, persona: BuddyPersona, setPersona: (p: BuddyPersona) => void }) {
-    const [tempPersona, setTempPersona] = useState(persona);
-
-    useEffect(() => {
-        setTempPersona(persona);
-    }, [persona, isOpen]);
-
-    const handleSave = () => {
-        setPersona(tempPersona);
-        setIsOpen(false);
-    };
-
-    return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Chat Buddy Settings</DialogTitle>
-                    <DialogDescription>
-                        Customize your buddy&apos;s personality to be the perfect companion for you.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                    <div className="grid gap-2">
-                        <Label htmlFor="buddy-name">Buddy&apos;s Name</Label>
-                        <Input id="buddy-name" value={tempPersona.name} onChange={(e) => setTempPersona({ ...tempPersona, name: e.target.value })} />
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="buddy-relationship">Relationship</Label>
-                        <Select value={tempPersona.relationship} onValueChange={(value) => setTempPersona({ ...tempPersona, relationship: value })}>
-                            <SelectTrigger id="buddy-relationship">
-                                <SelectValue placeholder="Select relationship" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Friend">Friend</SelectItem>
-                                <SelectItem value="Girlfriend">Girlfriend</SelectItem>
-                                <SelectItem value="Boyfriend">Boyfriend</SelectItem>
-                                <SelectItem value="Mentor">Mentor</SelectItem>
-                                <SelectItem value="Granny">Granny</SelectItem>
-                                <SelectItem value="Grandpa">Grandpa</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="grid gap-2">
-                        <Label>Gender</Label>
-                        <Select value={tempPersona.gender} onValueChange={(value) => setTempPersona({ ...tempPersona, gender: value })}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select gender" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Male">Male</SelectItem>
-                                <SelectItem value="Female">Female</SelectItem>
-                                <SelectItem value="Non-binary">Non-binary</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="grid gap-2">
-                        <div className="flex justify-between">
-                            <Label htmlFor="buddy-age">Age: {tempPersona.age}</Label>
-                        </div>
-                        <Slider
-                            id="buddy-age"
-                            min={10}
-                            max={100}
-                            step={1}
-                            value={[tempPersona.age]}
-                            onValueChange={([value]) => setTempPersona({ ...tempPersona, age: value })}
-                        />
-                    </div>
-                </div>
-                <DialogFooter>
-                    <div className='w-full flex justify-between'>
-                        <div className='flex gap-2'>
-                            <Button variant="outline"><Trash2 className="mr-2 h-4 w-4"/>Clear Chat</Button>
-                            <Button variant="outline"><Share className="mr-2 h-4 w-4"/>Share</Button>
-                            <Button variant="outline"><Upload className="mr-2 h-4 w-4"/>Import</Button>
-                        </div>
-                        <Button onClick={handleSave}><Save className="mr-2 h-4 w-4"/>Save</Button>
-                    </div>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
-}

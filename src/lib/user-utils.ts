@@ -1,8 +1,9 @@
 'use client';
 
-import { db } from '@/lib/firebase';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import type { User } from '@/lib/user-store';
+import { db, storage } from '@/lib/firebase';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import type { User, BuddyPersona } from '@/lib/user-store';
 
 export async function createUserInFirestore(uid: string, data: Omit<User, 'uid'>) {
     try {
@@ -101,5 +102,54 @@ export async function addChallenge(userId: string, newChallenge: any) {
     } catch (error: any) {
         console.error('Error adding challenge:', error);
         throw new Error(`Failed to add challenge: ${error?.message || 'Unknown error'}`);
+    }
+}
+
+// Profile management functions
+export async function updateUserProfile(uid: string, updates: Partial<Omit<User, 'uid'>>) {
+    try {
+        const userDocRef = doc(db, 'users', uid);
+        await updateDoc(userDocRef, updates);
+        console.log(`Successfully updated user profile for UID: ${uid}`);
+    } catch (error: any) {
+        console.error('Error updating user profile:', error);
+        
+        if (error?.code === 'permission-denied') {
+            throw new Error('Permission denied: Please check Firestore security rules.');
+        }
+        
+        throw new Error(`Failed to update user profile: ${error?.message || 'Unknown error'}`);
+    }
+}
+
+export async function uploadProfileImage(uid: string, file: File): Promise<string> {
+    try {
+        // Create a reference to the storage location
+        const imageRef = ref(storage, `profile-images/${uid}/${Date.now()}-${file.name}`);
+        
+        // Upload the file
+        const snapshot = await uploadBytes(imageRef, file);
+        
+        // Get the download URL
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        
+        // Update user profile with new avatar URL
+        await updateUserProfile(uid, { avatarUrl: downloadURL });
+        
+        console.log('Successfully uploaded profile image for UID:', uid);
+        return downloadURL;
+    } catch (error: any) {
+        console.error('Error uploading profile image:', error);
+        throw new Error(`Failed to upload profile image: ${error?.message || 'Unknown error'}`);
+    }
+}
+
+export async function updateBuddyPersona(uid: string, buddyPersona: BuddyPersona) {
+    try {
+        await updateUserProfile(uid, { buddyPersona });
+        console.log('Successfully updated buddy persona for UID:', uid);
+    } catch (error: any) {
+        console.error('Error updating buddy persona:', error);
+        throw new Error(`Failed to update buddy persona: ${error?.message || 'Unknown error'}`);
     }
 }

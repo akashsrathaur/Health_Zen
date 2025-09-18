@@ -6,7 +6,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/context/auth-context';
 import { AuthGuard } from '@/components/auth-guard';
-import { NotificationProvider } from '@/hooks/use-notifications.tsx';
+import { NotificationProvider } from '@/hooks/use-notifications';
 
 export const metadata: Metadata = {
   title: 'HealthZen',

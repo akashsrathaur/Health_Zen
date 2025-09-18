@@ -2,6 +2,7 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
 import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getStorage, type FirebaseStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -15,6 +16,7 @@ const firebaseConfig = {
 let app: FirebaseApp;
 let auth: Auth;
 let db: Firestore;
+let storage: FirebaseStorage;
 
 // This check is crucial for Next.js. It ensures that on the server,
 // we don't try to re-initialize the app on every hot-reload.
@@ -27,6 +29,7 @@ if (getApps().length === 0) {
         app = {} as FirebaseApp;
         auth = {} as Auth;
         db = {} as Firestore;
+        storage = {} as FirebaseStorage;
     } else {
         app = initializeApp(firebaseConfig);
     }
@@ -40,10 +43,12 @@ if (getApps().length === 0) {
 if (app.options) {
     auth = getAuth(app);
     db = getFirestore(app);
+    storage = getStorage(app);
 } else {
     // If the app is a dummy object, the services should be too.
     auth = {} as Auth;
     db = {} as Firestore;
+    storage = {} as FirebaseStorage;
 }
 
-export { app, auth, db };
+export { app, auth, db, storage };
