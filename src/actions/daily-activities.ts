@@ -24,7 +24,9 @@ export type DailyActivity = {
 // Update water intake and award points
 export async function updateWaterIntake(userId: string, glasses: number): Promise<{ success: boolean; pointsEarned?: number; error?: string }> {
   try {
-    if (!db || !db.app) {
+    // Check if Firebase is properly configured
+    if (!db || !db.app || !process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID === 'your-project-id') {
+      console.log('Firebase not configured, skipping database update');
       return { success: false, error: 'Firebase not configured' };
     }
 

@@ -121,8 +121,10 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete, userData }: {
             const newValue = Math.max(0, current + amount);
             const newProgress = Math.min((newValue / goal) * 100, 100);
             
-            // Update the backend immediately
-            updateWaterIntake(userData.uid, newValue);
+            // Update the backend immediately (ignore Firebase errors for now)
+            updateWaterIntake(userData.uid, newValue).catch(error => {
+                console.warn('Firebase water update failed in dialog, continuing with local update:', error);
+            });
             
             return { 
                 ...prev, 
@@ -709,7 +711,13 @@ export default function DashboardPage() {
         setDailyVibes(updatedVibes);
         
         try {
-          await updateWaterIntake(user.uid, newValue);
+          // Try to update water intake in Firebase, but don't fail if Firebase isn't configured
+          const result = await updateWaterIntake(user.uid, newValue);
+          if (!result.success && result.error !== 'Firebase not configured') {
+            console.warn('Firebase water update failed, continuing with local update:', result.error);
+          }
+          
+          // Always update local state regardless of Firebase status
           await updateDailyVibesAction(user.uid, updatedVibes);
           
           toast({
@@ -718,11 +726,20 @@ export default function DashboardPage() {
           });
         } catch (error) {
           console.error('Error updating water intake:', error);
-          toast({
-            title: 'Update failed',
-            description: 'Could not update water intake. Please try again.',
-            variant: 'destructive'
-          });
+          // Still update local state even if there's an error
+          try {
+            await updateDailyVibesAction(user.uid, updatedVibes);
+            toast({
+              title: `Water logged! 💧 (Local only)`,
+              description: `You've had ${newValue} glasses today. ${newValue >= 8 ? 'Daily goal achieved!' : `${8 - newValue} more to go!`}`
+            });
+          } catch (localError) {
+            toast({
+              title: 'Update failed',
+              description: 'Could not update water intake. Please try again.',
+              variant: 'destructive'
+            });
+          }
         }
       });
       return;
