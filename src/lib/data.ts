@@ -224,25 +224,25 @@ export const communityPosts: CommunityPost[] = [
   {
     id: 'post-1',
     user: {
-      uid: 'demo-user-1',
-      name: 'Community Member',
-      avatarUrl: 'https://picsum.photos/seed/avatar2/100/100',
+      uid: 'akash-001',
+      name: 'Akash',
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=akash-fitness&gender=male&backgroundColor=ffd93d&clothingColor=65c9ff',
     },
     timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    content: 'Started my day with some sunrise yoga! Feeling so energized and ready to take on the day. What are your favorite morning rituals? ☀️',
-    imageUrl: 'https://picsum.photos/seed/comm1/800/600',
-    imageHint: 'yoga sunrise',
-    reactions: { '💪': 25, '🔥': 18, '🌿': 12 },
+    content: 'Just completed my 30-day fitness transformation challenge! 💪 The journey wasn\'t easy, but consistency and dedication paid off. Lost 8kg and gained so much confidence. To anyone starting their fitness journey - you\'ve got this! #FitnessTransformation #HealthyLiving',
+    imageUrl: 'https://picsum.photos/seed/fitness1/800/600',
+    imageHint: 'fitness transformation before after',
+    reactions: { '💪': 45, '🔥': 32, '❤️': 28, '🙏': 15 },
     userReactions: {},
     comments: [
       {
-        id: 'comment-1',
+        id: 'comment-akash-1',
         user: {
-          uid: 'demo-user-2',
-          name: 'Wellness Guru',
-          avatarUrl: 'https://picsum.photos/seed/avatar3/100/100'
+          uid: 'saumyaa-002',
+          name: 'Saumyaa',
+          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=saumyaa-yoga&gender=female&backgroundColor=d4edda&clothingColor=721c24'
         },
-        content: 'Love this! I start with meditation and then yoga. Such a peaceful way to begin the day 🧘‍♀️',
+        content: 'Wow Akash! This is so inspiring. What was your workout routine? I\'m just starting my fitness journey.',
         timestamp: new Date(Date.now() - 1.5 * 60 * 60 * 1000).toISOString()
       }
     ],
@@ -250,51 +250,129 @@ export const communityPosts: CommunityPost[] = [
   {
     id: 'post-2',
     user: {
-      uid: 'demo-user-2',
-      name: 'Wellness Guru',
-      avatarUrl: 'https://picsum.photos/seed/avatar3/100/100',
+      uid: 'saumyaa-002',
+      name: 'Saumyaa',
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=saumyaa-yoga&gender=female&backgroundColor=d4edda&clothingColor=721c24',
     },
-    timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-    content: 'My go-to lunch for a productivity boost! A colorful salad packed with nutrients. Healthy eating doesn\'t have to be boring. #healthyeating #wellness',
-    imageUrl: 'https://picsum.photos/seed/comm2/800/600',
-    imageHint: 'salad bowl',
-    reactions: { '🌿': 42, '👍': 30 },
+    timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+    content: 'Morning yoga session by the lake 🌅 Starting my day with gratitude and mindfulness. This peaceful routine has completely transformed my mental health and energy levels. Nature truly is the best therapy! #YogaLife #MentalWellness #MorningRituals',
+    imageUrl: 'https://picsum.photos/seed/yoga-lake/800/600',
+    imageHint: 'yoga by lake sunrise',
+    reactions: { '🧘': 38, '🌿': 25, '❤️': 22, '😊': 18 },
     userReactions: {},
     comments: [],
   },
   {
     id: 'post-3',
     user: {
-      uid: 'demo-user-3',
-      name: 'Zen Master',
-      avatarUrl: 'https://picsum.photos/seed/avatar4/100/100',
+      uid: 'divyansh-003',
+      name: 'Divyansh',
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=divyansh-nutrition&gender=male&backgroundColor=bae1ff&clothingColor=25262b',
     },
-    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    content: 'Found the perfect spot to meditate today. Taking even 10 minutes to connect with nature and quiet the mind makes a huge difference.',
-    imageUrl: 'https://picsum.photos/seed/comm3/800/600',
-    imageHint: 'meditation nature',
-    reactions: { '🧘': 55, '❤️': 40, '🌿': 25 },
+    timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
+    content: 'Meal prep Sunday! 🥗 Preparing nutritious meals for the entire week. This colorful buddha bowl has quinoa, roasted vegetables, chickpeas, and homemade tahini dressing. Nutrition doesn\'t have to be boring when you add colors and flavors! #MealPrep #HealthyEating #Nutrition',
+    imageUrl: 'https://picsum.photos/seed/mealprep/800/600',
+    imageHint: 'colorful buddha bowl meal prep',
+    reactions: { '🌿': 35, '😋': 28, '👍': 24, '🍎': 12 },
     userReactions: {},
     comments: [
       {
-        id: 'comment-2',
+        id: 'comment-divyansh-1',
         user: {
-          uid: 'demo-user-1',
-          name: 'Community Member',
-          avatarUrl: 'https://picsum.photos/seed/avatar2/100/100'
+          uid: 'jaanvi-005',
+          name: 'Jaanvi',
+          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jaanvi-wellness&gender=female&backgroundColor=d0f0c0&clothingColor=2d5016'
         },
-        content: 'Beautiful spot! Where is this? I\'d love to find similar places in my area.',
-        timestamp: new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString()
+        content: 'This looks amazing! Can you share the tahini dressing recipe? I\'ve been looking for healthy dressing options.',
+        timestamp: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString()
+      }
+    ],
+  },
+  {
+    id: 'post-4',
+    user: {
+      uid: 'sarthak-004',
+      name: 'Sarthak',
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sarthak-running&gender=male&backgroundColor=e2e3e5&clothingColor=0c5460',
+    },
+    timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+    content: 'Hit a new personal record today! 🏃‍♂️ Ran my first 10K in under 45 minutes. Six months ago, I couldn\'t even run 1K without stopping. The key was gradual progression and never giving up. Every step counts, no matter how small! #Running #PersonalRecord #NeverGiveUp',
+    imageUrl: 'https://picsum.photos/seed/running/800/600',
+    imageHint: 'running track sunrise achievement',
+    reactions: { '🏃': 42, '💪': 38, '🔥': 31, '🏆': 19 },
+    userReactions: {},
+    comments: [
+      {
+        id: 'comment-sarthak-1',
+        user: {
+          uid: 'akash-001',
+          name: 'Akash',
+          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=akash-fitness&gender=male&backgroundColor=ffd93d&clothingColor=65c9ff'
+        },
+        content: 'Incredible progress Sarthak! Your dedication is truly inspiring. What training plan did you follow?',
+        timestamp: new Date(Date.now() - 11 * 60 * 60 * 1000).toISOString()
       },
       {
-        id: 'comment-3',
+        id: 'comment-sarthak-2',
         user: {
-          uid: 'demo-user-3',
-          name: 'Zen Master',
-          avatarUrl: 'https://picsum.photos/seed/avatar4/100/100'
+          uid: 'deepanjana-006',
+          name: 'Deepanjana',
+          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=deepanjana-holistic&gender=female&backgroundColor=e8f4fd&clothingColor=0a58ca'
         },
-        content: 'This is at the local botanical garden! They have a dedicated meditation area that\'s open to the public.',
-        timestamp: new Date(Date.now() - 22 * 60 * 60 * 1000).toISOString()
+        content: 'Congratulations! This motivates me to start my running journey. Any tips for beginners?',
+        timestamp: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString()
+      }
+    ],
+  },
+  {
+    id: 'post-5',
+    user: {
+      uid: 'jaanvi-005',
+      name: 'Jaanvi',
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jaanvi-wellness&gender=female&backgroundColor=d0f0c0&clothingColor=2d5016',
+    },
+    timestamp: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(),
+    content: 'Self-care Sunday ritual 🛌 Created my own spa day at home - face mask, meditation, journaling, and herbal tea. Taking time to recharge and reconnect with yourself is not selfish, it\'s necessary. How do you practice self-care? #SelfCare #MentalHealth #SelfLove',
+    imageUrl: 'https://picsum.photos/seed/selfcare/800/600',
+    imageHint: 'home spa relaxation self care',
+    reactions: { '❤️': 48, '🧘': 35, '🌿': 29, '😌': 22 },
+    userReactions: {},
+    comments: [
+      {
+        id: 'comment-jaanvi-1',
+        user: {
+          uid: 'saumyaa-002',
+          name: 'Saumyaa',
+          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=saumyaa-yoga&gender=female&backgroundColor=d4edda&clothingColor=721c24'
+        },
+        content: 'Love this! I do something similar every Sunday. It\'s amazing how much better we feel after taking care of ourselves.',
+        timestamp: new Date(Date.now() - 17 * 60 * 60 * 1000).toISOString()
+      }
+    ],
+  },
+  {
+    id: 'post-6',
+    user: {
+      uid: 'deepanjana-006',
+      name: 'Deepanjana',
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=deepanjana-holistic&gender=female&backgroundColor=e8f4fd&clothingColor=0a58ca',
+    },
+    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+    content: 'Growth mindset in action! 🌱 Started learning about holistic nutrition and it\'s fascinating how food can be medicine. Currently reading about Ayurvedic principles and how they can complement modern wellness practices. Never too late to expand your knowledge! #HolisticHealth #LifelongLearning #Ayurveda',
+    imageUrl: 'https://picsum.photos/seed/holistic/800/600',
+    imageHint: 'books herbs holistic health learning',
+    reactions: { '🌱': 33, '📚': 28, '🌿': 25, '🧘': 20 },
+    userReactions: {},
+    comments: [
+      {
+        id: 'comment-deepanjana-1',
+        user: {
+          uid: 'divyansh-003',
+          name: 'Divyansh',
+          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=divyansh-nutrition&gender=male&backgroundColor=bae1ff&clothingColor=25262b'
+        },
+        content: 'This is so interesting! I\'ve been exploring the connection between nutrition and mental health. Would love to hear more about what you\'re learning.',
+        timestamp: new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString()
       }
     ],
   },

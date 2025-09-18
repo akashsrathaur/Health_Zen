@@ -17,10 +17,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useAuth } from "@/context/auth-context";
 import { defaultUser } from "@/lib/user-store";
 import { useToast } from "@/hooks/use-toast";
-import { Flame, Upload, Loader2, User, Bot } from "lucide-react";
+import { Flame, Upload, Loader2, User, Bot, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BuddyPersona } from "@/lib/user-store";
 import { updateNotificationSettings } from "@/actions/notifications";
+import { AvatarSelector } from "@/components/ui/avatar-selector";
 
 const profileFormSchema = z.object({
   name: z.string().min(1, 'Name is required').max(50, 'Name must be less than 50 characters'),
@@ -40,11 +41,9 @@ type ProfileFormData = z.infer<typeof profileFormSchema>;
 type BuddyFormData = z.infer<typeof buddyFormSchema>;
 
 export default function SettingsPage() {
-    const { user, firebaseUser, updateProfile, uploadAvatar, updateBuddy } = useAuth();
+    const { user, firebaseUser, updateProfile, updateBuddy } = useAuth();
     const userData = user || defaultUser;
     const { toast } = useToast();
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [isUploading, setIsUploading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
@@ -99,49 +98,23 @@ export default function SettingsPage() {
         setHasUnsavedChanges(profileChanged || buddyChanged || notificationsChanged);
     }, [profileFormState, buddyFormState, userData, emailNotifications, pushNotifications]);
 
-    const handlePhotoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
-        // Validate file type
-        if (!file.type.startsWith('image/')) {
-            toast({
-                title: 'Invalid file type',
-                description: 'Please select an image file.',
-                variant: 'destructive',
-            });
-            return;
-        }
-
-        // Validate file size (5MB limit)
-        if (file.size > 5 * 1024 * 1024) {
-            toast({
-                title: 'File too large',
-                description: 'Please select an image smaller than 5MB.',
-                variant: 'destructive',
-            });
-            return;
-        }
-
-        setIsUploading(true);
+    const handleAvatarSelect = async (avatarUrl: string, avatarId: string) => {
         try {
-            await uploadAvatar(file);
+            await updateProfile({
+                avatarUrl: avatarUrl,
+                // Store avatar ID for future reference if needed
+                ...(avatarId && { avatarId: avatarId })
+            });
             toast({
-                title: 'Profile photo updated',
-                description: 'Your profile photo has been successfully updated.',
+                title: 'Avatar Updated',
+                description: 'Your profile avatar has been successfully updated.',
             });
         } catch (error: any) {
             toast({
-                title: 'Upload failed',
-                description: error.message || 'Failed to upload profile photo.',
+                title: 'Update failed',
+                description: error.message || 'Failed to update avatar.',
                 variant: 'destructive',
             });
-        } finally {
-            setIsUploading(false);
-            // Reset file input
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-            }
         }
     };
 
@@ -278,26 +251,11 @@ export default function SettingsPage() {
                             </div>
                         </div>
                         <div className="ml-auto">
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                onChange={handlePhotoChange}
-                                accept="image/*"
-                                className="hidden"
+                            <AvatarSelector 
+                                currentAvatarUrl={userData.avatarUrl}
+                                onAvatarSelect={handleAvatarSelect}
+                                disabled={isSaving}
                             />
-                            <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={() => fileInputRef.current?.click()}
-                                disabled={isUploading}
-                            >
-                                {isUploading ? (
-                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                ) : (
-                                    <Upload className="h-4 w-4 mr-2" />
-                                )}
-                                Change Photo
-                            </Button>
                         </div>
                     </div>
                     

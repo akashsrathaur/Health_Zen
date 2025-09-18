@@ -106,8 +106,8 @@ function PostCard({ post, currentUser }: { post: CommunityPost; currentUser: Use
                   variant={isActive ? "default" : "ghost"}
                   size="sm"
                   className={cn("rounded-full h-8 px-2", isActive && "bg-primary text-primary-foreground")}
-                  onClick={() => handleReaction(emoji)}
-                  disabled={!currentUser}
+                  onClick={() => {}} // Disabled - readonly mode
+                  disabled={true} // Always disabled
                 >
                   {emoji}
                   {count > 0 && <span className="ml-1 text-xs">{count}</span>}
@@ -118,7 +118,8 @@ function PostCard({ post, currentUser }: { post: CommunityPost; currentUser: Use
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setShowComments(!showComments)}
+            onClick={() => {}} // Disabled - readonly mode
+            disabled={true} // Always disabled
             className="flex items-center gap-1"
           >
             <MessageCircle className="h-4 w-4" />
@@ -543,14 +544,7 @@ export default function CommunityPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={testFirebaseConnection}
-              className="flex items-center gap-2"
-            >
-              🔧 Test Firebase
-            </Button>
+            {/* Test Firebase button hidden for production */}
             <Button
               variant="outline"
               size="sm"
@@ -566,7 +560,7 @@ export default function CommunityPage() {
       </div>
 
       <div className="space-y-6">
-        {user && <CreatePost onAddPost={handleAddPost} userData={userData} />}
+        {/* CreatePost component disabled - readonly mode */}
         <Separator />
         {posts.length === 0 ? (
           <Card className="text-center py-12">
