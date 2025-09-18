@@ -11,6 +11,14 @@ import { NotificationProvider } from '@/hooks/use-notifications';
 export const metadata: Metadata = {
   title: 'HealthZen',
   description: 'Your wellness companion for a healthier, balanced life.',
+  icons: {
+    icon: [
+      { url: '/favicon.svg', sizes: '16x16', type: 'image/svg+xml' },
+      { url: '/favicon-32x32.svg', sizes: '32x32', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.svg',
+    apple: '/apple-touch-icon.svg',
+  },
 };
 
 export default function RootLayout({
@@ -27,6 +35,11 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#6BCFA0" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="HealthZen" />
       </head>
       <body className="font-body antialiased">
          <ThemeProvider

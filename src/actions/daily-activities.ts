@@ -28,7 +28,7 @@ export async function updateWaterIntake(userId: string, glasses: number): Promis
       return { success: false, error: 'Firebase not configured' };
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format in local timezone
     const activityRef = doc(db, DAILY_ACTIVITIES_COLLECTION, `${userId}-${today}`);
     
     const currentActivity = await getDoc(activityRef);
@@ -75,7 +75,7 @@ export async function updateSleepHours(userId: string, hours: number): Promise<{
       return { success: false, error: 'Firebase not configured' };
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format in local timezone
     const activityRef = doc(db, DAILY_ACTIVITIES_COLLECTION, `${userId}-${today}`);
     
     const currentActivity = await getDoc(activityRef);
@@ -115,7 +115,7 @@ export async function updateGymMinutes(userId: string, minutes: number): Promise
       return { success: false, error: 'Firebase not configured' };
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format in local timezone
     const activityRef = doc(db, DAILY_ACTIVITIES_COLLECTION, `${userId}-${today}`);
     
     const currentActivity = await getDoc(activityRef);
@@ -160,7 +160,7 @@ export async function updateMedicationStatus(userId: string, taken: boolean): Pr
       return { success: false, error: 'Firebase not configured' };
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format in local timezone
     const activityRef = doc(db, DAILY_ACTIVITIES_COLLECTION, `${userId}-${today}`);
     
     const currentActivity = await getDoc(activityRef);
@@ -206,7 +206,7 @@ export async function completeCustomTask(userId: string, taskName: string): Prom
     }
 
     // Track the custom task completion
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format in local timezone
     const activityRef = doc(db, DAILY_ACTIVITIES_COLLECTION, `${userId}-${today}`);
     
     const currentActivity = await getDoc(activityRef);
@@ -247,7 +247,7 @@ export async function getTodayActivity(userId: string): Promise<DailyActivity | 
       return null;
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format in local timezone
     const activityRef = doc(db, DAILY_ACTIVITIES_COLLECTION, `${userId}-${today}`);
     const activityDoc = await getDoc(activityRef);
     

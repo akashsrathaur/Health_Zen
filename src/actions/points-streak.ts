@@ -42,7 +42,7 @@ export async function completeTask(userId: string): Promise<TaskCompletionResult
     }
 
     const userData = userDoc.data();
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format in local timezone
     const lastActivityDate = userData.lastActivityDate || '';
     const currentDailyPoints = userData.dailyPoints || 0;
     const currentStreak = userData.streak || 0;
@@ -71,7 +71,7 @@ export async function completeTask(userId: string): Promise<TaskCompletionResult
     if (isNewDay) {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      const yesterdayStr = yesterday.toLocaleDateString('en-CA'); // YYYY-MM-DD format in local timezone
       
       if (lastActivityDate === yesterdayStr) {
         // Consecutive day - increment streak

@@ -1,0 +1,39 @@
+<svg width="180" height="180" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with rounded corners for iOS -->
+  <rect width="180" height="180" rx="40" ry="40" fill="#f8f9fa"/>
+  
+  <!-- Centered logo scaled appropriately -->
+  <!-- Orange water drop at top -->
+  <path d="M90 20 C80 20, 70 30, 70 45 C70 55, 80 65, 90 65 C100 65, 110 55, 110 45 C110 30, 100 20, 90 20 Z" fill="#FFB366"/>
+  
+  <!-- Red dots on top sides -->
+  <circle cx="55" cy="45" r="5" fill="#FF6B8A"/>
+  <circle cx="125" cy="45" r="5" fill="#FF6B8A"/>
+  
+  <!-- Green semicircles on left and right -->
+  <path d="M30 55 C20 55, 15 65, 15 75 C15 85, 20 95, 30 95 Z" fill="#6BCFA0"/>
+  <path d="M150 55 C160 55, 165 65, 165 75 C165 85, 160 95, 150 95 Z" fill="#6BCFA0"/>
+  
+  <!-- Red dots on middle sides -->
+  <circle cx="30" cy="75" r="4" fill="#FF6B8A"/>
+  <circle cx="150" cy="75" r="4" fill="#FF6B8A"/>
+  
+  <!-- Blue curved element in center -->
+  <path d="M65 75 C75 65, 95 65, 105 75 C110 80, 110 85, 105 90 C95 100, 85 100, 80 95 C75 90, 65 85, 65 75 Z" fill="#5BC5E8" stroke="#5BC5E8" stroke-width="2"/>
+  
+  <!-- Pink/coral curved element intersecting -->
+  <path d="M80 75 C90 65, 100 70, 105 75 C110 80, 105 85, 100 90 C95 95, 85 90, 80 85 Z" fill="#FF8B94"/>
+  
+  <!-- Green semicircles at bottom -->
+  <path d="M30 95 C20 95, 15 105, 15 115 C15 125, 20 130, 30 130 L30 95 Z" fill="#6BCFA0"/>
+  <path d="M150 95 C160 95, 165 105, 165 115 C165 125, 160 130, 150 130 L150 95 Z" fill="#6BCFA0"/>
+  
+  <!-- Blue dot bottom left -->
+  <circle cx="40" cy="115" r="4" fill="#5BC5E8"/>
+  
+  <!-- Red dots at bottom -->
+  <circle cx="140" cy="115" r="4" fill="#FF6B8A"/>
+  
+  <!-- Pink/coral tulip shape at bottom center -->
+  <path d="M90 100 L85 115 L80 120 L85 125 L90 122 L95 125 L100 120 L95 115 Z" fill="#FF8B94"/>
+</svg>

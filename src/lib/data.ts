@@ -236,7 +236,7 @@ export const communityPosts: CommunityPost[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=akash-fitness&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=ffd93d&clothingColor=65c9ff&clothingGraphic=skullOutline',
     },
     timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    content: 'Just completed my 30-day fitness transformation challenge! 💪 The journey wasn\'t easy, but consistency and dedication paid off. Lost 8kg and gained so much confidence. To anyone starting their fitness journey - you\'ve got this! #FitnessTransformation #HealthyLiving',
+    content: 'Just completed my 30-day fitness transformation challenge! 💪 The journey wasn\'t easy, but consistency and dedication paid off. Lost 8kg and gained so much confidence. Health Fact: Regular strength training increases your metabolic rate for up to 24 hours post-workout! To anyone starting their fitness journey - you\'ve got this! #FitnessTransformation #HealthyLiving #HealthFacts',
     imageUrl: 'https://picsum.photos/seed/fitness1/800/600',
     imageHint: 'fitness transformation before after',
     reactions: { '💪': 45, '🔥': 32, '❤️': 28, '🙏': 15 },
@@ -262,7 +262,7 @@ export const communityPosts: CommunityPost[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=saumyaa-yoga&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=d4edda&clothingColor=721c24&clothingGraphic=skull',
     },
     timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-    content: 'Morning yoga session by the lake 🌅 Starting my day with gratitude and mindfulness. This peaceful routine has completely transformed my mental health and energy levels. Nature truly is the best therapy! #YogaLife #MentalWellness #MorningRituals',
+    content: 'Morning yoga session by the lake 🌅 Starting my day with gratitude and mindfulness. This peaceful routine has completely transformed my mental health and energy levels. Wellness Tip: Just 10 minutes of morning yoga can reduce cortisol levels by 23%! Nature truly is the best therapy! #YogaLife #MentalWellness #MorningRituals #WellnessTips',
     imageUrl: 'https://picsum.photos/seed/yoga-lake/800/600',
     imageHint: 'yoga by lake sunrise',
     reactions: { '🧘': 38, '🌿': 25, '❤️': 22, '😊': 18 },
@@ -277,7 +277,7 @@ export const communityPosts: CommunityPost[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=divyansh-nutrition&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=bae1ff&clothingColor=25262b&clothingGraphic=selena',
     },
     timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
-    content: 'Meal prep Sunday! 🥗 Preparing nutritious meals for the entire week. This colorful buddha bowl has quinoa, roasted vegetables, chickpeas, and homemade tahini dressing. Nutrition doesn\'t have to be boring when you add colors and flavors! #MealPrep #HealthyEating #Nutrition',
+    content: 'Meal prep Sunday! 🥗 Preparing nutritious meals for the entire week. This colorful buddha bowl has quinoa, roasted vegetables, chickpeas, and homemade tahini dressing. Nutrition Fact: Eating a rainbow of colors ensures you get diverse antioxidants and phytonutrients! Meal prep saves 4 hours per week on average. Nutrition doesn\'t have to be boring when you add colors and flavors! #MealPrep #HealthyEating #Nutrition #HealthFacts',
     imageUrl: 'https://picsum.photos/seed/mealprep/800/600',
     imageHint: 'colorful buddha bowl meal prep',
     reactions: { '🌿': 35, '😋': 28, '👍': 24, '🍎': 12 },
@@ -303,7 +303,7 @@ export const communityPosts: CommunityPost[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sarthak-running&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=e2e3e5&clothingColor=0c5460&clothingGraphic=skull',
     },
     timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-    content: 'Hit a new personal record today! 🏃‍♂️ Ran my first 10K in under 45 minutes. Six months ago, I couldn\'t even run 1K without stopping. The key was gradual progression and never giving up. Every step counts, no matter how small! #Running #PersonalRecord #NeverGiveUp',
+    content: 'Hit a new personal record today! 🏃‍♂️ Ran my first 10K in under 45 minutes. Six months ago, I couldn\'t even run 1K without stopping. Fitness Tip: The 80/20 rule - 80% of your runs should be at an easy, conversational pace for optimal improvement. The key was gradual progression and never giving up. Every step counts, no matter how small! #Running #PersonalRecord #NeverGiveUp #FitnessTips',
     imageUrl: 'https://picsum.photos/seed/running/800/600',
     imageHint: 'running track sunrise achievement',
     reactions: { '🏃': 42, '💪': 38, '🔥': 31, '🏆': 19 },
@@ -339,7 +339,7 @@ export const communityPosts: CommunityPost[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jaanvi-wellness&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=d0f0c0&clothingColor=2d5016&clothingGraphic=pizza',
     },
     timestamp: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(),
-    content: 'Self-care Sunday ritual 🛌 Created my own spa day at home - face mask, meditation, journaling, and herbal tea. Taking time to recharge and reconnect with yourself is not selfish, it\'s necessary. How do you practice self-care? #SelfCare #MentalHealth #SelfLove',
+    content: 'Self-care Sunday ritual 🛌 Created my own spa day at home - face mask, meditation, journaling, and herbal tea. Mental Health Tip: Regular self-care practices can reduce anxiety by up to 68% and improve sleep quality by 42%. Taking time to recharge and reconnect with yourself is not selfish, it\'s necessary. How do you practice self-care? #SelfCare #MentalHealth #SelfLove #MentalHealthTips',
     imageUrl: 'https://picsum.photos/seed/selfcare/800/600',
     imageHint: 'home spa relaxation self care',
     reactions: { '❤️': 48, '🧘': 35, '🌿': 29, '😌': 22 },
@@ -365,7 +365,7 @@ export const communityPosts: CommunityPost[] = [
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=deepanjana-holistic&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=e8f4fd&clothingColor=0a58ca&clothingGraphic=bear',
     },
     timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    content: 'Growth mindset in action! 🌱 Started learning about holistic nutrition and it\'s fascinating how food can be medicine. Currently reading about Ayurvedic principles and how they can complement modern wellness practices. Never too late to expand your knowledge! #HolisticHealth #LifelongLearning #Ayurveda',
+    content: 'Growth mindset in action! 🌱 Started learning about holistic nutrition and it\'s fascinating how food can be medicine. Currently reading about Ayurvedic principles and how they can complement modern wellness practices. Health Education Tip: Studies show that turmeric (curcumin) has anti-inflammatory properties equivalent to ibuprofen, but without side effects! Never too late to expand your knowledge! #HolisticHealth #LifelongLearning #Ayurveda #HealthEducation',
     imageUrl: 'https://picsum.photos/seed/holistic/800/600',
     imageHint: 'books herbs holistic health learning',
     reactions: { '🌱': 33, '📚': 28, '🌿': 25, '🧘': 20 },
@@ -380,6 +380,32 @@ export const communityPosts: CommunityPost[] = [
         },
         content: 'This is so interesting! I\'ve been exploring the connection between nutrition and mental health. Would love to hear more about what you\'re learning.',
         timestamp: new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString()
+      }
+    ],
+  },
+  {
+    id: 'post-7',
+    user: {
+      uid: 'divyansh-007',
+      name: 'Divyansh',
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=divyansh-hydration&mouth=smile&eyes=happy&eyebrows=default&backgroundColor=bae1ff&clothingColor=25262b&clothingGraphic=selena',
+    },
+    timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+    content: 'Hydration game strong today! 💧 Did you know your brain is 73% water? Even 2% dehydration can affect concentration, memory, and mood. I\'ve been tracking my water intake and the difference in energy levels is incredible! Hydration Hack: Add a pinch of sea salt and lemon to your water for better absorption. Stay hydrated, stay sharp! #Hydration #BrainHealth #WellnessTips #HealthFacts',
+    imageUrl: 'https://picsum.photos/seed/hydration/800/600',
+    imageHint: 'water bottle fresh fruits hydration',
+    reactions: { '💧': 41, '🧠': 28, '😊': 22, '👍': 18 },
+    userReactions: {},
+    comments: [
+      {
+        id: 'comment-divyansh-water-1',
+        user: {
+          uid: 'akash-001',
+          name: 'Akash',
+          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=akash-fitness&mouth=smile&eyes=happy&eyebrows=raisedExcited&backgroundColor=ffd93d&clothingColor=65c9ff&clothingGraphic=skullOutline'
+        },
+        content: 'Great tip about the sea salt and lemon! I never knew about the brain being 73% water. Thanks for sharing!',
+        timestamp: new Date(Date.now() - 5.5 * 60 * 60 * 1000).toISOString()
       }
     ],
   },

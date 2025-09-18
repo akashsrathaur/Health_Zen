@@ -996,8 +996,8 @@ export default function DashboardPage() {
                                   value={vibe.progress} 
                                   className={cn("w-full mt-3", 
                                     isCompleted && !isWaterLocked && '[&>div]:bg-primary',
-                                    // Always show progress bar, just change color when completed
-                                    vibe.progress > 0 ? 'opacity-100' : 'opacity-100'
+                                    // Always show progress bar for water intake, regardless of completion status
+                                    (vibe.id === 'water' || vibe.progress > 0) ? 'opacity-100' : 'opacity-100'
                                   )} 
                                 />
                               )}
@@ -1027,6 +1027,54 @@ export default function DashboardPage() {
                     ))}
                 </motion.div>
             </section>
+        </div>
+      </div>
+      
+      {/* Coming Soon Section */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-3">
+          <motion.div 
+            variants={itemVariants}
+            initial="hidden"
+            animate="visible"
+            className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/20 via-secondary/30 to-accent/20 p-8 text-center shadow-lg backdrop-blur-sm border border-primary/10"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 opacity-50" />
+            <div className="relative z-10">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 backdrop-blur-sm">
+                <div className="text-2xl animate-bounce">🚀</div>
+              </div>
+              <h3 className="mb-3 text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                Exciting Features Coming Soon!
+              </h3>
+              <p className="mb-6 text-muted-foreground max-w-2xl mx-auto">
+                We're working hard to bring you amazing new features including AI-powered meal planning, 
+                personalized workout routines, community challenges, and advanced health analytics. 
+                Stay tuned for updates!
+              </p>
+              <div className="flex flex-wrap justify-center gap-4 text-sm font-medium">
+                <div className="flex items-center gap-2 rounded-full bg-background/50 px-4 py-2 backdrop-blur-sm">
+                  <span className="h-2 w-2 rounded-full bg-green-500"></span>
+                  AI Meal Planning
+                </div>
+                <div className="flex items-center gap-2 rounded-full bg-background/50 px-4 py-2 backdrop-blur-sm">
+                  <span className="h-2 w-2 rounded-full bg-blue-500"></span>
+                  Smart Workouts
+                </div>
+                <div className="flex items-center gap-2 rounded-full bg-background/50 px-4 py-2 backdrop-blur-sm">
+                  <span className="h-2 w-2 rounded-full bg-purple-500"></span>
+                  Health Analytics
+                </div>
+                <div className="flex items-center gap-2 rounded-full bg-background/50 px-4 py-2 backdrop-blur-sm">
+                  <span className="h-2 w-2 rounded-full bg-orange-500"></span>
+                  Community Challenges
+                </div>
+              </div>
+              <div className="mt-6 text-xs text-muted-foreground">
+                Expected Launch: Q1 2026 • Join our beta program for early access!
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
       <AddVibeDialog

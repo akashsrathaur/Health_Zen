@@ -1,0 +1,35 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Orange drop at top -->
+  <path d="M16 3 C14 3, 12 4, 12 8 C12 10, 14 12, 16 12 C18 12, 20 10, 20 8 C20 4, 18 3, 16 3 Z" fill="#FFB366"/>
+  
+  <!-- Red dots on top sides -->
+  <circle cx="8" cy="8" r="1.5" fill="#FF6B8A"/>
+  <circle cx="24" cy="8" r="1.5" fill="#FF6B8A"/>
+  
+  <!-- Green side elements -->
+  <path d="M4 12 C2 12, 0 14, 0 16 C0 18, 2 20, 4 20 Z" fill="#6BCFA0"/>
+  <path d="M28 12 C30 12, 32 14, 32 16 C32 18, 30 20, 28 20 Z" fill="#6BCFA0"/>
+  
+  <!-- Red dots on middle sides -->
+  <circle cx="4" cy="16" r="1" fill="#FF6B8A"/>
+  <circle cx="28" cy="16" r="1" fill="#FF6B8A"/>
+  
+  <!-- Blue center element -->
+  <path d="M10 16 C12 14, 18 14, 20 16 C21 17, 21 18, 20 19 C18 21, 14 21, 13 20 C12 19, 10 18, 10 16 Z" fill="#5BC5E8"/>
+  
+  <!-- Pink accent -->
+  <path d="M13 16 C15 14, 17 15, 18 16 C19 17, 18 18, 17 19 C16 20, 14 19, 13 18 Z" fill="#FF8B94"/>
+  
+  <!-- Bottom elements -->
+  <path d="M4 21 C2 21, 0 23, 0 25 C0 27, 2 29, 4 29 L4 21 Z" fill="#6BCFA0"/>
+  <path d="M28 21 C30 21, 32 23, 32 25 C32 27, 30 29, 28 29 L28 21 Z" fill="#6BCFA0"/>
+  
+  <!-- Blue dot bottom left -->
+  <circle cx="6" cy="26" r="1" fill="#5BC5E8"/>
+  
+  <!-- Red dot bottom right -->
+  <circle cx="26" cy="26" r="1" fill="#FF6B8A"/>
+  
+  <!-- Bottom center accent -->
+  <path d="M16 24 L14 27 L13 28 L14 29 L16 28 L18 29 L19 28 L18 27 Z" fill="#FF8B94"/>
+</svg>

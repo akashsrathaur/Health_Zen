@@ -5,12 +5,66 @@ export const Icons = {
     <svg
       {...props}
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 400 100"
+      viewBox="0 0 120 120"
     >
-      <image 
-        href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAA+CAMAAAA32rIkAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURQAAAP////8A//8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/ANJ0XzYAAACBdFJOUwAEBQYICQoLDQ4PERIUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyNzg5Ojs8PT5AQUJDREZHSElLTE5PUVJTU1VWV1hZWltdXV5fYWJjZWZnaGlqa2xtbm9xcnN0dnh5enx9fn+AgYSGiouMj5CRlJWXmJmanZ6foaSmp6qrra+wsrS2t7i7vb/Aw8XHyMrO0NLT1NXW19ja3N3f4OHj5OXn6Onr7O7w8vT19/n7/v7Xn/gRAAAACXBIWXMAABcRAAAXEQHKJvM/AAADPUlEQVR4Xu2ai1MbRxCHo157x547p3XamXPOmXY3nEOHEWJAkoADxImT4g/k5+R3cgWf52fA9CgCg156U1VlV0+Xz4pYFEoEwLg8X/o+AgD0fAIA6P0GACCR4eEzAIBfPQMAIBwG/vT55wAAX/4AABgY+NfnnwMAfPECABAY+Pj17gIAH7wAADwG/vq1LwCA5wAASGAf+PVrXwAALwMAkMD+8KvffAwAeAEAQAj7hq+++RkAoAcAgBD2LV9+43MAgAMAQAj71i+//e23v/0GgH4BIAjhXwCAx/D/AgCQ2p+zVf8A9A4AENL+AQAAYR8AQAj7AACAsA8AIIQBAP8CAJDaHwAAhD0AAAgAGADiPqQvY/sSAAAg7AMACOE/AADE/QAAEAAbQNxHYF/8AAACAGAAiPsI7IsfAABgAID4H4B98SMAAAAJAJgH8L4Af+I7AACIBwBgHMD7AvyJ7wAAAQAAYBzA+yC++AEAAgBgHMD7YLz4AQAACYD6AOwL8CffAQBAPMCxL8C/eA8AAIgHABgHcN+ff/4PAADiAYB98QMAAAMAIu5P/vUvAACgDwB+A7Dv/gQAANAAAIBw/P/vAgDwCAAgDP8dAEAA/wMAoP8HAEAO+4P3f/8LAODbAQCh/D4AYP/gBQAAl4cAhO/9AAAAYB8AAEAIfwAAgLAPAACEAQD/AwCQ2t/nBwAAYQ8AAAIAZgDSHgAgpP0DAMgA6CMAQEj7BwCQAeiPAMhL+w8AyAEYfQAAQAAoA4P+BgAA/uE/wAAGEPcHACA+wMAA/AAAgP/wTwAAvk8AQAj7hgAAvk8AQAj7RgAAvkMAAIQ9AAAEAAAAAABoHwAAABi//wEAABAACgAw7AOA92EAgAAGEPcHACA+wMAA/PdvAIAPeABs/+4DACD+AgCQ+P5eCgDg8+9+AIDwD7x8AQAQ8HwBAGAg/P19AAD4DwCAv37fAwAgAMj+9Q0A4PMPAIAMjP8DABA+AwAg5w+EfwQAICQCyPz1CQBAqPz1DQCAUAkAkPrjAQAg/n+8AQCgHwAA9A8AQP8PANAAAIB+AABoBgCAfgAAIAZ+/gIAgAcAAMQAACA+AwAgBoAAYQ+AfwEAED4CAEAIfwAAQAj/AQCQ+h8Awj4AAPwJAGAA/AcAAPAHAABhHwBACAAYQOzPAACQ2h/yP+kHqgN6D51SAAAAAElFTkSuQmCC" 
-        width="400" 
-        height="100"
+      {/* Orange water drop at top */}
+      <path 
+        d="M60 10 C50 10, 40 20, 40 35 C40 45, 50 55, 60 55 C70 55, 80 45, 80 35 C80 20, 70 10, 60 10 Z" 
+        fill="#FFB366"
+      />
+      
+      {/* Red dots on top sides */}
+      <circle cx="30" cy="35" r="4" fill="#FF6B8A"/>
+      <circle cx="90" cy="35" r="4" fill="#FF6B8A"/>
+      
+      {/* Green semicircles on left and right */}
+      <path 
+        d="M15 45 C5 45, 0 55, 0 65 C0 75, 5 85, 15 85 Z" 
+        fill="#6BCFA0"
+      />
+      <path 
+        d="M105 45 C115 45, 120 55, 120 65 C120 75, 115 85, 105 85 Z" 
+        fill="#6BCFA0"
+      />
+      
+      {/* Red dots on middle sides */}
+      <circle cx="15" cy="60" r="3" fill="#FF6B8A"/>
+      <circle cx="105" cy="60" r="3" fill="#FF6B8A"/>
+      
+      {/* Blue curved element in center */}
+      <path 
+        d="M35 65 C45 55, 65 55, 75 65 C80 70, 80 75, 75 80 C65 90, 55 90, 50 85 C45 80, 35 75, 35 65 Z" 
+        fill="#5BC5E8" 
+        stroke="#5BC5E8" 
+        strokeWidth="2"
+      />
+      
+      {/* Pink/coral curved element intersecting */}
+      <path 
+        d="M50 65 C60 55, 70 60, 75 65 C80 70, 75 75, 70 80 C65 85, 55 80, 50 75 Z" 
+        fill="#FF8B94"
+      />
+      
+      {/* Green semicircles at bottom */}
+      <path 
+        d="M15 85 C5 85, 0 95, 0 105 C0 115, 5 120, 15 120 L15 85 Z" 
+        fill="#6BCFA0"
+      />
+      <path 
+        d="M105 85 C115 85, 120 95, 120 105 C120 115, 115 120, 105 120 L105 85 Z" 
+        fill="#6BCFA0"
+      />
+      
+      {/* Blue dot bottom left */}
+      <circle cx="25" cy="105" r="3" fill="#5BC5E8"/>
+      
+      {/* Red dots at bottom */}
+      <circle cx="95" cy="105" r="3" fill="#FF6B8A"/>
+      
+      {/* Pink/coral tulip shape at bottom center */}
+      <path 
+        d="M60 90 L55 105 L50 110 L55 115 L60 112 L65 115 L70 110 L65 105 Z" 
+        fill="#FF8B94"
       />
     </svg>
   ),
