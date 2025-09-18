@@ -14,7 +14,7 @@ import {
   getDocs, 
   getDoc 
 } from 'firebase/firestore';
-import type { CommunityPost, Comment } from '@/lib/data';
+import type { CommunityPost, PostComment } from '@/lib/data';
 import { revalidatePath } from 'next/cache';
 import { nanoid } from 'nanoid';
 
@@ -108,9 +108,9 @@ export async function togglePostReaction(postId: string, userId: string, emoji: 
 }
 
 // Add comment to a post
-export async function addCommentToPost(postId: string, comment: Omit<Comment, 'id' | 'timestamp'>) {
+export async function addCommentToPost(postId: string, comment: Omit<PostComment, 'id' | 'timestamp'>) {
   try {
-    const newComment: Comment = {
+    const newComment: PostComment = {
       id: nanoid(),
       ...comment,
       timestamp: new Date().toISOString()

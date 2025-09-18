@@ -376,10 +376,10 @@ export type CommunityPost = {
   imageHint?: string;
   reactions: { [key: string]: number };
   userReactions: { [userId: string]: string }; // userId -> emoji
-  comments: Comment[];
+  comments: PostComment[];
 };
 
-export type Comment = {
+export type PostComment = {
   id: string;
   user: {
     uid: string;

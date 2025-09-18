@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { communityPosts as initialCommunityPosts, type CommunityPost } from '@/lib/data';
 import { Textarea } from '@/components/ui/textarea';
-import { Camera, Send, CircleUser, Video, RefreshCcw, CheckCircle, XCircle, MessageCircle, Heart, ThumbsUp, RotateCcw } from 'lucide-react';
+import { Camera, Send, CircleUser, Video, RefreshCcw, CheckCircle, XCircle, MessageCircle, Heart, ThumbsUp, RotateCcw, Users } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useState, useRef, useEffect } from 'react';
 import { nanoid } from 'nanoid';
@@ -378,8 +378,8 @@ export default function CommunityPage() {
       console.log('Current posts count:', posts.length);
       console.log('Current user:', user);
       console.log('Firebase config check:', {
-        hasApiKey: !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-        hasProjectId: !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+        hasApiKey: typeof window !== 'undefined' ? !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY : 'server-side',
+        hasProjectId: typeof window !== 'undefined' ? !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID : 'server-side'
       });
       
       // Instead of full page reload, just force re-fetch
