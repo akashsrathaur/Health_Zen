@@ -46,6 +46,17 @@ const sleepChartConfig = {
   }
 } satisfies ChartConfig;
 
+const gymChartConfig = {
+  minutes: {
+    label: 'Minutes',
+    color: 'hsl(var(--chart-3))',
+  },
+  goal: {
+    label: 'Goal',
+    color: 'hsl(var(--foreground))'
+  }
+} satisfies ChartConfig;
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -114,6 +125,10 @@ export default function ProgressTrackerPage() {
     day, 
     hours: userProgress.weeklySleepData[i] 
   }));
+  const gymChartData = days.map((day, i) => ({ 
+    day, 
+    minutes: userProgress.weeklyGymData[i] 
+  }));
   
   // Get achievements based on real progress
   const achievements = getUserAchievements(userProgress);
@@ -176,6 +191,10 @@ export default function ProgressTrackerPage() {
               <Icons.points className="h-4 w-4" />
               <span className="font-semibold">{userProgress.completedTasks} tasks completed</span>
             </div>
+            <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+              <Icon name="Dumbbell" className="h-4 w-4" />
+              <span className="font-semibold">{userProgress.gymMinutes} min gym today</span>
+            </div>
           </div>
         </div>
         <div className="flex gap-2 mt-4 sm:mt-0">
@@ -219,7 +238,7 @@ export default function ProgressTrackerPage() {
                 <XAxis dataKey="day" tickLine={false} tickMargin={10} axisLine={false} />
                 <YAxis hide />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="glasses" fill="var(--color-glasses)" radius={4} />
+                <Bar dataKey="glasses" fill="var(--color-glasses)" radius={4} maxBarSize={24} />
                 <ReferenceLine y={userProgress.waterGoal} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
               </BarChart>
             </ChartContainer>
@@ -237,7 +256,8 @@ export default function ProgressTrackerPage() {
         </Card>
       </div>
 
-      <Card>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <Card>
           <CardHeader>
             <CardTitle>Sleep Duration</CardTitle>
             <CardDescription>Last 7 days (Goal: {userProgress.sleepGoal} hours) | Today: {userProgress.sleepHours}h</CardDescription>
@@ -255,6 +275,26 @@ export default function ProgressTrackerPage() {
             </ChartContainer>
           </CardContent>
         </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Gym Workouts</CardTitle>
+            <CardDescription>Last 7 days (Goal: {userProgress.gymGoal} minutes) | Today: {userProgress.gymMinutes} min</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={gymChartConfig} className="h-64 w-full">
+              <BarChart accessibilityLayer data={gymChartData}>
+                <CartesianGrid vertical={false} />
+                <XAxis dataKey="day" tickLine={false} tickMargin={10} axisLine={false} />
+                <YAxis hide />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="minutes" fill="var(--color-minutes)" radius={4} maxBarSize={24} />
+                <ReferenceLine y={userProgress.gymGoal} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </div>
 
       <Card>
         <CardHeader>

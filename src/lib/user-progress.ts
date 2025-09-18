@@ -9,9 +9,12 @@ export type UserProgress = {
   waterGoal: number;
   sleepHours: number;
   sleepGoal: number;
+  gymMinutes: number; // minutes today
+  gymGoal: number;
   lastActivityDate: string;
   weeklyWaterData: number[]; // 7 days
   weeklySleepData: number[]; // 7 days
+  weeklyGymData: number[]; // 7 days (minutes)
 };
 
 // Generate realistic progress data based on user's actual activity
@@ -30,9 +33,12 @@ export function getUserProgressData(user: User): UserProgress {
       waterGoal: 8,
       sleepHours: 0,
       sleepGoal: 8,
+      gymMinutes: 0,
+      gymGoal: 60, // 60 minutes goal
       lastActivityDate: today,
       weeklyWaterData: [0, 0, 0, 0, 0, 0, 0], // All zeros for new user
       weeklySleepData: [0, 0, 0, 0, 0, 0, 0], // All zeros for new user
+      weeklyGymData: [0, 0, 0, 0, 0, 0, 0], // All zeros for new user
     };
   }
 
@@ -42,6 +48,7 @@ export function getUserProgressData(user: User): UserProgress {
   // Generate weekly data based on user's actual streak
   const weeklyWaterData = generateWeeklyWaterData(actualStreak);
   const weeklySleepData = generateWeeklySleepData(actualStreak);
+  const weeklyGymData = generateWeeklyGymData(actualStreak);
 
   return {
     streak: actualStreak,
@@ -52,9 +59,12 @@ export function getUserProgressData(user: User): UserProgress {
     waterGoal: 8,
     sleepHours: getTodaySleepHours(user), // This should come from daily tracking
     sleepGoal: 8,
+    gymMinutes: getTodayGymMinutes(user), // This should come from daily tracking
+    gymGoal: 60,
     lastActivityDate: user.lastActivityDate || today,
     weeklyWaterData,
     weeklySleepData,
+    weeklyGymData,
   };
 }
 
@@ -102,6 +112,21 @@ function generateWeeklySleepData(streak: number): number[] {
   });
 }
 
+// Generate realistic weekly gym data based on user activity
+function generateWeeklyGymData(streak: number): number[] {
+  if (streak === 0) {
+    // New user - minimal gym activity
+    return [0, 0, 0, 0, 0, 0, Math.min(30, Math.floor(Math.random() * 20))];
+  }
+  
+  // Generate data based on streak length
+  const baseGym = Math.min(45, streak * 3); // 3 minutes per streak day, max 45 minutes
+  return Array.from({ length: 7 }, () => {
+    const variance = Math.random() * 30 - 15; // -15 to +15 minutes
+    return Math.max(0, Math.min(90, Math.round(baseGym + variance)));
+  });
+}
+
 // These should be replaced with actual daily tracking data from daily activities
 function getTodayWaterIntake(user: User): number {
   // This should ideally come from getTodayActivity() but for now use estimation
@@ -116,6 +141,15 @@ function getTodaySleepHours(user: User): number {
   if (streak === 0 && (user.totalTasksCompleted || 0) === 0) return 0;
   if (streak === 0) return 6.5; // User has some activity but no streak
   return Math.min(9, 6 + Math.min(streak, 14) * 0.1); // Cap improvement at 2 weeks
+}
+
+function getTodayGymMinutes(user: User): number {
+  // This should ideally come from getTodayActivity() but for now use estimation
+  // New users start with 0, active users get reasonable estimates
+  const streak = user.streak || 0;
+  if (streak === 0 && (user.totalTasksCompleted || 0) === 0) return 0;
+  if (streak === 0) return 15; // User has some activity but no streak
+  return Math.min(60, streak * 3); // 3 minutes per streak day, max 60 minutes
 }
 
 // Get achievements based on REAL user progress

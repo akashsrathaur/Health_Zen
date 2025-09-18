@@ -32,7 +32,7 @@ import { useAuth } from '@/context/auth-context';
 import { defaultUser } from '@/lib/user-store';
 import { useNotifications } from '@/hooks/use-notifications';
 import { updateDailyVibes as updateDailyVibesAction, updateChallenge as updateChallengeAction } from '@/lib/user-utils';
-import { updateWaterIntake } from '@/actions/daily-activities';
+import { updateWaterIntake, updateGymMinutes } from '@/actions/daily-activities';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -141,6 +141,15 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
         })
     }
     
+    const handleGymChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const minutes = parseInt(e.target.value) || 0;
+        setCurrentVibe(prev => {
+             if (!prev || prev.id !== 'gym') return prev;
+             const goal = 60;
+             return { ...prev, value: `${minutes}/60 minutes`, progress: (minutes / goal) * 100 }
+        })
+    }
+    
     const handleMedicationToggle = (checked: boolean) => {
       setCurrentVibe(prev => {
         if (!prev || prev.id !== 'medication') return prev;
@@ -204,6 +213,19 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
                                 step="0.5" 
                                 value={currentVibe.value ? parseFloat(currentVibe.value) : 0} 
                                 onChange={handleSleepChange} 
+                                className="w-40"
+                            />
+                        </div>
+                    )}
+                    {currentVibe.id === 'gym' && isEditable && (
+                        <div className="space-y-2">
+                            <Label htmlFor="gym-minutes">Workout Duration (minutes)</Label>
+                            <Input 
+                                id="gym-minutes" 
+                                type="number" 
+                                step="5" 
+                                value={currentVibe.value ? parseInt(currentVibe.value.split('/')[0]) : 0} 
+                                onChange={handleGymChange} 
                                 className="w-40"
                             />
                         </div>
@@ -706,7 +728,45 @@ export default function DashboardPage() {
       return;
     }
     
-    if (vibe && !vibe.completedAt && vibe.id !== 'medication' && vibe.id !== 'water') {
+    // Special handling for gym workout
+    if (vibe && vibe.id === 'gym') {
+      startTransition(async () => {
+        if (!user) return;
+        const current = parseInt(vibe.value.split('/')[0]);
+        const newValue = Math.min(current + 15, 120); // Add 15 minutes, max 120
+        const newProgress = Math.min((newValue / 60) * 100, 100);
+        
+        const updatedVibe = { 
+          ...vibe, 
+          value: `${newValue}/60 minutes`,
+          progress: newProgress,
+          completedAt: newValue >= 60 ? new Date().toISOString() : undefined
+        };
+        
+        const updatedVibes = dailyVibes.map(v => v.id === vibeId ? updatedVibe : v);
+        setDailyVibes(updatedVibes);
+        
+        try {
+          await updateGymMinutes(user.uid, newValue);
+          await updateDailyVibesAction(user.uid, updatedVibes);
+          
+          toast({
+            title: `Workout logged! 💪`,
+            description: `You've worked out for ${newValue} minutes today. ${newValue >= 60 ? 'Daily goal achieved!' : `${60 - newValue} more minutes to go!`}`
+          });
+        } catch (error) {
+          console.error('Error updating gym minutes:', error);
+          toast({
+            title: 'Update failed',
+            description: 'Could not update workout time. Please try again.',
+            variant: 'destructive'
+          });
+        }
+      });
+      return;
+    }
+    
+    if (vibe && !vibe.completedAt && vibe.id !== 'medication' && vibe.id !== 'water' && vibe.id !== 'gym') {
       setActiveVibeId(vibeId);
       setActiveChallengeId(null);
       setIsCameraOpen(true);
@@ -843,6 +903,7 @@ export default function DashboardPage() {
                       const isTask = !nonSnapVibeIds.includes(vibe.id);
                       const isSleepCard = vibe.id === 'sleep';
                       const isWaterCard = vibe.id === 'water';
+                      const isGymCard = vibe.id === 'gym';
                       const isMedicationCard = vibe.id === 'medication';
                       const isCompleted = isMedicationCard ? vibe.progress === 100 : !!vibe.completedAt;
                       
@@ -905,13 +966,18 @@ export default function DashboardPage() {
                                             e.stopPropagation();
                                             handleMarkVibeAsDone(vibe.id)
                                         }}
-                                        disabled={(isCompleted && !isMedicationCard && vibe.id !== 'water') || isWaterLocked || isPending || isMedicationDisabled}
+                                        disabled={(isCompleted && !isMedicationCard && vibe.id !== 'water' && vibe.id !== 'gym') || isWaterLocked || isPending || isMedicationDisabled}
                                         className="ml-2"
                                     >
                                         {isWaterCard ? (
                                           <>
                                             <Plus className="mr-2 h-4 w-4" />
                                             {isCompleted ? 'Add More' : 'Add Glass'}
+                                          </>
+                                        ) : isGymCard ? (
+                                          <>
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            {isCompleted ? 'Add More' : 'Add 15min'}
                                           </>
                                         ) : (
                                           <>

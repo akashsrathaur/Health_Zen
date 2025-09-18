@@ -14,6 +14,7 @@ export type DailyActivity = {
   waterIntake: number; // glasses consumed
   waterGoal: number;
   sleepHours: number;
+  gymMinutes: number; // workout minutes
   medicationTaken: boolean;
   customActivities: { [key: string]: any };
   tasksCompleted: number;
@@ -104,6 +105,51 @@ export async function updateSleepHours(userId: string, hours: number): Promise<{
   } catch (error) {
     console.error('Error updating sleep hours:', error);
     return { success: false, error: 'Failed to update sleep hours' };
+  }
+}
+
+// Update gym minutes and award points
+export async function updateGymMinutes(userId: string, minutes: number): Promise<{ success: boolean; pointsEarned?: number; error?: string }> {
+  try {
+    if (!db || !db.app) {
+      return { success: false, error: 'Firebase not configured' };
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    const activityRef = doc(db, DAILY_ACTIVITIES_COLLECTION, `${userId}-${today}`);
+    
+    const currentActivity = await getDoc(activityRef);
+    const existingData = currentActivity.exists() ? currentActivity.data() : {};
+    
+    await setDoc(activityRef, {
+      ...existingData,
+      userId,
+      date: today,
+      gymMinutes: Math.max(0, minutes),
+      updatedAt: new Date().toISOString(),
+    }, { merge: true });
+
+    // Award points for workout milestones (15, 30, 45, 60 minutes)
+    let pointsEarned = 0;
+    const milestones = [15, 30, 45, 60];
+    const previousMinutes = existingData.gymMinutes || 0;
+    
+    for (const milestone of milestones) {
+      if (minutes >= milestone && previousMinutes < milestone) {
+        const taskResult = await completeTask(userId);
+        if (taskResult.success) {
+          pointsEarned += taskResult.pointsEarned;
+        }
+      }
+    }
+
+    revalidatePath('/dashboard');
+    revalidatePath('/progress-tracker');
+    
+    return { success: true, pointsEarned };
+  } catch (error) {
+    console.error('Error updating gym minutes:', error);
+    return { success: false, error: 'Failed to update gym minutes' };
   }
 }
 
@@ -212,6 +258,7 @@ export async function getTodayActivity(userId: string): Promise<DailyActivity | 
         waterIntake: 0,
         waterGoal: 8,
         sleepHours: 0,
+        gymMinutes: 0,
         medicationTaken: false,
         customActivities: {},
         tasksCompleted: 0,
