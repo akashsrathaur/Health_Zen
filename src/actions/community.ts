@@ -63,8 +63,21 @@ export async function addCommunityPost(newPost: Omit<CommunityPost, 'id'>) {
     console.error('Error details:', {
       code: (error as any)?.code,
       message: (error as any)?.message,
-      stack: (error as any)?.stack
+      stack: (error as any)?.stack,
+      name: (error as any)?.name
     });
+    
+    // Check if it's a Firestore-specific error
+    if (error?.code?.includes('permission-denied')) {
+      console.error('Permission denied - check Firestore security rules');
+      throw new Error('Permission denied: Unable to write to communityPosts collection. Check Firestore security rules.');
+    }
+    
+    if (error?.code?.includes('not-found')) {
+      console.error('Collection not found - communityPosts collection may not exist');
+      throw new Error('Collection not found: communityPosts collection does not exist in Firestore.');
+    }
+    
     throw error;
   }
 }

@@ -3,10 +3,19 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Temporary: Allow authenticated users to read and write any document
-    // This helps debug authentication vs authorization issues
+    // Allow authenticated users to read and write any document
     match /{document=**} {
       allow read, write: if request.auth != null;
+    }
+    
+    // Explicitly allow communityPosts collection
+    match /communityPosts/{postId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Allow user data documents
+    match /userData/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
