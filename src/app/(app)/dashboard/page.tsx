@@ -32,6 +32,7 @@ import { useAuth } from '@/context/auth-context';
 import { defaultUser } from '@/lib/user-store';
 import { useNotifications } from '@/hooks/use-notifications';
 import { updateDailyVibes as updateDailyVibesAction, updateChallenge as updateChallengeAction } from '@/lib/user-utils';
+import { updateWaterIntake } from '@/actions/daily-activities';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -111,13 +112,23 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete }: { isOpen: b
 
     if (!currentVibe) return null;
 
-    const handleWaterChange = (amount: number) => {
+    const handleWaterChange = async (amount: number) => {
+        if (!user) return;
         setCurrentVibe(prev => {
             if (!prev || prev.id !== 'water') return prev;
             const current = parseInt(prev.value.split('/')[0]);
-            const goal = prev.value.split('/')[1];
+            const goal = parseInt(prev.value.split('/')[1]?.match(/\d+/)?.[0] || '8');
             const newValue = Math.max(0, current + amount);
-            return { ...prev, value: `${newValue}/${goal.trim()}`, progress: (newValue / parseInt(goal.match(/\d+/)?.[0] || '1')) * 100 };
+            const newProgress = Math.min((newValue / goal) * 100, 100);
+            
+            // Update the backend immediately
+            updateWaterIntake(user.uid, newValue);
+            
+            return { 
+                ...prev, 
+                value: `${newValue}/${goal} glasses`, 
+                progress: newProgress
+            };
         });
     }
 
@@ -656,7 +667,46 @@ export default function DashboardPage() {
 
   const handleMarkVibeAsDone = (vibeId: string) => {
     const vibe = dailyVibes.find(v => v.id === vibeId);
-    if (vibe && !vibe.completedAt && vibe.id !== 'medication') {
+    
+    // Special handling for water intake
+    if (vibe && vibe.id === 'water') {
+      startTransition(async () => {
+        if (!user) return;
+        const current = parseInt(vibe.value.split('/')[0]);
+        const newValue = Math.min(current + 1, 8); // Add 1 glass, max 8
+        const newProgress = Math.min((newValue / 8) * 100, 100);
+        
+        const updatedVibe = { 
+          ...vibe, 
+          value: `${newValue}/8 glasses`,
+          progress: newProgress,
+          completedAt: newValue >= 8 ? new Date().toISOString() : undefined
+        };
+        
+        const updatedVibes = dailyVibes.map(v => v.id === vibeId ? updatedVibe : v);
+        setDailyVibes(updatedVibes);
+        
+        try {
+          await updateWaterIntake(user.uid, newValue);
+          await updateDailyVibesAction(user.uid, updatedVibes);
+          
+          toast({
+            title: `Water logged! 💧`,
+            description: `You've had ${newValue} glasses today. ${newValue >= 8 ? 'Daily goal achieved!' : `${8 - newValue} more to go!`}`
+          });
+        } catch (error) {
+          console.error('Error updating water intake:', error);
+          toast({
+            title: 'Update failed',
+            description: 'Could not update water intake. Please try again.',
+            variant: 'destructive'
+          });
+        }
+      });
+      return;
+    }
+    
+    if (vibe && !vibe.completedAt && vibe.id !== 'medication' && vibe.id !== 'water') {
       setActiveVibeId(vibeId);
       setActiveChallengeId(null);
       setIsCameraOpen(true);
@@ -766,7 +816,7 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground text-glow-purple">
+        <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground">
           Welcome back, <span>{(user && user.name) ? user.name.split(' ')[0] : 'friend'}!</span>
         </h1>
         <p className="text-muted-foreground">
@@ -827,11 +877,11 @@ export default function DashboardPage() {
                           >
                               <div className='flex items-center'>
                                   <Icon name={vibe.icon} className={cn("mr-4 h-8 w-8", 
-                                    isCompleted && !isWaterLocked ? 'text-accent' : 'text-primary'
+                                    isCompleted && !isWaterLocked ? 'text-primary' : 'text-primary'
                                   )} />
                                   <div className="flex-1">
                                       <p className={cn("font-medium", 
-                                        isCompleted && !isWaterLocked && 'text-accent'
+                                        isCompleted && !isWaterLocked && 'text-primary'
                                       )}>{vibe.title}</p>
                                       {isSleepCard && !isSleepLoggingActive ? (
                                         <div className='flex items-center gap-2 text-xs text-muted-foreground'>
@@ -855,14 +905,23 @@ export default function DashboardPage() {
                                             e.stopPropagation();
                                             handleMarkVibeAsDone(vibe.id)
                                         }}
-                                        disabled={(isCompleted && !isMedicationCard) || isWaterLocked || isPending || isMedicationDisabled}
+                                        disabled={(isCompleted && !isMedicationCard && vibe.id !== 'water') || isWaterLocked || isPending || isMedicationDisabled}
                                         className="ml-2"
                                     >
-                                        <CheckCircle className="mr-2 h-4 w-4" />
-                                        {isMedicationCard && vibe.medicationConfig ? 
-                                          (vibe.medicationConfig.dosesTaken >= vibe.medicationConfig.dailyDoses ? 'Complete' : 'Take Dose') :
-                                          (isCompleted ? 'Done' : 'Mark Done')
-                                        }
+                                        {isWaterCard ? (
+                                          <>
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            {isCompleted ? 'Add More' : 'Add Glass'}
+                                          </>
+                                        ) : (
+                                          <>
+                                            <CheckCircle className="mr-2 h-4 w-4" />
+                                            {isMedicationCard && vibe.medicationConfig ? 
+                                              (vibe.medicationConfig.dosesTaken >= vibe.medicationConfig.dailyDoses ? 'Complete' : 'Take Dose') :
+                                              (isCompleted ? 'Done' : 'Mark Done')
+                                            }
+                                          </>
+                                        )}
                                     </Button>
                                   )}
                               </div>
@@ -870,7 +929,9 @@ export default function DashboardPage() {
                                 <Progress 
                                   value={vibe.progress} 
                                   className={cn("w-full mt-3", 
-                                    isCompleted && !isWaterLocked && '[&>div]:bg-accent'
+                                    isCompleted && !isWaterLocked && '[&>div]:bg-primary',
+                                    // Always show progress bar, just change color when completed
+                                    vibe.progress > 0 ? 'opacity-100' : 'opacity-100'
                                   )} 
                                 />
                               )}
