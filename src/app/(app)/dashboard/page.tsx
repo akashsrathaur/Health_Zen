@@ -692,56 +692,11 @@ export default function DashboardPage() {
   const handleMarkVibeAsDone = (vibeId: string) => {
     const vibe = dailyVibes.find(v => v.id === vibeId);
     
-    // Special handling for water intake
+    // Special handling for water intake - use camera verification
     if (vibe && vibe.id === 'water') {
-      startTransition(async () => {
-        if (!user) return;
-        const current = parseInt(vibe.value.split('/')[0]);
-        const newValue = Math.min(current + 1, 8); // Add 1 glass, max 8
-        const newProgress = Math.min((newValue / 8) * 100, 100);
-        
-        const updatedVibe = { 
-          ...vibe, 
-          value: `${newValue}/8 glasses`,
-          progress: newProgress,
-          completedAt: newValue >= 8 ? new Date().toISOString() : undefined
-        };
-        
-        const updatedVibes = dailyVibes.map(v => v.id === vibeId ? updatedVibe : v);
-        setDailyVibes(updatedVibes);
-        
-        try {
-          // Try to update water intake in Firebase, but don't fail if Firebase isn't configured
-          const result = await updateWaterIntake(user.uid, newValue);
-          if (!result.success && result.error !== 'Firebase not configured') {
-            console.warn('Firebase water update failed, continuing with local update:', result.error);
-          }
-          
-          // Always update local state regardless of Firebase status
-          await updateDailyVibesAction(user.uid, updatedVibes);
-          
-          toast({
-            title: `Water logged! 💧`,
-            description: `You've had ${newValue} glasses today. ${newValue >= 8 ? 'Daily goal achieved!' : `${8 - newValue} more to go!`}`
-          });
-        } catch (error) {
-          console.error('Error updating water intake:', error);
-          // Still update local state even if there's an error
-          try {
-            await updateDailyVibesAction(user.uid, updatedVibes);
-            toast({
-              title: `Water logged! 💧 (Local only)`,
-              description: `You've had ${newValue} glasses today. ${newValue >= 8 ? 'Daily goal achieved!' : `${8 - newValue} more to go!`}`
-            });
-          } catch (localError) {
-            toast({
-              title: 'Update failed',
-              description: 'Could not update water intake. Please try again.',
-              variant: 'destructive'
-            });
-          }
-        }
-      });
+      setActiveVibeId(vibeId);
+      setActiveChallengeId(null);
+      setIsCameraOpen(true);
       return;
     }
     
@@ -861,15 +816,57 @@ export default function DashboardPage() {
             const vibe = dailyVibes.find(v => v.id === activeVibeId);
             if (vibe) {
                 completedSomething = true;
-                const updatedVibe = { ...vibe, completedAt: new Date().toISOString() };
-                const updatedVibes = dailyVibes.map(v => v.id === activeVibeId ? updatedVibe : v);
-                setDailyVibes(updatedVibes);
-                await updateDailyVibesAction(user.uid, updatedVibes);
+                
+                // Special handling for water intake after camera verification
+                if (vibe.id === 'water') {
+                  const current = parseInt(vibe.value.split('/')[0]);
+                  const newValue = Math.min(current + 1, 8); // Add 1 glass, max 8
+                  const newProgress = Math.min((newValue / 8) * 100, 100);
+                  
+                  const updatedVibe = { 
+                    ...vibe, 
+                    value: `${newValue}/8 glasses`,
+                    progress: newProgress,
+                    completedAt: new Date().toISOString() // This will trigger the 1.5h cooldown timer
+                  };
+                  
+                  const updatedVibes = dailyVibes.map(v => v.id === activeVibeId ? updatedVibe : v);
+                  setDailyVibes(updatedVibes);
+                  
+                  try {
+                    // Try to update water intake in Firebase
+                    const result = await updateWaterIntake(user.uid, newValue);
+                    if (!result.success && result.error !== 'Firebase not configured') {
+                      console.warn('Firebase water update failed, continuing with local update:', result.error);
+                    }
+                    
+                    await updateDailyVibesAction(user.uid, updatedVibes);
+                    
+                    toast({
+                      title: `Water logged! 💧`,
+                      description: `You've had ${newValue} glasses today. ${newValue >= 8 ? 'Daily goal achieved!' : `${8 - newValue} more to go!`} Next glass in 1h 30m.`
+                    });
+                  } catch (error) {
+                    console.error('Error updating water intake:', error);
+                    // Still update local state
+                    await updateDailyVibesAction(user.uid, updatedVibes);
+                    toast({
+                      title: `Water logged! 💧 (Local only)`,
+                      description: `You've had ${newValue} glasses today. ${newValue >= 8 ? 'Daily goal achieved!' : `${8 - newValue} more to go!`} Next glass in 1h 30m.`
+                    });
+                  }
+                } else {
+                  // Regular task completion for non-water activities
+                  const updatedVibe = { ...vibe, completedAt: new Date().toISOString() };
+                  const updatedVibes = dailyVibes.map(v => v.id === activeVibeId ? updatedVibe : v);
+                  setDailyVibes(updatedVibes);
+                  await updateDailyVibesAction(user.uid, updatedVibes);
 
-                toast({
-                    title: 'Task Completed!',
-                    description: `You've successfully completed '${vibe.title}'.`
-                });
+                  toast({
+                      title: 'Task Completed!',
+                      description: `You've successfully completed '${vibe.title}'.`
+                  });
+                }
             }
         }
 
