@@ -102,19 +102,20 @@ function generateWeeklySleepData(streak: number): number[] {
   });
 }
 
-// These should be replaced with actual daily tracking data
+// These should be replaced with actual daily tracking data from daily activities
 function getTodayWaterIntake(user: User): number {
-  // This is a placeholder - should come from daily tracking
-  // For now, return based on daily points (rough estimation)
-  return Math.min(8, Math.floor((user.dailyPoints || 0) * 0.5));
+  // This should ideally come from getTodayActivity() but for now use estimation
+  // Based on daily points as rough proxy (each 4 points ≈ 2 glasses)
+  return Math.min(8, Math.floor((user.dailyPoints || 0) / 2));
 }
 
 function getTodaySleepHours(user: User): number {
-  // This is a placeholder - should come from daily tracking
-  // For now, return reasonable default or based on streak
+  // This should ideally come from getTodayActivity() but for now use estimation
+  // New users start with 0, active users get reasonable estimates
   const streak = user.streak || 0;
-  if (streak === 0) return 0;
-  return Math.min(9, 6 + streak * 0.2);
+  if (streak === 0 && (user.totalTasksCompleted || 0) === 0) return 0;
+  if (streak === 0) return 6.5; // User has some activity but no streak
+  return Math.min(9, 6 + Math.min(streak, 14) * 0.1); // Cap improvement at 2 weeks
 }
 
 // Get achievements based on REAL user progress
