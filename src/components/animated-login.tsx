@@ -12,7 +12,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Separator } from './ui/separator';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff } from 'lucide-react';
 
 type RobotState = 'idle' | 'peeking' | 'wrong' | 'correct';
 
@@ -99,6 +99,7 @@ export function AnimatedLogin() {
   const [robotState, setRobotState] = useState<RobotState>('idle');
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -178,14 +179,28 @@ export function AnimatedLogin() {
                     </div>
                        <div className="grid gap-2">
                           <Label htmlFor="password">Password</Label>
-                          <Input 
-                              variant="gradient"
-                              id="password" 
-                              type="password" 
-                              required
-                              value={password}
-                              onChange={handlePasswordChange}
-                           />
+                          <div className="relative">
+                            <Input 
+                                variant="gradient"
+                                id="password" 
+                                type={showPassword ? "text" : "password"}
+                                required
+                                value={password}
+                                onChange={handlePasswordChange}
+                                className="pr-10"
+                             />
+                             <button
+                               type="button"
+                               onClick={() => setShowPassword(!showPassword)}
+                               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                             >
+                               {showPassword ? (
+                                 <EyeOff className="h-4 w-4" />
+                               ) : (
+                                 <Eye className="h-4 w-4" />
+                               )}
+                             </button>
+                           </div>
                       </div>
                       {error && <p className="text-sm font-medium text-destructive">{error}</p>}
                       <div className="flex items-center justify-between pt-2">

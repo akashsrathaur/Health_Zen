@@ -97,17 +97,21 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
                 "gradient-border-card-inner flex flex-col items-center justify-center p-4 text-center transition-all duration-300 h-full cursor-pointer",
                 'hover:shadow-lg'
               )}>
+                <Icon name={achievement.icon} className={cn("h-8 w-8 mb-2 transition-all duration-300", iconColor, iconGlow)} />
+                <p className="text-sm font-semibold">{achievement.name}</p>
+                {!achievement.unlocked && <p className="text-xs text-muted-foreground">Locked</p>}
+              </Card>
+            </div>
           ) : (
             <Card className={cn(
               "flex flex-col items-center justify-center p-4 text-center transition-all duration-300 h-full cursor-pointer",
               'opacity-60 grayscale hover:opacity-80 hover:grayscale-0'
             )}>
-          )}
               <Icon name={achievement.icon} className={cn("h-8 w-8 mb-2 transition-all duration-300", iconColor, iconGlow)} />
               <p className="text-sm font-semibold">{achievement.name}</p>
               {!achievement.unlocked && <p className="text-xs text-muted-foreground">Locked</p>}
-              </Card>
-            {achievement.unlocked && </div>}
+            </Card>
+          )}
         </TooltipTrigger>
         <TooltipContent>
             <p className='max-w-xs'>{achievement.description}</p>

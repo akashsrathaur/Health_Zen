@@ -10,7 +10,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-orange-400/20 via-orange-600/10 to-background">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-[#ff7f7f]/20 via-[#20b2aa]/10 to-background dark:from-[#ff6b6b]/30 dark:via-[#4ecdc4]/20 dark:to-background">
        <div className="w-full bg-background/50 backdrop-blur-sm">
         <div className="mx-auto flex max-w-5xl items-center justify-between p-4">
             <Link href="/dashboard" className="flex items-center gap-2 text-foreground">

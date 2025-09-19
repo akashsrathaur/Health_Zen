@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { User, KeyRound, Mail, Smartphone, ArrowLeft, VenetianMask, Calendar } from 'lucide-react';
+import { User, KeyRound, Mail, Smartphone, ArrowLeft, VenetianMask, Calendar, Eye, EyeOff } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Icons } from '@/components/icons';
@@ -31,6 +31,8 @@ export default function SignupPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [doshaResult, setDoshaResult] = useState<DoshaResult | null>(null);
     const [isCreatingAccount, setIsCreatingAccount] = useState(false);
     const [error, setError] = useState('');
@@ -117,7 +119,7 @@ export default function SignupPage() {
       <div className="w-full max-w-4xl space-y-6">
         <div className="flex flex-col items-center space-y-4 text-center mb-6">
           <Icons.logo className="h-8 w-auto" />
-          <h1 className="text-2xl font-bold">Complete Your Wellness Profile</h1>
+          <h1 className="text-2xl font-bold text-gradient">Complete Your Wellness Profile</h1>
         </div>
         <DoshaQuiz onComplete={handleDoshaComplete} onBack={handleBackToBasicInfo} />
       </div>
@@ -132,9 +134,16 @@ export default function SignupPage() {
           <Icons.logo className="h-8 w-auto" />
           <h2 className="text-xl font-semibold">Creating Your Account...</h2>
           {doshaResult && (
-            <div className="text-center">
-              <p className="text-muted-foreground mb-2">Your Dosha: <span className="font-semibold text-primary">{doshaResult.primary}</span></p>
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <div className="text-center gradient-border-card p-6 rounded-xl">
+              <div className="gradient-border-card-inner p-4 rounded-lg bg-card/80 backdrop-blur-sm">
+                <p className="text-muted-foreground mb-4">Your Dosha: <span className="font-semibold text-gradient">{doshaResult.primary}</span></p>
+                <div className="relative w-12 h-12 mx-auto">
+                  <div className="animate-spin rounded-full h-12 w-12 border-2 border-transparent bg-gradient-to-r from-coral-500 to-teal-500 p-1">
+                    <div className="bg-background rounded-full w-full h-full"></div>
+                  </div>
+                  <div className="absolute inset-0 animate-pulse rounded-full bg-gradient-to-r from-coral-500/20 to-teal-500/20"></div>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -150,7 +159,8 @@ export default function SignupPage() {
             <h1 className="text-xl font-bold">Create Your HealthZen Account</h1>
             <p className="text-sm text-muted-foreground">Step 1 of 2: Basic Information</p>
         </div>
-      <Card className="rounded-t-3xl border-t-4 border-primary bg-card/80 p-8 backdrop-blur-md">
+      <div className="gradient-border-card">
+        <Card className="gradient-border-card-inner rounded-t-3xl bg-card/80 p-8 backdrop-blur-md">
         <form onSubmit={handleBasicInfoSubmit} className="animate-pop-in space-y-4" style={{ animationDelay: '0.2s' }}>
             <div className="grid gap-2 text-left">
                 <Label htmlFor="fullname">Full Name</Label>
@@ -203,13 +213,24 @@ export default function SignupPage() {
                     <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                     <Input 
                         id="password" 
-                        type="password" 
+                        type={showPassword ? "text" : "password"}
                         placeholder="••••••••" 
                         required 
-                        className="pl-10" 
+                        className="pl-10 pr-10" 
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
                 </div>
             </div>
             <div className="grid gap-2 text-left">
@@ -218,13 +239,24 @@ export default function SignupPage() {
                     <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                     <Input 
                         id="confirm-password" 
-                        type="password" 
+                        type={showConfirmPassword ? "text" : "password"}
                         placeholder="••••••••" 
                         required 
-                        className="pl-10" 
+                        className="pl-10 pr-10" 
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
                 </div>
             </div>
 
@@ -237,11 +269,12 @@ export default function SignupPage() {
 
             {error && <p className="text-sm text-destructive text-center">{error}</p>}
 
-            <Button size="lg" className="w-full bg-gradient-to-r from-primary to-red-400 text-lg font-bold" type="submit">
+            <Button variant="gradient" size="lg" className="w-full text-lg font-bold" type="submit">
                 Next: Discover Your Dosha 🕉️
             </Button>
         </form>
-      </Card>
+        </Card>
+      </div>
         <div className="flex justify-between items-center text-sm">
          <Button variant="ghost" asChild>
             <Link href="/login"><ArrowLeft className='mr-2 h-4 w-4' />Back</Link>
