@@ -243,7 +243,7 @@ export default function ProgressTrackerPage() {
     return !!vibe.completedAt;
   });
   const dailyPoints = Math.min(completedVibes.length * 5, 30); // 5 points per completed vibe, max 30
-  const totalPoints = userData.totalPoints || (userProgress.streak * 10) + dailyPoints;
+  const totalPoints = (userProgress.streak * 10) + dailyPoints;
   
   const waterChartData = days.map((day, i) => ({ 
     day, 

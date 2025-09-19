@@ -83,6 +83,14 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 @layer utilities {
@@ -104,6 +112,7 @@
     );
     border-radius: 50%;
     padding: 3px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .gradient-border-inner {
@@ -154,7 +163,7 @@
   }
 
   .gradient-hover {
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .gradient-hover:hover {
@@ -163,6 +172,8 @@
       hsl(var(--accent) / 0.6), 
       hsl(var(--secondary) / 0.8)
     );
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px hsl(var(--primary) / 0.2);
   }
 
   /* Button gradients will be defined in light/dark mode sections */
@@ -247,6 +258,37 @@
       transform: scale(1.1); 
       opacity: 0.8;
     }
+  }
+
+  /* Improved loading spinner */
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid hsl(var(--muted));
+    border-top: 3px solid hsl(var(--primary));
+    border-radius: 50%;
+    animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Skeleton loading animation */
+  .skeleton {
+    background: linear-gradient(110deg, 
+      hsl(var(--muted)) 8%, 
+      hsl(var(--muted-foreground) / 0.1) 18%, 
+      hsl(var(--muted)) 33%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
   }
 
   /* Dark theme enhancements */
@@ -402,14 +444,6 @@
     transform: translateY(-1px);
   }
 
-  @keyframes gradient-rotate {
-    0% {
-      filter: hue-rotate(0deg);
-    }
-    100% {
-      filter: hue-rotate(360deg);
-    }
-  }
 
   @keyframes gradient-shift {
     0%, 100% {
@@ -420,38 +454,13 @@
     }
   }
 
-  /* Enhanced gradient effects */
-  .gradient-animate {
-    background: linear-gradient(
-      -45deg,
-      hsl(var(--primary)),
-      hsl(var(--accent)),
-      hsl(var(--secondary)),
-      hsl(var(--primary))
-    );
-    background-size: 400% 400%;
-    animation: gradient-shift 4s ease infinite;
-  }
 
-  /* Story ring animations */
-  .story-ring {
-    background: linear-gradient(45deg, 
-      #FF6B6B,
-      #4ECDC4,
-      #45B7D1,
-      #96CEB4,
-      #FF6B6B
-    );
-    background-size: 300% 300%;
-    animation: gradient-shift 3s ease infinite;
-    padding: 3px;
-    border-radius: 50%;
-  }
 
   /* Enhanced hover effects for avatars */
   .avatar-glow:hover {
     box-shadow: 0 0 20px rgba(255, 107, 107, 0.4), 0 0 40px rgba(78, 205, 196, 0.3);
     transform: scale(1.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* Pulse animation for better visibility */
@@ -501,9 +510,28 @@
   .scrollbar-hide {
     -ms-overflow-style: none;  /* Internet Explorer 10+ */
     scrollbar-width: none;  /* Firefox */
+    overflow-x: auto;
+    scroll-behavior: smooth;
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;  /* Safari and Chrome */
+  }
+
+  /* Custom scrollbar for better UX */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 3px;
+    transition: background 0.2s ease;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.6);
   }
 
   /* Mobile status bar and PWA optimizations */

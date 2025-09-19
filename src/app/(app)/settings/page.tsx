@@ -456,7 +456,7 @@ export default function SettingsPage() {
 
             {/* Dosha Profile */}
             {userData.dosha && (
-                <DoshaDisplay user={userData} className="" />
+                <DoshaDisplay user={{...userData, uid: user?.uid || ''}} className="" />
             )}
 
             {/* Contact Information */}
