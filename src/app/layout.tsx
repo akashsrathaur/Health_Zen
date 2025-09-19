@@ -39,8 +39,8 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         
         {/* Theme colors for status bar - matches app background colors */}
-        <meta name="theme-color" content="#FBF9F7" media="(prefers-color-scheme: light)" />
-        <meta name="theme-color" content="#0F172A" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
         
         {/* iOS specific meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />

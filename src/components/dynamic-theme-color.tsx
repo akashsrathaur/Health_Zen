@@ -11,8 +11,8 @@ export function DynamicThemeColor() {
     const actualTheme = theme === 'system' ? systemTheme : theme;
     
     // Define theme colors that match the app's background colors
-    const lightThemeColor = '#FBF9F7'; // hsl(33, 15%, 98%) - Light background
-    const darkThemeColor = '#0F172A';  // hsl(222, 47%, 11%) - Dark background
+    const lightThemeColor = '#FFFFFF'; // Pure white (hsl(0, 0%, 100%)) - Light background
+    const darkThemeColor = '#000000';  // Pure black (hsl(0, 0%, 0%)) - Dark background
     
     // Update the theme-color meta tag
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');

@@ -798,7 +798,7 @@ export default function DashboardPage() {
                   }
                 } else {
                   // Regular task completion for non-water activities
-                  const updatedVibe = { ...vibe, completedAt: new Date().toISOString() };
+                  const updatedVibe = { ...vibe, completedAt: new Date().toISOString(), progress: 100 };
                   const updatedVibes = dailyVibes.map(v => v.id === activeVibeId ? updatedVibe : v);
                   setDailyVibes(updatedVibes);
                   await updateDailyVibesAction(user.uid, updatedVibes);

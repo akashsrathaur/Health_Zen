@@ -472,6 +472,47 @@
     box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
   }
 
+  /* Sidebar active state gradients */
+  [data-sidebar="menu-button"][data-active="true"] {
+    background: linear-gradient(135deg, 
+      #FF6B6B, /* Coral */
+      #4ECDC4, /* Teal */
+      #45B7D1, /* Sky blue */
+      #96CEB4  /* Mint green */
+    ) !important;
+    background-size: 300% 300%;
+    animation: gradient-shift 4s ease infinite;
+    color: white !important;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+  }
+
+  /* Dark mode sidebar active state */
+  .dark [data-sidebar="menu-button"][data-active="true"] {
+    background: linear-gradient(135deg, 
+      #FF6B6B, /* Bright coral */
+      #00E5FF, /* Bright cyan */
+      #E91E63, /* Bright pink */
+      #8BC34A  /* Light green */
+    ) !important;
+    background-size: 300% 300%;
+    animation: gradient-shift 4s ease infinite;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4), 0 0 20px rgba(0, 229, 255, 0.3);
+  }
+
+  /* Sidebar hover state gradients */
+  [data-sidebar="menu-button"]:hover:not([data-active="true"]) {
+    background: linear-gradient(135deg, 
+      rgba(255, 107, 107, 0.1), 
+      rgba(78, 205, 196, 0.1), 
+      rgba(69, 183, 209, 0.1), 
+      rgba(150, 206, 180, 0.1)
+    ) !important;
+    background-size: 300% 300%;
+    animation: gradient-shift 4s ease infinite;
+  }
+
 
   @keyframes gradient-shift {
     0%, 100% {
