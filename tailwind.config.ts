@@ -105,6 +105,12 @@ export default {
         'accordion-up': 'accordion-up 0.2s ease-out',
         'bounce-in': 'bounce-in 0.5s ease-out',
         'pop-in': 'pop-in 0.3s ease-out',
+        'gradient-rotate': 'gradient-rotate 3s linear infinite',
+      },
+      backgroundImage: {
+        'gradient-primary': 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--secondary)))',
+        'gradient-light': 'linear-gradient(135deg, hsl(var(--primary) / 0.6), hsl(var(--accent) / 0.4), hsl(var(--secondary) / 0.6))',
+        'gradient-subtle': 'linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--accent) / 0.05), hsl(var(--secondary) / 0.1))',
       },
     },
   },

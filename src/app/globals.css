@@ -94,6 +94,77 @@
     box-shadow: 0 0 10px hsl(var(--primary)), 0 0 20px hsl(var(--primary) / 0.7);
   }
 
+  /* Gradient utilities */
+  .gradient-border {
+    position: relative;
+    background: linear-gradient(135deg, 
+      hsl(var(--primary)), 
+      hsl(var(--accent)), 
+      hsl(var(--secondary))
+    );
+    border-radius: 50%;
+    padding: 3px;
+  }
+
+  .gradient-border-inner {
+    background: hsl(var(--background));
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .gradient-border-card {
+    position: relative;
+    background: linear-gradient(135deg, 
+      hsl(var(--primary) / 0.6), 
+      hsl(var(--accent) / 0.4), 
+      hsl(var(--secondary) / 0.6)
+    );
+    border-radius: calc(var(--radius) + 2px);
+    padding: 2px;
+  }
+
+  .gradient-border-card-inner {
+    background: hsl(var(--card));
+    border-radius: var(--radius);
+    width: 100%;
+    height: 100%;
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, 
+      hsl(var(--primary)), 
+      hsl(var(--accent))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .gradient-bg {
+    background: linear-gradient(135deg, 
+      hsl(var(--primary) / 0.1), 
+      hsl(var(--accent) / 0.05), 
+      hsl(var(--secondary) / 0.1)
+    );
+  }
+
+  .gradient-hover {
+    transition: all 0.3s ease;
+  }
+
+  .gradient-hover:hover {
+    background: linear-gradient(135deg, 
+      hsl(var(--primary) / 0.8), 
+      hsl(var(--accent) / 0.6), 
+      hsl(var(--secondary) / 0.8)
+    );
+  }
+
   /* Mobile utilities */
   @media (max-width: 475px) {
     .xs\:hidden {
@@ -152,6 +223,68 @@
   
   .dark .border {
     border-color: hsl(217 32% 17%);
+  }
+
+  /* Dark theme gradient enhancements */
+  .dark .gradient-border {
+    background: linear-gradient(135deg, 
+      hsl(var(--primary)), 
+      hsl(25 95% 53%), /* Bright orange */
+      hsl(300 85% 65%), /* Bright purple */
+      hsl(var(--accent))
+    );
+    animation: gradient-rotate 3s linear infinite;
+  }
+
+  .dark .gradient-border-inner {
+    background: hsl(var(--card));
+  }
+
+  .dark .gradient-border-card {
+    background: linear-gradient(135deg, 
+      hsl(var(--primary) / 0.8), 
+      hsl(25 95% 53% / 0.6), /* Bright orange with opacity */
+      hsl(300 85% 65% / 0.6), /* Bright purple with opacity */
+      hsl(var(--accent) / 0.8)
+    );
+  }
+
+  .dark .gradient-text {
+    background: linear-gradient(135deg, 
+      hsl(25 95% 53%), /* Bright orange */
+      hsl(300 85% 65%), /* Bright purple */
+      hsl(var(--primary))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .dark .gradient-bg {
+    background: linear-gradient(135deg, 
+      hsl(var(--primary) / 0.15), 
+      hsl(25 95% 53% / 0.1), 
+      hsl(300 85% 65% / 0.1), 
+      hsl(var(--accent) / 0.15)
+    );
+  }
+
+  @keyframes gradient-rotate {
+    0% {
+      filter: hue-rotate(0deg);
+    }
+    100% {
+      filter: hue-rotate(360deg);
+    }
+  }
+
+  /* Scrollbar utilities */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
   }
 
   /* Mobile status bar and PWA optimizations */

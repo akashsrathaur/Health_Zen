@@ -24,6 +24,7 @@ import { useAuth } from '@/context/auth-context';
 import { defaultUser, type User } from '@/lib/user-store';
 import { addCommunityPost as addPostAction, togglePostReaction, addCommentToPost } from '@/actions/community';
 import { formatDistanceToNow } from 'date-fns';
+import { Stories } from '@/components/stories';
 
 
 function PostCard({ post, currentUser }: { post: CommunityPost; currentUser: User | null }) {
@@ -65,9 +66,10 @@ function PostCard({ post, currentUser }: { post: CommunityPost; currentUser: Use
   const userReaction = currentUser ? post.userReactions?.[currentUser.uid] : null;
 
   return (
-    <Card className="overflow-hidden">
+    <div className="gradient-border-card">
+      <Card className="gradient-border-card-inner overflow-hidden">
       <CardHeader className="flex flex-row items-center gap-3">
-        <Avatar>
+        <Avatar variant="gradient">
           <AvatarImage src={post.user.avatarUrl} alt={post.user.name} />
           <AvatarFallback>{post.user.name.charAt(0)}</AvatarFallback>
         </Avatar>
@@ -137,7 +139,7 @@ function PostCard({ post, currentUser }: { post: CommunityPost; currentUser: Use
           <div className="w-full space-y-3">
             {post.comments?.map((comment) => (
               <div key={comment.id} className="flex gap-3">
-                <Avatar className="h-8 w-8">
+                <Avatar variant="gradient" className="h-8 w-8">
                   <AvatarImage src={comment.user.avatarUrl} alt={comment.user.name} />
                   <AvatarFallback>{comment.user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
@@ -157,7 +159,7 @@ function PostCard({ post, currentUser }: { post: CommunityPost; currentUser: Use
           {/* Add Comment */}
           {currentUser && (
             <div className="w-full flex gap-3">
-              <Avatar className="h-8 w-8">
+              <Avatar variant="gradient" className="h-8 w-8">
                 <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
                 <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
               </Avatar>
@@ -186,7 +188,8 @@ function PostCard({ post, currentUser }: { post: CommunityPost; currentUser: Use
           )}
         </CardFooter>
       )}
-    </Card>
+      </Card>
+    </div>
   );
 }
 
@@ -210,10 +213,11 @@ function CreatePost({ onAddPost, userData }: { onAddPost: (content: string, imag
 
     return (
         <>
-            <Card>
+            <div className="gradient-border-card">
+                <Card className="gradient-border-card-inner">
                 <CardContent className="p-4">
                     <div className="flex gap-4">
-                        <Avatar>
+                        <Avatar variant="gradient">
                             <AvatarImage src={userData.avatarUrl} />
                             <AvatarFallback>{userData.name.charAt(0)}</AvatarFallback>
                         </Avatar>
@@ -243,7 +247,8 @@ function CreatePost({ onAddPost, userData }: { onAddPost: (content: string, imag
                         </div>
                     </div>
                 </CardContent>
-            </Card>
+                </Card>
+            </div>
             <CameraDialog 
                 isOpen={isCameraOpen} 
                 onClose={() => setIsCameraOpen(false)} 
@@ -558,11 +563,30 @@ export default function CommunityPage() {
         </div>
       </div>
 
+      {/* Stories Section */}
+      <Stories 
+        currentUser={user}
+        onAddStory={() => {
+          toast({
+            title: "Stories Feature",
+            description: "Stories functionality coming soon!"
+          })
+        }}
+        onViewStory={(storyId) => {
+          console.log('Viewing story:', storyId)
+          toast({
+            title: "Story Viewer",
+            description: "Story viewing feature coming soon!"
+          })
+        }}
+      />
+
       <div className="space-y-6">
         {/* CreatePost component disabled - readonly mode */}
         <Separator />
         {posts.length === 0 ? (
-          <Card className="text-center py-12">
+          <div className="gradient-border-card">
+            <Card className="gradient-border-card-inner text-center py-12">
             <CardContent>
               <div className="flex flex-col items-center gap-4">
                 <Users className="h-12 w-12 text-muted-foreground" />
@@ -578,7 +602,8 @@ export default function CommunityPage() {
                 </div>
               </div>
             </CardContent>
-          </Card>
+            </Card>
+          </div>
         ) : (
           posts.map((post) => (
             <PostCard key={post.id} post={post} currentUser={user} />
