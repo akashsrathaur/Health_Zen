@@ -4,9 +4,13 @@ import { useEffect } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { notificationClient } from '@/lib/notification-client';
 import { dailyResetService } from '@/lib/daily-reset-service';
+import { useMotivationalNotifications } from './use-motivational-notifications';
 
 export function useAppServices() {
   const { user } = useAuth();
+  
+  // Initialize motivational notifications
+  const motivationalNotifications = useMotivationalNotifications();
 
   useEffect(() => {
     // Initialize notification client when app loads
@@ -36,5 +40,9 @@ export function useAppServices() {
     sendNotification: notificationClient.sendNotification.bind(notificationClient),
     requestNotificationPermission: notificationClient.requestPermission.bind(notificationClient),
     manualDailyReset: dailyResetService.manualReset.bind(dailyResetService),
+    // Motivational notification methods
+    showMotivationalNotification: motivationalNotifications.showVisitNotification,
+    startHourlyMotivationalNotifications: motivationalNotifications.startHourlyNotifications,
+    stopHourlyMotivationalNotifications: motivationalNotifications.stopHourlyNotifications,
   };
 }

@@ -34,6 +34,7 @@ import { useNotifications } from '@/hooks/use-notifications';
 import { updateDailyVibes as updateDailyVibesAction, updateChallenge as updateChallengeAction, removeDailyVibe as removeDailyVibeAction } from '@/lib/user-utils';
 import { updateWaterIntake, updateGymMinutes } from '@/actions/daily-activities';
 import { dailyResetService } from '@/lib/daily-reset-service';
+import { MotivationalNotificationTest } from '@/components/motivational-notification-test';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -1140,6 +1141,14 @@ export default function DashboardPage() {
           </motion.div>
         </div>
       </div>
+      
+      {/* Motivational Notification Test Section - Temporary for Testing */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-1">
+          <MotivationalNotificationTest />
+        </div>
+      </div>
+      
       <AddVibeDialog
         isOpen={isAddVibeOpen}
         onClose={() => setIsAddVibeOpen(false)}
