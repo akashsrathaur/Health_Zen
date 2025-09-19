@@ -78,7 +78,10 @@ export default function DoshaQuiz({ onComplete, onBack }: DoshaQuizProps) {
           </CardHeader>
           <CardContent className="space-y-8">
             {/* Primary Dosha Display */}
-            <div className={cn("rounded-lg p-6 text-white shadow-lg", doshaInfo.color)}>
+            <div 
+              className="rounded-lg p-6 text-white shadow-lg"
+              style={{ backgroundColor: doshaInfo.bgColor }}
+            >
               <h3 className="text-xl font-bold mb-2 text-white">{doshaInfo.name}</h3>
               <p className="mb-2 text-white/90">{doshaInfo.characteristics}</p>
               {isBalanced && (
@@ -92,9 +95,10 @@ export default function DoshaQuiz({ onComplete, onBack }: DoshaQuizProps) {
             <div className="grid grid-cols-3 gap-4">
               {Object.entries(scores).map(([dosha, score]) => (
                 <div key={dosha} className="text-center">
-                  <div className={cn("w-16 h-16 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold text-lg", 
-                    doshaDescriptions[dosha as DoshaType].color
-                  )}>
+                  <div 
+                    className="w-16 h-16 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold text-lg"
+                    style={{ backgroundColor: doshaDescriptions[dosha as DoshaType].bgColor }}
+                  >
                     {score}
                   </div>
                   <p className="text-sm font-medium text-foreground">{dosha}</p>
@@ -179,10 +183,13 @@ export default function DoshaQuiz({ onComplete, onBack }: DoshaQuizProps) {
                     onClick={() => handleAnswer(option.dosha)}
                   >
                     <div className="flex items-start space-x-3">
-                      <div className={cn(
-                        "w-3 h-3 rounded-full mt-1 flex-shrink-0",
-                        isSelected ? "bg-white" : doshaColor
-                      )} />
+                      <div 
+                        className={cn(
+                          "w-3 h-3 rounded-full mt-1 flex-shrink-0",
+                          isSelected && "bg-white"
+                        )}
+                        style={!isSelected ? { backgroundColor: doshaDescriptions[option.dosha].bgColor } : {}}
+                      />
                       <div className="space-y-1">
                         <p className={cn(
                           "font-medium",

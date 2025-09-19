@@ -88,6 +88,7 @@ export const doshaDescriptions = {
     physical: "Dry skin, slim body, irregular digestion",
     mental: "Quick thinking, but distracted easily",
     color: "bg-blue-500",
+    bgColor: "#3B82F6", // blue-500
     tips: "Focus on grounding activities, warm foods, and regular routines."
   },
   Pitta: {
@@ -96,6 +97,7 @@ export const doshaDescriptions = {
     physical: "Sensitive, warm skin, medium build, strong appetite",
     mental: "Sharp, competitive",
     color: "bg-orange-600",
+    bgColor: "#EA580C", // orange-600
     tips: "Practice cooling activities, avoid spicy foods, and manage stress."
   },
   Kapha: {
@@ -104,6 +106,7 @@ export const doshaDescriptions = {
     physical: "Oily skin, broad/stocky body, slow metabolism",
     mental: "Steady, slow to anger",
     color: "bg-green-500",
+    bgColor: "#22C55E", // green-500
     tips: "Engage in energizing activities, light foods, and regular exercise."
   }
 };
