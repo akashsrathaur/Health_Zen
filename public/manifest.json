@@ -4,8 +4,8 @@
   "description": "Your wellness companion for a healthier, balanced life.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FAF9F8",
-  "theme_color": "#E07935",
+  "background_color": "#FBF9F7",
+  "theme_color": "#FBF9F7",
   "orientation": "portrait-primary",
   "icons": [
     {

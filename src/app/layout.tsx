@@ -38,13 +38,13 @@ export default function RootLayout({
         />
         <link rel="manifest" href="/manifest.json" />
         
-        {/* Theme colors for status bar - matches app primary colors */}
-        <meta name="theme-color" content="#E07935" media="(prefers-color-scheme: light)" />
-        <meta name="theme-color" content="#F97316" media="(prefers-color-scheme: dark)" />
+        {/* Theme colors for status bar - matches app background colors */}
+        <meta name="theme-color" content="#FBF9F7" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#0F172A" media="(prefers-color-scheme: dark)" />
         
         {/* iOS specific meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="HealthZen" />
         
         {/* Additional mobile optimization */}
