@@ -275,38 +275,38 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="mx-auto max-w-3xl space-y-8">
-            <div>
-                <h1 className="font-headline text-3xl font-bold tracking-tight">Account Settings</h1>
-                <p className="text-muted-foreground">
+        <div className="mx-auto max-w-3xl space-y-6 sm:space-y-8">
+            <div className="px-1">
+                <h1 className="font-headline text-2xl sm:text-3xl font-bold tracking-tight">Account Settings</h1>
+                <p className="text-muted-foreground text-sm sm:text-base">
                     Manage your account details and preferences.
                 </p>
             </div>
             
             {/* Profile Settings */}
             <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <User className="h-5 w-5" />
+                <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                        <User className="h-4 w-4 sm:h-5 sm:w-5" />
                         Profile
                     </CardTitle>
-                    <CardDescription>This is how others will see you on the site.</CardDescription>
+                    <CardDescription className="text-xs sm:text-sm">This is how others will see you on the site.</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                    <div className="flex items-center gap-4">
-                        <Avatar className="h-20 w-20">
+                <CardContent className="space-y-4 sm:space-y-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <Avatar className="h-16 w-16 sm:h-20 sm:w-20 mx-auto sm:mx-0">
                             <AvatarImage src={userData.avatarUrl} />
                             <AvatarFallback>{userData.name.charAt(0)}</AvatarFallback>
                         </Avatar>
-                        <div className="grid gap-1">
-                            <h3 className="font-semibold">{userData.name}</h3>
+                        <div className="grid gap-1 text-center sm:text-left flex-1">
+                            <h3 className="font-semibold text-lg sm:text-base">{userData.name}</h3>
                             <p className="text-sm text-muted-foreground">{userData.age} years old</p>
-                            <div className="flex items-center gap-1.5 text-sm text-yellow-500">
+                            <div className="flex items-center gap-1.5 text-sm text-yellow-500 justify-center sm:justify-start">
                                 <Flame className="h-4 w-4"/>
                                 <span className="font-semibold">{userData.streak} Day Streak</span>
                             </div>
                         </div>
-                        <div className="ml-auto">
+                        <div className="w-full sm:w-auto sm:ml-auto">
                             <AvatarSelector
                                 currentAvatarUrl={userData.avatarUrl}
                                 onAvatarSelect={handleAvatarSelect}
@@ -354,17 +354,17 @@ export default function SettingsPage() {
 
             {/* Buddy Settings */}
             <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Bot className="h-5 w-5" />
+                <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                        <Bot className="h-4 w-4 sm:h-5 sm:w-5" />
                         Wellness Buddy
                     </CardTitle>
-                    <CardDescription>Configure your AI wellness companion's personality and relationship.</CardDescription>
+                    <CardDescription className="text-xs sm:text-sm">Configure your AI wellness companion's personality and relationship.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Form {...buddyForm}>
                         <div className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <FormField
                                     control={buddyForm.control}
                                     name="name"
@@ -398,7 +398,7 @@ export default function SettingsPage() {
                                     )}
                                 />
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <FormField
                                     control={buddyForm.control}
                                     name="gender"
@@ -461,46 +461,48 @@ export default function SettingsPage() {
 
             {/* Contact Information */}
             <Card>
-                <CardHeader>
-                    <CardTitle>Contact Information</CardTitle>
-                    <CardDescription>Your email and mobile number (read-only).</CardDescription>
+                <CardHeader className="pb-4">
+                    <CardTitle className="text-lg sm:text-xl">Contact Information</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">Your email and mobile number (read-only).</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input id="email" type="email" readOnly value={firebaseUser?.email || "No email provided"} />
+                        <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                        <Input id="email" type="email" readOnly value={firebaseUser?.email || "No email provided"} className="text-sm" />
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="mobile">Mobile Number</Label>
-                        <Input id="mobile" type="tel" readOnly value={userData.phone || "No phone provided"} />
+                        <Label htmlFor="mobile" className="text-sm font-medium">Mobile Number</Label>
+                        <Input id="mobile" type="tel" readOnly value={userData.phone || "No phone provided"} className="text-sm" />
                     </div>
                 </CardContent>
             </Card>
 
             {/* Notifications */}
             <Card>
-                <CardHeader>
-                    <CardTitle>Notifications</CardTitle>
-                    <CardDescription>Choose how you want to be notified.</CardDescription>
+                <CardHeader className="pb-4">
+                    <CardTitle className="text-lg sm:text-xl">Notifications</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">Choose how you want to be notified.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-secondary/50">
-                        <div className="space-y-0.5">
-                            <Label htmlFor="email-notifications" className="text-base font-normal cursor-pointer">Email Notifications</Label>
-                            <p className="text-sm text-muted-foreground">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 rounded-lg border p-4 transition-colors hover:bg-secondary/50">
+                        <div className="space-y-0.5 flex-1">
+                            <Label htmlFor="email-notifications" className="text-sm sm:text-base font-normal cursor-pointer">Email Notifications</Label>
+                            <p className="text-xs sm:text-sm text-muted-foreground">
                                 Receive challenge updates and motivational quotes in your inbox.
                             </p>
                         </div>
-                        <Switch 
-                            id="email-notifications" 
-                            checked={emailNotifications}
-                            onCheckedChange={setEmailNotifications}
-                        />
+                        <div className="flex justify-end">
+                            <Switch 
+                                id="email-notifications" 
+                                checked={emailNotifications}
+                                onCheckedChange={setEmailNotifications}
+                            />
+                        </div>
                     </div>
-                    <div className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-secondary/50">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 rounded-lg border p-4 transition-colors hover:bg-secondary/50">
                         <div className="space-y-0.5 flex-1">
-                            <Label htmlFor="push-notifications" className="text-base font-normal cursor-pointer">Push Notifications</Label>
-                            <p className="text-sm text-muted-foreground">
+                            <Label htmlFor="push-notifications" className="text-sm sm:text-base font-normal cursor-pointer">Push Notifications</Label>
+                            <p className="text-xs sm:text-sm text-muted-foreground">
                                 Get real-time alerts for tasks and motivation on your device.
                             </p>
                             {!hasNotificationPermission && (
@@ -510,13 +512,13 @@ export default function SettingsPage() {
                                 </p>
                             )}
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-end gap-2">
                             {!hasNotificationPermission && (
                                 <Button
                                     size="sm"
                                     variant="outline"
                                     onClick={handleNotificationPermissionRequest}
-                                    className="text-xs"
+                                    className="text-xs px-3"
                                 >
                                     <Bell className="h-3 w-3 mr-1" />
                                     Allow
@@ -544,45 +546,52 @@ export default function SettingsPage() {
                 "sticky bottom-4 transition-all duration-200",
                 hasUnsavedChanges ? "ring-2 ring-primary/20 shadow-lg" : "shadow-sm"
             )}>
-                <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
+                <CardContent className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-0 sm:justify-between">
+                        <div className="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-start">
                             {hasUnsavedChanges && (
                                 <div className="flex items-center gap-2 text-amber-600">
                                     <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-                                    <span className="text-sm font-medium">You have unsaved changes</span>
+                                    <span className="text-xs sm:text-sm font-medium">You have unsaved changes</span>
                                 </div>
                             )}
                             {!hasUnsavedChanges && (
                                 <div className="flex items-center gap-2 text-green-600">
                                     <div className="h-2 w-2 rounded-full bg-green-500" />
-                                    <span className="text-sm font-medium">All changes saved</span>
+                                    <span className="text-xs sm:text-sm font-medium">All changes saved</span>
                                 </div>
                             )}
                         </div>
                         
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
                             {hasUnsavedChanges && (
                                 <Button 
                                     variant="outline" 
                                     onClick={handleDiscardChanges}
                                     disabled={isSaving}
+                                    className="flex-1 sm:flex-none text-xs sm:text-sm px-3 sm:px-4"
+                                    size="sm"
                                 >
-                                    Discard Changes
+                                    <span className="hidden xs:inline">Discard Changes</span>
+                                    <span className="xs:hidden">Discard</span>
                                 </Button>
                             )}
                             <Button 
                                 onClick={handleSaveAllChanges}
                                 disabled={!hasUnsavedChanges || isSaving}
-                                className="min-w-[120px]"
+                                className="flex-1 sm:flex-none min-w-[100px] sm:min-w-[120px] text-xs sm:text-sm px-3 sm:px-4"
+                                size="sm"
                             >
                                 {isSaving ? (
                                     <>
-                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                        Saving...
+                                        <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 mr-2 animate-spin" />
+                                        <span>Saving...</span>
                                     </>
                                 ) : (
-                                    'Save All Changes'
+                                    <>
+                                        <span className="hidden xs:inline">Save All Changes</span>
+                                        <span className="xs:hidden">Save All</span>
+                                    </>
                                 )}
                             </Button>
                         </div>
