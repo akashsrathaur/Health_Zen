@@ -185,7 +185,7 @@ export function ChatBuddy() {
                         )}>
                             <CardHeader className="flex flex-row items-center justify-between p-4">
                                 <div className="flex items-center gap-3">
-                                    <Bot className="h-6 w-6 text-primary" />
+                                    <Bot className="h-6 w-6 bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent" />
                                     <div className='grid gap-0.5'>
                                         <h3 className="font-semibold">{persona.name}</h3>
                                         <p className="text-xs text-muted-foreground">{persona.relationship}</p>
