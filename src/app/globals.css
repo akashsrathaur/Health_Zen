@@ -128,12 +128,17 @@
   .gradient-border-card {
     position: relative;
     background: linear-gradient(135deg, 
-      hsl(var(--primary) / 0.6), 
-      hsl(var(--accent) / 0.4), 
-      hsl(var(--secondary) / 0.6)
+      #FF6B6B 0%,  /* Coral */
+      #4ECDC4 25%, /* Teal */
+      #45B7D1 50%, /* Sky blue */
+      #96CEB4 75%, /* Mint green */
+      #FF6B6B 100% /* Back to coral for seamless loop */
     );
+    background-size: 300% 300%;
+    animation: gradient-shift 4s ease infinite;
     border-radius: calc(var(--radius) + 2px);
     padding: 2px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .gradient-border-card-inner {
@@ -141,6 +146,7 @@
     border-radius: var(--radius);
     width: 100%;
     height: 100%;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .gradient-text {
@@ -193,10 +199,15 @@
   /* Progress bar gradients */
   .gradient-progress {
     background: linear-gradient(90deg, 
-      hsl(var(--primary)), 
-      hsl(var(--accent)), 
-      hsl(var(--secondary))
+      #FF6B6B, /* Coral */
+      #4ECDC4, /* Teal */
+      #45B7D1, /* Sky blue */
+      #96CEB4  /* Mint green */
     );
+    background-size: 300% 100%;
+    animation: gradient-shift 4s ease infinite;
+    border-radius: inherit;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* Navigation gradients */
@@ -392,11 +403,15 @@
 
   .dark .gradient-border-card {
     background: linear-gradient(135deg, 
-      hsl(var(--primary) / 0.8), 
-      hsl(25 95% 53% / 0.6), /* Bright orange with opacity */
-      hsl(300 85% 65% / 0.6), /* Bright purple with opacity */
-      hsl(var(--accent) / 0.8)
+      #FF6B6B 0%,  /* Bright coral */
+      #00E5FF 25%, /* Bright cyan */
+      #E91E63 50%, /* Bright pink */
+      #8BC34A 75%, /* Light green */
+      #FF6B6B 100% /* Back to coral */
     );
+    background-size: 300% 300%;
+    animation: gradient-shift 4s ease infinite;
+    box-shadow: 0 0 15px rgba(255, 107, 107, 0.3), 0 0 30px rgba(0, 229, 255, 0.2);
   }
 
   .dark .gradient-text {
@@ -442,6 +457,19 @@
     background-size: 300% 300%;
     box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5), 0 4px 15px rgba(0, 229, 255, 0.4);
     transform: translateY(-1px);
+  }
+
+  /* Dark mode progress bar gradients */
+  .dark .gradient-progress {
+    background: linear-gradient(90deg, 
+      #FF6B6B, /* Bright coral */
+      #00E5FF, /* Bright cyan */
+      #E91E63, /* Bright pink */
+      #8BC34A  /* Light green */
+    );
+    background-size: 300% 100%;
+    animation: gradient-shift 4s ease infinite;
+    box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
   }
 
 
