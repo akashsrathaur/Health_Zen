@@ -10,19 +10,23 @@ const Avatar = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root> & {
     variant?: 'default' | 'gradient' | 'story'
   }
->(({ className, variant = 'default', ...props }, ref) => {
+>(({ className, variant = 'default', children, ...props }, ref) => {
   if (variant === 'gradient' || variant === 'story') {
     return (
       <div className={cn(
         "gradient-border",
-        variant === 'story' && "animate-gradient-rotate",
-        className
+        variant === 'story' && "animate-gradient-rotate"
       )}>
         <AvatarPrimitive.Root
           ref={ref}
-          className="gradient-border-inner relative flex shrink-0 overflow-hidden"
+          className={cn(
+            "gradient-border-inner relative flex shrink-0 overflow-hidden",
+            className
+          )}
           {...props}
-        />
+        >
+          {children}
+        </AvatarPrimitive.Root>
       </div>
     )
   }
@@ -35,7 +39,9 @@ const Avatar = React.forwardRef<
         className
       )}
       {...props}
-    />
+    >
+      {children}
+    </AvatarPrimitive.Root>
   )
 })
 Avatar.displayName = AvatarPrimitive.Root.displayName
@@ -59,7 +65,7 @@ const AvatarFallback = React.forwardRef<
   <AvatarPrimitive.Fallback
     ref={ref}
     className={cn(
-      "flex h-full w-full items-center justify-center rounded-full bg-muted",
+      "flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-primary/80 to-accent/80 text-white font-semibold backdrop-blur-sm",
       className
     )}
     {...props}

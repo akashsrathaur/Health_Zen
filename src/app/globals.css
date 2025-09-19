@@ -165,22 +165,7 @@
     );
   }
 
-  /* Button gradients */
-  .gradient-button {
-    background: linear-gradient(135deg, 
-      hsl(var(--primary)), 
-      hsl(var(--accent)), 
-      hsl(var(--secondary))
-    );
-    border: none;
-    color: white;
-    transition: all 0.3s ease;
-  }
-
-  .gradient-button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 25px hsl(var(--primary) / 0.3);
-  }
+  /* Button gradients will be defined in light/dark mode sections */
 
   /* Input gradients */
   .gradient-input {
@@ -281,15 +266,82 @@
     border-color: hsl(217 32% 17%);
   }
 
+  /* Light mode gradient enhancements */
+  .gradient-border {
+    background: linear-gradient(135deg, 
+      #FF6B6B, /* Coral */
+      #9C27B0, /* Purple */
+      #2196F3, /* Blue */
+      #4CAF50, /* Green */
+      #FF9800  /* Orange */
+    );
+    background-size: 300% 300%;
+    animation: gradient-shift 3s ease infinite;
+    padding: 3px;
+    border-radius: 50%;
+  }
+
+  .gradient-button {
+    background: linear-gradient(135deg, 
+      #FF6B6B, /* Coral */
+      #4ECDC4, /* Teal */
+      #45B7D1, /* Sky blue */
+      #96CEB4  /* Mint green */
+    );
+    background-size: 300% 300%;
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    animation: gradient-shift 4s ease infinite;
+  }
+
+  .gradient-button:hover {
+    background: linear-gradient(135deg, 
+      #FF5252, /* Darker coral */
+      #26A69A, /* Darker teal */
+      #2196F3, /* Darker blue */
+      #66BB6A  /* Darker mint */
+    );
+    background-size: 300% 300%;
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4), 0 4px 15px rgba(78, 205, 196, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .gradient-border-card {
+    background: linear-gradient(135deg, 
+      hsl(var(--primary) / 0.7), 
+      hsl(300 70% 60% / 0.5), 
+      hsl(200 80% 60% / 0.7)
+    );
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, 
+      hsl(var(--primary)), 
+      hsl(300 70% 60%), 
+      hsl(200 80% 60%)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
   /* Dark theme gradient enhancements */
   .dark .gradient-border {
     background: linear-gradient(135deg, 
-      hsl(var(--primary)), 
-      hsl(25 95% 53%), /* Bright orange */
-      hsl(300 85% 65%), /* Bright purple */
-      hsl(var(--accent))
+      #FF6B6B, /* Bright coral */
+      #00E5FF, /* Bright cyan */
+      #E91E63, /* Bright pink */
+      #8BC34A, /* Light green */
+      #FFC107  /* Amber */
     );
-    animation: gradient-rotate 3s linear infinite;
+    background-size: 300% 300%;
+    animation: gradient-shift 3s ease infinite;
+    padding: 3px;
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(255, 107, 107, 0.3), 0 0 40px rgba(0, 229, 255, 0.2);
   }
 
   .dark .gradient-border-inner {
@@ -323,6 +375,31 @@
       hsl(300 85% 65% / 0.1), 
       hsl(var(--accent) / 0.15)
     );
+  }
+
+  /* Dark mode button gradients */
+  .dark .gradient-button {
+    background: linear-gradient(135deg, 
+      #FF6B6B, /* Bright coral */
+      #00E5FF, /* Cyan */
+      #E91E63, /* Pink */
+      #8BC34A  /* Light green */
+    );
+    background-size: 300% 300%;
+    animation: gradient-shift 4s ease infinite;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+  }
+
+  .dark .gradient-button:hover {
+    background: linear-gradient(135deg, 
+      #FF8A80, /* Lighter coral */
+      #18FFFF, /* Brighter cyan */
+      #F48FB1, /* Lighter pink */
+      #AED581  /* Brighter light green */
+    );
+    background-size: 300% 300%;
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5), 0 4px 15px rgba(0, 229, 255, 0.4);
+    transform: translateY(-1px);
   }
 
   @keyframes gradient-rotate {
@@ -359,16 +436,65 @@
   /* Story ring animations */
   .story-ring {
     background: linear-gradient(45deg, 
-      hsl(var(--primary)),
-      hsl(25 95% 53%),
-      hsl(300 85% 65%),
-      hsl(var(--accent)),
-      hsl(var(--primary))
+      #FF6B6B,
+      #4ECDC4,
+      #45B7D1,
+      #96CEB4,
+      #FF6B6B
     );
     background-size: 300% 300%;
     animation: gradient-shift 3s ease infinite;
     padding: 3px;
     border-radius: 50%;
+  }
+
+  /* Enhanced hover effects for avatars */
+  .avatar-glow:hover {
+    box-shadow: 0 0 20px rgba(255, 107, 107, 0.4), 0 0 40px rgba(78, 205, 196, 0.3);
+    transform: scale(1.05);
+  }
+
+  /* Pulse animation for better visibility */
+  .gradient-pulse {
+    animation: gradient-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes gradient-pulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.02);
+    }
+  }
+
+  /* Light mode story effects */
+  .story-gradient-light {
+    background: linear-gradient(135deg, 
+      #FF6B6B 0%,
+      #4ECDC4 25%,
+      #45B7D1 50%,
+      #96CEB4 75%,
+      #FF6B6B 100%
+    );
+    background-size: 200% 200%;
+    animation: gradient-shift 4s ease infinite;
+  }
+
+  /* Dark mode story effects */
+  .dark .story-gradient-dark {
+    background: linear-gradient(135deg, 
+      #FF6B6B 0%,
+      #00E5FF 25%,
+      #E91E63 50%,
+      #8BC34A 75%,
+      #FF6B6B 100%
+    );
+    background-size: 200% 200%;
+    animation: gradient-shift 4s ease infinite;
+    box-shadow: 0 0 15px rgba(255, 107, 107, 0.4);
   }
 
   /* Scrollbar utilities */

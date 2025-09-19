@@ -77,16 +77,19 @@ export function Stories({
         <div className="flex flex-col items-center gap-2 min-w-[80px]">
           <div className="relative">
             <Avatar 
-              variant="default" 
-              className="h-16 w-16 ring-2 ring-muted cursor-pointer hover:ring-primary/50 transition-all"
+              variant="gradient" 
+              className="h-16 w-16 cursor-pointer hover:scale-105 transition-all"
               onClick={onAddStory}
             >
               <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
-              <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-semibold">
+                {currentUser.name.charAt(0).toUpperCase()}
+              </AvatarFallback>
             </Avatar>
             <Button
+              variant="gradient"
               size="sm"
-              className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full p-0 shadow-md hover:scale-110 transition-transform"
+              className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full p-0 shadow-lg hover:scale-110 transition-all"
               onClick={onAddStory}
             >
               <Plus className="h-3 w-3" />
@@ -103,18 +106,16 @@ export function Stories({
           className="flex flex-col items-center gap-2 min-w-[80px] cursor-pointer"
           onClick={() => onViewStory?.(story.id)}
         >
-          <div className={cn(
-            "story-ring transition-all hover:scale-105",
-            story.viewed && "opacity-60"
-          )}>
-            <Avatar 
-              className="h-16 w-16 bg-background"
-            >
+          <Avatar 
+            variant="story"
+            className={cn(
+              "h-16 w-16 transition-all hover:scale-105",
+              story.viewed && "opacity-60"
+            )}
           >
-              <AvatarImage src={story.user.avatarUrl} alt={story.user.name} />
-              <AvatarFallback>{story.user.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-          </div>
+            <AvatarImage src={story.user.avatarUrl} alt={story.user.name} />
+            <AvatarFallback>{story.user.name.charAt(0)}</AvatarFallback>
+          </Avatar>
           <span className="text-xs font-medium text-center truncate w-20">
             {story.user.name}
           </span>
