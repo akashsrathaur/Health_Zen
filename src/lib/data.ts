@@ -117,16 +117,11 @@ export const initialDailyVibes: DailyVibe[] = [
     progress: 0,
   },
   {
-    id: 'medication',
-    title: 'Medication',
-    value: 'Pending',
-    icon: 'Pill',
+    id: 'gym',
+    title: 'Workout',
+    value: '0/60 minutes',
+    icon: 'Dumbbell',
     progress: 0,
-    medicationConfig: {
-      dailyDoses: 2,
-      dosesTaken: 0,
-      intervalHours: 4,
-    },
   },
   {
     id: 'streak',

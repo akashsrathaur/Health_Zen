@@ -182,7 +182,7 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete, userData }: {
     const isProtectedVibe = protectedVibes.includes(currentVibe.id);
     const isCompleted = currentVibe.id === 'medication' ? currentVibe.progress === 100 : !!currentVibe.completedAt;
     const isEditable = !isCompleted && !isProtectedVibe;
-    const canDelete = !isProtectedVibe && currentVibe.isCustom;
+    const canDelete = !isProtectedVibe && (currentVibe.isCustom || currentVibe.id === 'medication');
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
