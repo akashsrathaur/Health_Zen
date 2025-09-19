@@ -1,4 +1,16 @@
 
+/**
+ * Health Zen - AI-Powered Personalized Wellness Companion
+ * Copyright © 2025 Akash Rathaur. All Rights Reserved.
+ * 
+ * Community Page - Social wellness platform
+ * Features community sharing, challenges, and peer support for wellness journeys
+ * 
+ * @author Akash Rathaur
+ * @email akashsrathaur@gmail.com
+ * @website https://github.com/akashsrathaur
+ */
+
 'use client';
 import Image from 'next/image';
 import { Balancer } from 'react-wrap-balancer';

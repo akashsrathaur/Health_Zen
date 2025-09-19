@@ -1,4 +1,16 @@
 
+/**
+ * Health Zen - AI-Powered Personalized Wellness Companion
+ * Copyright © 2025 Akash Rathaur. All Rights Reserved.
+ * 
+ * Progress Tracker Page - Visual analytics and wellness metrics
+ * Features comprehensive wellness tracking with charts and progress visualization
+ * 
+ * @author Akash Rathaur
+ * @email akashsrathaur@gmail.com
+ * @website https://github.com/akashsrathaur
+ */
+
 'use client';
 import { Balancer } from 'react-wrap-balancer';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';

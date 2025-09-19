@@ -1,4 +1,16 @@
 
+/**
+ * Health Zen - AI-Powered Personalized Wellness Companion
+ * Copyright © 2025 Akash Rathaur. All Rights Reserved.
+ * 
+ * Settings Page - User profile and app configuration
+ * Features Ayurvedic dosha profiling, notification settings, and personalization
+ * 
+ * @author Akash Rathaur
+ * @email akashsrathaur@gmail.com
+ * @website https://github.com/akashsrathaur
+ */
+
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';

@@ -1,4 +1,16 @@
 
+/**
+ * Health Zen - AI-Powered Personalized Wellness Companion
+ * Copyright © 2025 Akash Rathaur. All Rights Reserved.
+ * 
+ * Chat Buddy AI Flow - Gemini AI integration for wellness conversations
+ * Implements personalized AI wellness companion with Ayurvedic knowledge
+ * 
+ * @author Akash Rathaur
+ * @email akashsrathaur@gmail.com
+ * @website https://github.com/akashsrathaur
+ */
+
 'use server';
 /**
  * @fileOverview A personalized chat buddy AI agent.

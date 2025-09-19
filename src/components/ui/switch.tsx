@@ -1,3 +1,15 @@
+/**
+ * Health Zen - AI-Powered Personalized Wellness Companion
+ * Copyright © 2025 Akash Rathaur. All Rights Reserved.
+ * 
+ * Switch UI Component - Custom gradient-styled toggle switch
+ * Enhanced with beautiful gradient themes for wellness UI
+ * 
+ * @author Akash Rathaur
+ * @email akashsrathaur@gmail.com
+ * @website https://github.com/akashsrathaur
+ */
+
 "use client"
 
 import * as React from "react"

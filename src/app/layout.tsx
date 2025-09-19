@@ -1,5 +1,17 @@
 
-import type { Metadata } from 'next';
+/**
+ * Health Zen - AI-Powered Personalized Wellness Companion
+ * Copyright © 2025 Akash Rathaur. All Rights Reserved.
+ * 
+ * This file is part of Health Zen, a comprehensive wellness platform
+ * that combines traditional Ayurvedic wisdom with modern AI technology.
+ * 
+ * @author Akash Rathaur
+ * @email akashsrathaur@gmail.com
+ * @website https://github.com/akashsrathaur
+ */
+
+import type { Metadata } from 'next'
 import { Provider as BalancerProvider } from 'react-wrap-balancer';
 import { Toaster } from '@/components/ui/toaster';
 import './globals.css';

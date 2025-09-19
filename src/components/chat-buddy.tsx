@@ -1,4 +1,16 @@
 
+/**
+ * Health Zen - AI-Powered Personalized Wellness Companion
+ * Copyright © 2025 Akash Rathaur. All Rights Reserved.
+ * 
+ * Chat Buddy Component - Personalized AI wellness companion
+ * Features adaptive personality and intelligent health conversations
+ * 
+ * @author Akash Rathaur
+ * @email akashsrathaur@gmail.com
+ * @website https://github.com/akashsrathaur
+ */
+
 'use client';
 
 import { useEffect, useRef, useState, useTransition } from 'react';

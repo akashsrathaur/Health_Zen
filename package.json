@@ -1,7 +1,32 @@
 {
-  "name": "nextn",
-  "version": "0.1.0",
+  "name": "health-zen",
+  "version": "1.0.0",
+  "description": "AI-Powered Personalized Wellness Companion - Where Ancient Wisdom Meets Modern Technology",
+  "author": {
+    "name": "Akash Rathaur",
+    "email": "akashsrathaur@gmail.com",
+    "url": "https://github.com/akashsrathaur"
+  },
+  "license": "UNLICENSED",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akashsrathaur/Health_Zen.git"
+  },
+  "keywords": [
+    "health",
+    "wellness",
+    "ayurveda",
+    "ai",
+    "nextjs",
+    "react",
+    "typescript",
+    "firebase",
+    "gemini",
+    "personalized-health",
+    "wellness-companion"
+  ],
+  "homepage": "https://healthzen.app",
   "scripts": {
     "dev": "next dev --turbopack -p 9002",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
