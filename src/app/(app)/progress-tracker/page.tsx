@@ -395,9 +395,9 @@ export default function ProgressTrackerPage() {
                 <span className="text-muted-foreground text-xs sm:text-sm">({dailyPoints}/30)</span>
               </div>
             </div>
-            <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-orange-600 dark:text-orange-400">
-              <Icons.streak className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-              <span className="font-semibold">{userProgress.streak} streak</span>
+            <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <Icons.streak className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0 bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent" />
+              <span className="font-semibold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">{userProgress.streak} streak</span>
             </div>
             <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-blue-600 dark:text-blue-400">
               <Icons.points className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />

@@ -1030,7 +1030,7 @@ export default function DashboardPage() {
                   Health Analytics
                 </div>
                 <div className="flex items-center gap-2 rounded-full bg-background/50 px-4 py-2 backdrop-blur-sm">
-                  <span className="h-2 w-2 rounded-full bg-orange-500"></span>
+                  <span className="h-2 w-2 rounded-full bg-gradient-to-r from-orange-400 to-red-500"></span>
                   Community Challenges
                 </div>
               </div>

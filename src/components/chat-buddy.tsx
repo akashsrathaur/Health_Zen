@@ -236,11 +236,11 @@ export function ChatBuddy() {
                                                         animate={{ opacity: 1, y: 0 }}
                                                         transition={{ duration: 0.3 }}
                                                         className={cn("group relative max-w-[75%] rounded-lg px-3 py-2 text-sm", msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary')}>
-                                                        <p style={{whiteSpace: 'pre-wrap'}}>{msg.content}</p>
-                                                         <div className={cn("absolute bottom-1 right-2 flex items-center gap-1 text-xs",
+                                                        <p style={{whiteSpace: 'pre-wrap'}} className={msg.role === 'user' ? 'pb-4' : ''}>{msg.content}</p>
+                                                         <div className={cn("absolute bottom-1 right-2 flex items-center gap-1 text-xs min-w-fit",
                                                             msg.role === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
                                                         )}>
-                                                            <span>{format(new Date(msg.timestamp), 'HH:mm')}</span>
+                                                            <span className="whitespace-nowrap">{format(new Date(msg.timestamp), 'HH:mm')}</span>
                                                             {msg.role === 'user' && <MessageStatus status={msg.status} />}
                                                         </div>
                                                     </motion.div>
