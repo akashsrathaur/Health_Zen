@@ -103,16 +103,18 @@ export function Stories({
           className="flex flex-col items-center gap-2 min-w-[80px] cursor-pointer"
           onClick={() => onViewStory?.(story.id)}
         >
-          <Avatar 
-            variant="story"
-            className={cn(
-              "h-16 w-16 transition-all hover:scale-105",
-              story.viewed && "opacity-60"
-            )}
+          <div className={cn(
+            "story-ring transition-all hover:scale-105",
+            story.viewed && "opacity-60"
+          )}>
+            <Avatar 
+              className="h-16 w-16 bg-background"
+            >
           >
-            <AvatarImage src={story.user.avatarUrl} alt={story.user.name} />
-            <AvatarFallback>{story.user.name.charAt(0)}</AvatarFallback>
-          </Avatar>
+              <AvatarImage src={story.user.avatarUrl} alt={story.user.name} />
+              <AvatarFallback>{story.user.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+          </div>
           <span className="text-xs font-medium text-center truncate w-20">
             {story.user.name}
           </span>

@@ -158,43 +158,46 @@ export function AnimatedLogin() {
   return (
     <div className="w-full max-w-sm mx-auto">
         <Robot state={robotState} />
-        <Card className="rounded-2xl shadow-lg bg-card/90 backdrop-blur-sm">
-            <CardContent className="p-6">
-                <form onSubmit={handleLogin} className="space-y-4">
-                     <div className="grid gap-2">
-                        <Label htmlFor="loginId">Email or Phone</Label>
-                        <Input 
-                            id="loginId" 
-                            type="text" 
-                            placeholder="Email or Phone Number" 
-                            required 
-                            value={loginId}
-                            onChange={(e) => setLoginId(e.target.value)}
-                            onFocus={handleLoginIdFocus}
-                            onBlur={() => setRobotState(password.length > 0 ? 'peeking' : 'idle')}
-                        />
+        <div className="gradient-border-card">
+          <Card className="gradient-border-card-inner rounded-2xl shadow-lg backdrop-blur-sm">
+              <CardContent className="p-6">
+                  <form onSubmit={handleLogin} className="space-y-4">
+                       <div className="grid gap-2">
+                          <Label htmlFor="loginId">Email or Phone</Label>
+                          <Input 
+                              variant="gradient"
+                              id="loginId" 
+                              type="text" 
+                              placeholder="Email or Phone Number" 
+                              required 
+                              value={loginId}
+                              onChange={(e) => setLoginId(e.target.value)}
+                              onFocus={handleLoginIdFocus}
+                              onBlur={() => setRobotState(password.length > 0 ? 'peeking' : 'idle')}
+                          />
                     </div>
-                     <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
-                        <Input 
-                            id="password" 
-                            type="password" 
-                            required
-                            value={password}
-                            onChange={handlePasswordChange}
-                         />
-                    </div>
-                    {error && <p className="text-sm font-medium text-destructive">{error}</p>}
-                    <div className="flex items-center justify-between pt-2">
-                        <div className="flex items-center space-x-2">
-                            <Checkbox id="remember-me" />
-                            <Label htmlFor="remember-me" className="text-sm font-normal text-muted-foreground">Remember me</Label>
-                        </div>
-                        <a href="#" className="text-sm font-medium text-primary hover:underline">Forgot password?</a>
-                    </div>
-                    <Button type="submit" className="w-full !mt-6" size="lg" disabled={robotState === 'correct'}>
-                      {robotState === 'correct' ? 'Success!' : 'Sign In'}
-                    </Button>
+                       <div className="grid gap-2">
+                          <Label htmlFor="password">Password</Label>
+                          <Input 
+                              variant="gradient"
+                              id="password" 
+                              type="password" 
+                              required
+                              value={password}
+                              onChange={handlePasswordChange}
+                           />
+                      </div>
+                      {error && <p className="text-sm font-medium text-destructive">{error}</p>}
+                      <div className="flex items-center justify-between pt-2">
+                          <div className="flex items-center space-x-2">
+                              <Checkbox id="remember-me" />
+                              <Label htmlFor="remember-me" className="text-sm font-normal text-muted-foreground">Remember me</Label>
+                          </div>
+                          <a href="#" className="text-sm font-medium text-primary hover:underline">Forgot password?</a>
+                      </div>
+                      <Button variant="gradient" type="submit" className="w-full !mt-6" size="lg" disabled={robotState === 'correct'}>
+                        {robotState === 'correct' ? 'Success!' : 'Sign In'}
+                      </Button>
                 </form>
                  <div className="mt-4 text-center text-sm text-muted-foreground">
                     Don&apos;t have an account?{' '}
@@ -204,8 +207,9 @@ export function AnimatedLogin() {
                         </Link>
                     </Button>
                 </div>
-            </CardContent>
-        </Card>
+              </CardContent>
+          </Card>
+        </div>
     </div>
   );
 }

@@ -28,13 +28,13 @@ function AppContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div style={mainContentStyle}>
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
+      <header className="gradient-nav sticky top-0 z-30 flex h-16 items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-2">
           <SidebarTrigger />
           <div className="hidden items-center gap-2 md:flex">
             <Link href="/dashboard" className='flex items-center gap-2'>
               <Icons.logo className="h-6 w-6" />
-              <span className="font-semibold">HealthZen</span>
+              <span className="font-semibold gradient-text">HealthZen</span>
             </Link>
           </div>
         </div>
@@ -54,7 +54,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <div className="min-h-screen">
-        <Sidebar className="border-r">
+        <Sidebar className="gradient-sidebar border-r">
           <SidebarHeader className="h-16 justify-center p-4">
             <Link href="/dashboard" className="flex items-center gap-2">
                 <Icons.logo className="h-8 w-8" />

@@ -63,7 +63,8 @@ function ChallengeCard({ challenge, onMarkAsDone }: { challenge: Challenge, onMa
 
   return (
     <motion.div variants={itemVariants} className="h-full">
-        <Card className="flex flex-col h-full transition-all duration-200 hover:bg-secondary/10">
+        <div className="gradient-border-card h-full">
+          <Card className="gradient-border-card-inner flex flex-col h-full transition-all duration-200 hover:bg-secondary/10">
           <Link href={`/challenges`} className='flex flex-col flex-grow'>
             <CardHeader className="flex flex-row items-start gap-4 space-y-0 pb-4">
                 <Icon name={challenge.icon} className="h-8 w-8 text-primary" />
@@ -82,7 +83,7 @@ function ChallengeCard({ challenge, onMarkAsDone }: { challenge: Challenge, onMa
                     </div>
                     )}
                 </div>
-                <Progress value={progress} />
+                <Progress variant="gradient" value={progress} />
             </CardContent>
           </Link>
            <CardFooter className="p-2 pt-0">
@@ -100,7 +101,8 @@ function ChallengeCard({ challenge, onMarkAsDone }: { challenge: Challenge, onMa
                     {challenge.isCompletedToday ? 'Completed' : 'Done for today'}
                 </Button>
             </CardFooter>
-        </Card>
+          </Card>
+        </div>
     </motion.div>
   );
 }
@@ -993,13 +995,14 @@ export default function DashboardPage() {
 
                       return (
                         <motion.div key={vibe.id} variants={itemVariants}>
-                          <Card 
-                            className={cn("p-4 transition-all duration-300 hover:shadow-md", 
-                                isVibeDisabled || isMedicationDisabled ? 'cursor-not-allowed bg-muted/50' : 'hover:bg-card/50 cursor-pointer',
-                                isCompleted && !isWaterLocked && 'bg-primary/5 border-primary/20 shadow-sm'
-                            )}
-                            onClick={() => !isVibeDisabled && !isMedicationDisabled && handleEditVibe(vibe)}
-                          >
+                          <div className="gradient-border-card">
+                            <Card 
+                              className={cn("gradient-border-card-inner p-4 transition-all duration-300 hover:shadow-md", 
+                                  isVibeDisabled || isMedicationDisabled ? 'cursor-not-allowed bg-muted/50' : 'hover:bg-card/50 cursor-pointer',
+                                  isCompleted && !isWaterLocked && 'bg-primary/5 shadow-sm'
+                              )}
+                              onClick={() => !isVibeDisabled && !isMedicationDisabled && handleEditVibe(vibe)}
+                            >
                               <div className='flex items-center'>
                                   <Icon name={vibe.icon} className={cn("mr-4 h-8 w-8", 
                                     isCompleted && !isWaterLocked ? 'text-primary' : 'text-primary'
@@ -1057,15 +1060,16 @@ export default function DashboardPage() {
                               </div>
                               {vibe.progress !== undefined && vibe.id !== 'streak' && (
                                 <Progress 
+                                  variant="gradient"
                                   value={vibe.progress} 
                                   className={cn("w-full mt-3", 
-                                    isCompleted && !isWaterLocked && '[&>div]:bg-primary',
                                     // Always show progress bar for water intake, regardless of completion status
                                     (vibe.id === 'water' || vibe.progress > 0) ? 'opacity-100' : 'opacity-100'
                                   )} 
                                 />
                               )}
-                          </Card>
+                            </Card>
+                          </div>
                         </motion.div>
                       )
                     })}

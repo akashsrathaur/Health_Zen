@@ -4,10 +4,10 @@
 
 @layer base {
   :root {
-    --background: 33 15% 98%;
-    --foreground: 22 25% 8%;
-    --card: 33 30% 94%;
-    --card-foreground: 22 25% 8%;
+    --background: 0 0% 100%; /* Pure white for light mode */
+    --foreground: 0 0% 0%; /* Pure black text for light mode */
+    --card: 0 0% 98%; /* Very light card background */
+    --card-foreground: 0 0% 0%;
     --popover: 33 15% 98%;
     --popover-foreground: 22 25% 8%;
     --primary: 15 75% 62%;
@@ -39,10 +39,10 @@
   }
 
   .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-    --card: 222 84% 5%;
-    --card-foreground: 210 40% 98%;
+    --background: 0 0% 0%; /* Pure black for dark mode */
+    --foreground: 0 0% 100%; /* Pure white text for dark mode */
+    --card: 0 0% 5%; /* Very dark card background */
+    --card-foreground: 0 0% 100%;
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
     --primary: 25 95% 53%;
@@ -165,6 +165,62 @@
     );
   }
 
+  /* Button gradients */
+  .gradient-button {
+    background: linear-gradient(135deg, 
+      hsl(var(--primary)), 
+      hsl(var(--accent)), 
+      hsl(var(--secondary))
+    );
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+  }
+
+  .gradient-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px hsl(var(--primary) / 0.3);
+  }
+
+  /* Input gradients */
+  .gradient-input {
+    border: 2px solid transparent;
+    background: linear-gradient(hsl(var(--background)), hsl(var(--background))) padding-box,
+                linear-gradient(135deg, hsl(var(--primary) / 0.6), hsl(var(--accent) / 0.6)) border-box;
+  }
+
+  .gradient-input:focus {
+    background: linear-gradient(hsl(var(--background)), hsl(var(--background))) padding-box,
+                linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent))) border-box;
+  }
+
+  /* Progress bar gradients */
+  .gradient-progress {
+    background: linear-gradient(90deg, 
+      hsl(var(--primary)), 
+      hsl(var(--accent)), 
+      hsl(var(--secondary))
+    );
+  }
+
+  /* Navigation gradients */
+  .gradient-nav {
+    background: linear-gradient(135deg, 
+      hsl(var(--background) / 0.95), 
+      hsl(var(--card) / 0.95)
+    );
+    backdrop-filter: blur(10px);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  /* Sidebar gradients */
+  .gradient-sidebar {
+    background: linear-gradient(180deg, 
+      hsl(var(--background)), 
+      hsl(var(--card) / 0.5)
+    );
+  }
+
   /* Mobile utilities */
   @media (max-width: 475px) {
     .xs\:hidden {
@@ -276,6 +332,43 @@
     100% {
       filter: hue-rotate(360deg);
     }
+  }
+
+  @keyframes gradient-shift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  /* Enhanced gradient effects */
+  .gradient-animate {
+    background: linear-gradient(
+      -45deg,
+      hsl(var(--primary)),
+      hsl(var(--accent)),
+      hsl(var(--secondary)),
+      hsl(var(--primary))
+    );
+    background-size: 400% 400%;
+    animation: gradient-shift 4s ease infinite;
+  }
+
+  /* Story ring animations */
+  .story-ring {
+    background: linear-gradient(45deg, 
+      hsl(var(--primary)),
+      hsl(25 95% 53%),
+      hsl(300 85% 65%),
+      hsl(var(--accent)),
+      hsl(var(--primary))
+    );
+    background-size: 300% 300%;
+    animation: gradient-shift 3s ease infinite;
+    padding: 3px;
+    border-radius: 50%;
   }
 
   /* Scrollbar utilities */

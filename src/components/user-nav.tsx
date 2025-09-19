@@ -105,7 +105,7 @@ export function UserNav() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-            <Avatar className="h-9 w-9">
+            <Avatar variant="gradient" className="h-9 w-9">
               <AvatarImage src={userData.avatarUrl} alt={userData.name} />
               <AvatarFallback>{userData.name.charAt(0)}</AvatarFallback>
             </Avatar>
