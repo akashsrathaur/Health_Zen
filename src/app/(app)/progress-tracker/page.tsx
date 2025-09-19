@@ -20,12 +20,13 @@ import { cn } from '@/lib/utils';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { exportReportAsImage, shareReport } from '@/lib/export-report';
 import { useToast } from '@/hooks/use-toast';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Icons } from '@/components/icons';
 import { useAuth } from '@/context/auth-context';
 import { defaultUser } from '@/lib/user-store';
 import { getUserProgressData, type UserProgress } from '@/lib/user-progress';
 import { format } from 'date-fns';
+import { getTodayActivity, type DailyActivity } from '@/actions/daily-activities';
 
 const waterChartConfig = {
   glasses: {
@@ -115,10 +116,27 @@ export default function ProgressTrackerPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [todayActivity, setTodayActivity] = useState<DailyActivity | null>(null);
   
   // Use live user data from auth context instead of static data
   const userData = user || { ...defaultUser, uid: 'default' };
   const userProgress = liveUserProgress || { streak: userData.streak || 0, completedTasks: 0 };
+  
+  // Fetch real activity data from Firebase on component mount and when user changes
+  useEffect(() => {
+    async function fetchTodayActivity() {
+      if (userData.uid && userData.uid !== 'default') {
+        try {
+          const activity = await getTodayActivity(userData.uid);
+          setTodayActivity(activity);
+        } catch (error) {
+          console.error('Error fetching today activity:', error);
+        }
+      }
+    }
+    
+    fetchTodayActivity();
+  }, [userData.uid]);
   
   // Generate date labels for the last 7 days from selected date
   const generateLast7Days = (fromDate: Date = selectedDate) => {
@@ -166,25 +184,33 @@ export default function ProgressTrackerPage() {
     
     // Set today's actual data at the correct position if it exists
     if (todayIndex >= 0 && todayIndex < 7) {
-      // Water data - parse from "X/8 glasses" format
-      if (liveWaterVibe?.value) {
-        const waterMatch = liveWaterVibe.value.match(/^(\d+)/);
-        const waterCount = waterMatch ? parseInt(waterMatch[1]) : 0;
-        waterData[todayIndex] = Math.max(0, Math.min(waterCount, 8));
-      }
-      
-      // Sleep data - parse from "X.Xh" format
-      if (liveSleepVibe?.value) {
-        const sleepMatch = liveSleepVibe.value.match(/^([\d.]+)/);
-        const sleepHours = sleepMatch ? parseFloat(sleepMatch[1]) : 0;
-        sleepData[todayIndex] = Math.max(0, Math.min(sleepHours, 12));
-      }
-      
-      // Gym data - parse from "X/60 minutes" format
-      if (liveGymVibe?.value) {
-        const gymMatch = liveGymVibe.value.match(/^(\d+)/);
-        const gymMinutes = gymMatch ? parseInt(gymMatch[1]) : 0;
-        gymData[todayIndex] = Math.max(0, Math.min(gymMinutes, 120));
+      // Prioritize Firebase activity data over daily vibes data if available
+      if (todayActivity) {
+        waterData[todayIndex] = Math.max(0, Math.min(todayActivity.waterIntake || 0, 8));
+        sleepData[todayIndex] = Math.max(0, Math.min(todayActivity.sleepHours || 0, 12));
+        gymData[todayIndex] = Math.max(0, Math.min(todayActivity.gymMinutes || 0, 120));
+      } else {
+        // Fallback to parsing from daily vibes data
+        // Water data - parse from "X/8 glasses" format
+        if (liveWaterVibe?.value) {
+          const waterMatch = liveWaterVibe.value.match(/^(\d+)/);
+          const waterCount = waterMatch ? parseInt(waterMatch[1]) : 0;
+          waterData[todayIndex] = Math.max(0, Math.min(waterCount, 8));
+        }
+        
+        // Sleep data - parse from "X.Xh" format
+        if (liveSleepVibe?.value) {
+          const sleepMatch = liveSleepVibe.value.match(/^([\d.]+)/);
+          const sleepHours = sleepMatch ? parseFloat(sleepMatch[1]) : 0;
+          sleepData[todayIndex] = Math.max(0, Math.min(sleepHours, 12));
+        }
+        
+        // Gym data - parse from "X/60 minutes" format
+        if (liveGymVibe?.value) {
+          const gymMatch = liveGymVibe.value.match(/^(\d+)/);
+          const gymMinutes = gymMatch ? parseInt(gymMatch[1]) : 0;
+          gymData[todayIndex] = Math.max(0, Math.min(gymMinutes, 120));
+        }
       }
     }
     
@@ -203,10 +229,13 @@ export default function ProgressTrackerPage() {
   const sleepVibe = dailyVibes.find(vibe => vibe.id === 'sleep');
   const gymVibe = dailyVibes.find(vibe => vibe.id === 'gym');
   
-  // Parse current values from live data
-  const currentWater = waterVibe?.value ? parseInt(waterVibe.value.match(/^(\d+)/)?.[1] || '0') : 0;
-  const currentSleep = sleepVibe?.value ? parseFloat(sleepVibe.value.match(/^([\d.]+)/)?.[1] || '0') : 0;
-  const currentGym = gymVibe?.value ? parseInt(gymVibe.value.match(/^(\d+)/)?.[1] || '0') : 0;
+  // Parse current values from live data - prioritize Firebase data over daily vibes
+  const currentWater = todayActivity?.waterIntake ? todayActivity.waterIntake : 
+    (waterVibe?.value ? parseInt(waterVibe.value.match(/^(\d+)/)?.[1] || '0') : 0);
+  const currentSleep = todayActivity?.sleepHours ? todayActivity.sleepHours :
+    (sleepVibe?.value ? parseFloat(sleepVibe.value.match(/^([\d.]+)/)?.[1] || '0') : 0);
+  const currentGym = todayActivity?.gymMinutes ? todayActivity.gymMinutes :
+    (gymVibe?.value ? parseInt(gymVibe.value.match(/^(\d+)/)?.[1] || '0') : 0);
   
   // Calculate daily points from completed vibes (real-time sync)
   const completedVibes = dailyVibes.filter(vibe => {

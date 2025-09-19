@@ -173,8 +173,8 @@ export default function DoshaQuiz({ onComplete, onBack }: DoshaQuizProps) {
                     key={index}
                     variant={isSelected ? "default" : "outline"}
                     className={cn(
-                      "w-full text-left justify-start h-auto p-4",
-                      isSelected && doshaColor
+                      "w-full text-left justify-start h-auto p-4 transition-all duration-200",
+                      isSelected && doshaColor && "text-white hover:opacity-90"
                     )}
                     onClick={() => handleAnswer(option.dosha)}
                   >
@@ -183,9 +183,15 @@ export default function DoshaQuiz({ onComplete, onBack }: DoshaQuizProps) {
                         "w-3 h-3 rounded-full mt-1 flex-shrink-0",
                         isSelected ? "bg-white" : doshaColor
                       )} />
-                      <div>
-                        <p className="font-medium">{option.text}</p>
-                        <p className="text-xs opacity-75 mt-1">
+                      <div className="space-y-1">
+                        <p className={cn(
+                          "font-medium",
+                          isSelected ? "text-white" : "text-foreground"
+                        )}>{option.text}</p>
+                        <p className={cn(
+                          "text-xs mt-1",
+                          isSelected ? "text-white/80" : "text-muted-foreground opacity-75"
+                        )}>
                           {option.dosha} characteristic
                         </p>
                       </div>

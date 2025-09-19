@@ -1094,6 +1094,13 @@ export default function DashboardPage() {
         </div>
       </div>
       
+      {/* Motivational Notification Test Section - Temporary for Testing */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-1">
+          <MotivationalNotificationTest />
+        </div>
+      </div>
+      
       {/* Coming Soon Section */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-3">
@@ -1139,13 +1146,6 @@ export default function DashboardPage() {
               </div>
             </div>
           </motion.div>
-        </div>
-      </div>
-      
-      {/* Motivational Notification Test Section - Temporary for Testing */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-1">
-          <MotivationalNotificationTest />
         </div>
       </div>
       

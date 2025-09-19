@@ -194,15 +194,27 @@ class DailyResetServiceImpl implements DailyResetService {
       const hasTasksToday = userData.dailyVibes?.some((vibe: any) => vibe.completedAt) || false;
 
       if (wasActiveToday || hasTasksToday) {
-        // User was active today, increment streak
-        const newStreak = currentStreak + 1;
+        // User was active today
+        let newStreak = currentStreak;
+        
+        if (currentStreak === 0) {
+          // Starting first streak
+          newStreak = 1;
+        } else if (wasActiveYesterday) {
+          // Consecutive activity - increment streak
+          newStreak = currentStreak + 1;
+        } else {
+          // Active today but not yesterday - reset to 1
+          newStreak = 1;
+        }
         
         await updateDoc(userRef, {
           streak: newStreak,
           lastStreakUpdate: new Date().toISOString(),
+          lastActivityDate: today,
         });
         
-        console.log(`✅ Incremented streak for user ${userId}: ${currentStreak} -> ${newStreak}`);
+        console.log(`✅ Updated streak for user ${userId}: ${currentStreak} -> ${newStreak}`);
       } else if (wasActiveYesterday) {
         // User was active yesterday but not today, maintain streak for one day
         console.log(`⚠️ User ${userId} was active yesterday but not today, maintaining streak at ${currentStreak} for now`);
@@ -240,11 +252,9 @@ class DailyResetServiceImpl implements DailyResetService {
       }
 
       const userData = userDoc.data();
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const tomorrowStr = tomorrow.toLocaleDateString('en-CA');
+      const today = new Date().toLocaleDateString('en-CA');
       
-      console.log(`Resetting daily metrics for user ${userId} for date: ${tomorrowStr}`);
+      console.log(`Resetting daily metrics for user ${userId} for date: ${today}`);
       
       // Reset user daily metrics
       const resetData: any = {
@@ -309,11 +319,11 @@ class DailyResetServiceImpl implements DailyResetService {
       
       await updateDoc(userRef, resetData);
       
-      // Create fresh daily activities document for tomorrow
-      const newDailyActivitiesRef = doc(db, 'dailyActivities', `${userId}-${tomorrowStr}`);
+      // Ensure fresh daily activities document exists for today
+      const newDailyActivitiesRef = doc(db, 'dailyActivities', `${userId}-${today}`);
       await setDoc(newDailyActivitiesRef, {
         userId,
-        date: tomorrowStr,
+        date: today,
         waterIntake: 0,
         waterGoal: 8,
         sleepHours: 0,
@@ -323,10 +333,10 @@ class DailyResetServiceImpl implements DailyResetService {
         tasksCompleted: 0,
         pointsEarned: 0,
         createdAt: new Date().toISOString(),
-      });
+      }, { merge: true }); // Use merge to avoid overwriting existing data
       
       console.log(`✅ Successfully reset daily metrics for user ${userId}`);
-      console.log(`📅 Created fresh activities document for: ${tomorrowStr}`);
+      console.log(`📅 Ensured fresh activities document for: ${today}`);
     } catch (error) {
       console.error(`❌ Error resetting daily metrics for user ${userId}:`, error);
       throw error;
@@ -336,6 +346,38 @@ class DailyResetServiceImpl implements DailyResetService {
   // Method to manually trigger reset for testing
   async manualReset(userId: string): Promise<void> {
     await this.performDailyReset(userId);
+  }
+  
+  // Check if daily reset is needed for user and trigger it
+  async checkAndTriggerResetIfNeeded(userId: string): Promise<void> {
+    if (!db) {
+      console.warn('Firebase not configured, skipping reset check');
+      return;
+    }
+    
+    try {
+      const userRef = doc(db, 'users', userId);
+      const userDoc = await getDoc(userRef);
+      
+      if (!userDoc.exists()) {
+        console.warn(`User ${userId} not found for reset check`);
+        return;
+      }
+      
+      const userData = userDoc.data();
+      const today = new Date().toLocaleDateString('en-CA');
+      const lastResetDate = userData.lastResetDate ? new Date(userData.lastResetDate).toLocaleDateString('en-CA') : '';
+      
+      // Check if we need to reset for today
+      if (lastResetDate !== today) {
+        console.log(`Daily reset needed for user ${userId}. Last reset: ${lastResetDate}, Today: ${today}`);
+        await this.performDailyReset(userId);
+      } else {
+        console.log(`Daily reset already done today for user ${userId}`);
+      }
+    } catch (error) {
+      console.error(`Error checking reset for user ${userId}:`, error);
+    }
   }
 }
 

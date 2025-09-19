@@ -77,12 +77,12 @@ export async function completeTask(userId: string): Promise<TaskCompletionResult
         // Consecutive day - increment streak
         newStreak = currentStreak + 1;
         streakUpdated = true;
-      } else if (lastActivityDate !== '' && lastActivityDate !== yesterdayStr) {
-        // Broke streak - reset to 1
+      } else if (lastActivityDate === '') {
+        // First activity ever - start streak
         newStreak = 1;
         streakUpdated = true;
-      } else if (lastActivityDate === '') {
-        // First activity - start streak
+      } else if (lastActivityDate !== yesterdayStr) {
+        // Broke streak - reset to 1
         newStreak = 1;
         streakUpdated = true;
       }
