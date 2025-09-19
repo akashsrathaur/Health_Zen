@@ -69,6 +69,16 @@ export function ChatBuddy() {
         scrollToBottom();
     }, [messages, isPending]);
     
+    // Restore focus when isPending changes from true to false
+    useEffect(() => {
+        if (!isPending && inputRef.current && isOpen) {
+            const timer = setTimeout(() => {
+                inputRef.current?.focus({ preventScroll: true });
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [isPending, isOpen]);
+    
     const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
@@ -86,7 +96,10 @@ export function ChatBuddy() {
         setMessages(currentMessages => [...currentMessages, newUserMessage]);
         setError(null);
         formRef.current?.reset();
-        inputRef.current?.focus();
+        // Keep focus on input during the conversation
+        if (inputRef.current) {
+            inputRef.current.focus({ preventScroll: true });
+        }
 
         startTransition(async () => {
             
@@ -119,6 +132,13 @@ export function ChatBuddy() {
                     setMessages(currentMessages => [...currentMessages.map(msg => 
                         msg.id === newUserMessage.id ? { ...msg, status: 'read' as const } : msg
                     ), modelMessage]);
+                    
+                    // Restore focus to input after AI response
+                    setTimeout(() => {
+                        if (inputRef.current && !isPending) {
+                            inputRef.current.focus({ preventScroll: true });
+                        }
+                    }, 150);
                 }
             } catch (error: any) {
                 console.error("Error in chat action:", error);
@@ -126,6 +146,13 @@ export function ChatBuddy() {
                 setMessages(currentMessages => currentMessages.map(msg => 
                     msg.id === newUserMessage.id ? { ...msg, status: 'sent' } : msg
                 ));
+                
+                // Restore focus to input even after error
+                setTimeout(() => {
+                    if (inputRef.current && !isPending) {
+                        inputRef.current.focus({ preventScroll: true });
+                    }
+                }, 150);
             }
         });
     };

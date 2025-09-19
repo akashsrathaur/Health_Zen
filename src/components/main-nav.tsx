@@ -33,13 +33,20 @@ const navItems = [
 
 export function MainNav() {
   const pathname = usePathname();
-  const { state } = useSidebar();
+  const { state, isMobile, setOpen } = useSidebar();
+
+  const handleNavItemClick = () => {
+    // Close sidebar on mobile when navigation item is clicked
+    if (isMobile) {
+      setOpen(false);
+    }
+  };
 
   return (
     <SidebarMenu className={state === 'collapsed' ? 'p-2 items-center' : 'p-2'}>
       {navItems.map((item) => (
         <SidebarMenuItem key={item.href}>
-          <Link href={item.href}>
+          <Link href={item.href} onClick={handleNavItemClick}>
             <SidebarMenuButton
               isActive={pathname === item.href}
               tooltip={item.label}
