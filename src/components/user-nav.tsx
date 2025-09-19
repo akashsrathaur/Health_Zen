@@ -61,14 +61,14 @@ export function UserNav() {
       </div>
       <DropdownMenu onOpenChange={handleNotificationToggle}>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="relative rounded-full">
+          <Button variant="ghost" size="icon" className="relative rounded-full notification-bell">
             <Bell className="h-5 w-5" />
             {unreadCount > 0 && (
               <Badge
                 variant="destructive"
-                className="absolute -right-1 -top-1 h-4 w-4 justify-center rounded-full p-0 text-[10px]"
+                className="absolute -right-1 -top-1 h-5 w-5 justify-center rounded-full p-0 text-[10px] font-bold shadow-lg notification-badge border-2 border-background"
               >
-                {unreadCount}
+                {unreadCount > 99 ? '99+' : unreadCount}
               </Badge>
             )}
           </Button>

@@ -39,40 +39,40 @@
   }
 
   .dark {
-    --background: 22 20% 6%;
-    --foreground: 33 15% 95%;
-    --card: 22 25% 10%;
-    --card-foreground: 33 15% 95%;
-    --popover: 22 20% 8%;
-    --popover-foreground: 33 15% 95%;
-    --primary: 15 80% 68%;
-    --primary-foreground: 22 20% 6%;
-    --secondary: 35 55% 45%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 22 20% 12%;
-    --muted-foreground: 33 15% 70%;
-    --accent: 15 90% 70%;
-    --accent-foreground: 22 20% 6%;
-    --destructive: 0 70% 55%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 22 20% 18%;
-    --input: 22 25% 12%;
-    --ring: 15 80% 68%;
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 222 84% 5%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 25 95% 53%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 223 47% 11%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 32% 17%;
+    --input: 217 32% 17%;
+    --ring: 25 95% 53%;
     
-    --chart-1: 15 60% 60%;
-    --chart-2: 35 30% 50%;
-    --chart-3: 15 65% 55%;
-    --chart-4: 200 50% 50%;
-    --chart-5: 60 50% 50%;
+    --chart-1: 25 95% 53%;
+    --chart-2: 0 84% 60%;
+    --chart-3: 48 100% 67%;
+    --chart-4: 262 83% 58%;
+    --chart-5: 142 76% 36%;
 
     --radius: 1rem;
 
-    --sidebar-background: 22 20% 10%;
-    --sidebar-foreground: 33 15% 90%;
-    --sidebar-border: 22 15% 18%;
-    --sidebar-accent: 15 60% 60%;
-    --sidebar-accent-foreground: 22 15% 8%;
-    --sidebar-ring: 15 60% 60%;
+    --sidebar-background: 222 84% 5%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-border: 217 32% 17%;
+    --sidebar-accent: 25 95% 53%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-ring: 25 95% 53%;
   }
 }
 
@@ -111,6 +111,47 @@
     .xs\:inline {
       display: none;
     }
+  }
+
+  /* Notification enhancements */
+  .notification-bell {
+    transition: all 0.2s ease;
+  }
+  
+  .notification-bell:hover {
+    transform: scale(1.1);
+  }
+  
+  .notification-badge {
+    animation: notification-pulse 2s infinite;
+  }
+  
+  @keyframes notification-pulse {
+    0%, 100% { 
+      transform: scale(1); 
+      opacity: 1;
+    }
+    50% { 
+      transform: scale(1.1); 
+      opacity: 0.8;
+    }
+  }
+
+  /* Dark theme enhancements */
+  .dark .bg-gradient-to-br {
+    background-image: linear-gradient(to bottom right, hsl(var(--accent)), hsl(var(--primary)));
+  }
+  
+  .dark .text-glow {
+    text-shadow: 0 0 8px hsl(var(--primary) / 0.9), 0 0 20px hsl(var(--primary) / 0.6);
+  }
+  
+  .dark .card {
+    box-shadow: 0 1px 3px 0 hsl(217 32% 17% / 0.5);
+  }
+  
+  .dark .border {
+    border-color: hsl(217 32% 17%);
   }
 
 }

@@ -20,6 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { nanoid } from 'nanoid';
 import { addChallenge as addChallengeAction, updateChallenge as updateChallengeAction, removeChallenge as removeChallengeAction } from '@/lib/user-utils';
 import { useAuth } from '@/context/auth-context';
+import { useNotifications } from '@/hooks/use-notifications';
 
 
 function ChallengeCard({ challenge, onUploadProof, onShare, onQuit }: { 
@@ -539,6 +540,7 @@ export default function ChallengesPage() {
   const [challengeToShare, setChallengeToShare] = useState<Challenge | null>(null);
   const [challengeToQuit, setChallengeToQuit] = useState<Challenge | null>(null);
   const { toast } = useToast();
+  const { addNotification } = useNotifications();
 
   const handleOpenUpload = (challengeId: string) => {
     setActiveChallengeId(challengeId);
@@ -561,6 +563,11 @@ export default function ChallengesPage() {
             toast({
                 title: "Streak Continued!",
                 description: `You've completed your goal for today. Great job!`
+            });
+            
+            addNotification({
+                title: `Challenge Progress! 🎯`,
+                description: `You've completed day ${updatedChallenge.currentDay} of ${challengeToUpdate.title}.`
             });
         }
     }
@@ -638,6 +645,11 @@ export default function ChallengesPage() {
       toast({
         title: `Welcome to ${publicChallenge.title}! 🎯`,
         description: `You've joined the challenge. Start today and build your streak!`
+      });
+      
+      addNotification({
+        title: `New Challenge Joined! 🎯`,
+        description: `You've joined ${publicChallenge.title}. Ready to start your journey?`
       });
     }
   };

@@ -567,13 +567,33 @@ export default function DashboardPage() {
     );
 
     newlyUnlocked.forEach((ach: Achievement) => {
+        // Special messages for streak achievements
+        const isStreakAchievement = ach.id.startsWith('streak-');
+        const streakDays = isStreakAchievement ? parseInt(ach.id.split('-')[1]) : 0;
+        
+        let notificationTitle = `You've unlocked the ${ach.name} badge!`;
+        let notificationDescription = 'Check your progress on the Tracker page.';
+        
+        if (isStreakAchievement) {
+            notificationTitle = `🔥 ${streakDays}-Day Streak Achievement!`;
+            if (streakDays === 1) {
+                notificationDescription = 'Great start! Keep building your healthy habits.';
+            } else if (streakDays === 7) {
+                notificationDescription = 'One week of consistency! You\'re building strong habits.';
+            } else if (streakDays === 30) {
+                notificationDescription = 'Incredible! A full month of wellness dedication. You\'re unstoppable!';
+            } else {
+                notificationDescription = `${streakDays} days of consistent healthy habits. Amazing progress!`;
+            }
+        }
+        
         toast({
             title: "Badge Unlocked! 🎉",
             description: `You've earned the "${ach.name}" badge. Keep it up!`,
         });
         addNotification({
-            title: `You've unlocked the ${ach.name} badge!`,
-            description: 'Check your progress on the Tracker page.',
+            title: notificationTitle,
+            description: notificationDescription,
         });
     });
 
