@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/context/auth-context';
 import { AuthGuard } from '@/components/auth-guard';
 import { NotificationProvider } from '@/hooks/use-notifications';
+import { DynamicThemeColor } from '@/components/dynamic-theme-color';
 
 export const metadata: Metadata = {
   title: 'HealthZen',
@@ -36,10 +37,19 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#6BCFA0" />
+        
+        {/* Theme colors for status bar - matches app primary colors */}
+        <meta name="theme-color" content="#E07935" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#F97316" media="(prefers-color-scheme: dark)" />
+        
+        {/* iOS specific meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="HealthZen" />
+        
+        {/* Additional mobile optimization */}
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
       </head>
       <body className="font-body antialiased">
          <ThemeProvider
@@ -48,6 +58,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <DynamicThemeColor />
             <BalancerProvider>
               <NotificationProvider>
                 <AuthProvider>
