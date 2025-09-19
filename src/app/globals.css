@@ -94,4 +94,23 @@
     box-shadow: 0 0 10px hsl(var(--primary)), 0 0 20px hsl(var(--primary) / 0.7);
   }
 
+  /* Mobile utilities */
+  @media (max-width: 475px) {
+    .xs\:hidden {
+      display: none;
+    }
+  }
+  
+  @media (min-width: 476px) {
+    .xs\:inline {
+      display: inline;
+    }
+  }
+  
+  @media (max-width: 475px) {
+    .xs\:inline {
+      display: none;
+    }
+  }
+
 }

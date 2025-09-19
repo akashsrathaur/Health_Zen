@@ -28,6 +28,7 @@ interface AuthContextType {
   setPosts: React.Dispatch<React.SetStateAction<CommunityPost[]>>;
   userProgress: ProgressState | null;
   setUserProgress: React.Dispatch<React.SetStateAction<ProgressState | null>>;
+  streak: number;
   updateProfile: (updates: Partial<Omit<User, 'uid'>>) => Promise<void>;
   uploadAvatar: (file: File) => Promise<string>;
   updateBuddy: (buddyPersona: BuddyPersona) => Promise<void>;
@@ -45,6 +46,7 @@ const AuthContext = createContext<AuthContextType>({
   setPosts: () => {},
   userProgress: null,
   setUserProgress: () => {},
+  streak: 0,
   updateProfile: async () => {},
   uploadAvatar: async () => '',
   updateBuddy: async () => {},
@@ -210,6 +212,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setPosts,
     userProgress,
     setUserProgress,
+    streak: user?.streak || 0,
     updateProfile: handleUpdateProfile,
     uploadAvatar: handleUploadAvatar,
     updateBuddy: handleUpdateBuddy

@@ -111,14 +111,14 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
 
 export default function ProgressTrackerPage() {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, dailyVibes, userProgress: liveUserProgress } = useAuth();
   const [isExporting, setIsExporting] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   
-  // Get real user data instead of fake data - handle missing uid for defaultUser
+  // Use live user data from auth context instead of static data
   const userData = user || { ...defaultUser, uid: 'default' };
-  const userProgress = getUserProgressData(userData);
+  const userProgress = liveUserProgress || { streak: userData.streak || 0, completedTasks: 0 };
   
   // Generate date labels for the last 7 days from selected date
   const generateLast7Days = (fromDate: Date = selectedDate) => {
@@ -159,31 +159,30 @@ export default function ProgressTrackerPage() {
     const sleepData = [0, 0, 0, 0, 0, 0, 0];
     const gymData = [0, 0, 0, 0, 0, 0, 0];
     
-    // Get actual daily vibes data from user if available
-    const dailyVibes = user?.dailyVibes || [];
-    const waterVibe = dailyVibes.find(vibe => vibe.id === 'water');
-    const sleepVibe = dailyVibes.find(vibe => vibe.id === 'sleep');
-    const gymVibe = dailyVibes.find(vibe => vibe.id === 'gym');
+    // Get actual daily vibes data from live context
+    const liveWaterVibe = dailyVibes.find(vibe => vibe.id === 'water');
+    const liveSleepVibe = dailyVibes.find(vibe => vibe.id === 'sleep');
+    const liveGymVibe = dailyVibes.find(vibe => vibe.id === 'gym');
     
     // Set today's actual data at the correct position if it exists
     if (todayIndex >= 0 && todayIndex < 7) {
       // Water data - parse from "X/8 glasses" format
-      if (waterVibe?.value) {
-        const waterMatch = waterVibe.value.match(/^(\d+)/);
+      if (liveWaterVibe?.value) {
+        const waterMatch = liveWaterVibe.value.match(/^(\d+)/);
         const waterCount = waterMatch ? parseInt(waterMatch[1]) : 0;
         waterData[todayIndex] = Math.max(0, Math.min(waterCount, 8));
       }
       
       // Sleep data - parse from "X.Xh" format
-      if (sleepVibe?.value) {
-        const sleepMatch = sleepVibe.value.match(/^([\d.]+)/);
+      if (liveSleepVibe?.value) {
+        const sleepMatch = liveSleepVibe.value.match(/^([\d.]+)/);
         const sleepHours = sleepMatch ? parseFloat(sleepMatch[1]) : 0;
         sleepData[todayIndex] = Math.max(0, Math.min(sleepHours, 12));
       }
       
       // Gym data - parse from "X/60 minutes" format
-      if (gymVibe?.value) {
-        const gymMatch = gymVibe.value.match(/^(\d+)/);
+      if (liveGymVibe?.value) {
+        const gymMatch = liveGymVibe.value.match(/^(\d+)/);
         const gymMinutes = gymMatch ? parseInt(gymMatch[1]) : 0;
         gymData[todayIndex] = Math.max(0, Math.min(gymMinutes, 120));
       }
@@ -199,16 +198,23 @@ export default function ProgressTrackerPage() {
   const days = generateLast7Days(selectedDate);
   const dateData = getRealHistoricalData(selectedDate);
   
-  // Get current values from daily vibes for display
-  const dailyVibes = user?.dailyVibes || [];
+  // Get current values from live daily vibes data
   const waterVibe = dailyVibes.find(vibe => vibe.id === 'water');
   const sleepVibe = dailyVibes.find(vibe => vibe.id === 'sleep');
   const gymVibe = dailyVibes.find(vibe => vibe.id === 'gym');
   
-  // Parse current values
+  // Parse current values from live data
   const currentWater = waterVibe?.value ? parseInt(waterVibe.value.match(/^(\d+)/)?.[1] || '0') : 0;
   const currentSleep = sleepVibe?.value ? parseFloat(sleepVibe.value.match(/^([\d.]+)/)?.[1] || '0') : 0;
   const currentGym = gymVibe?.value ? parseInt(gymVibe.value.match(/^(\d+)/)?.[1] || '0') : 0;
+  
+  // Calculate daily points from completed vibes (real-time sync)
+  const completedVibes = dailyVibes.filter(vibe => {
+    if (vibe.id === 'medication') return vibe.progress === 100;
+    return !!vibe.completedAt;
+  });
+  const dailyPoints = Math.min(completedVibes.length * 5, 30); // 5 points per completed vibe, max 30
+  const totalPoints = userData.totalPoints || (userProgress.streak * 10) + dailyPoints;
   
   const waterChartData = days.map((day, i) => ({ 
     day, 
@@ -223,7 +229,7 @@ export default function ProgressTrackerPage() {
     minutes: dateData.gym[i] || 0
   }));
   
-  // Get achievements based on real progress
+  // Get achievements based on live progress data
   const achievements = getAchievements({ streak: userProgress.streak, completedTasks: userProgress.completedTasks });
   const unlockedAchievements = achievements.filter(a => a.unlocked).length;
   const totalAchievements = achievements.length;
@@ -250,7 +256,7 @@ export default function ProgressTrackerPage() {
   const handleShareReport = async () => {
     setIsExporting(true);
     try {
-      await shareReport('progress-report', `Check out my wellness progress! 🌟 ${userProgress.totalPoints} points earned and ${userProgress.streak} day streak! #HealthZen`);
+      await shareReport('progress-report', `Check out my wellness progress! 🌟 ${totalPoints} points earned and ${userProgress.streak} day streak! #HealthZen`);
     } catch (error) {
       toast({
         title: 'Share Failed',
@@ -264,11 +270,11 @@ export default function ProgressTrackerPage() {
 
   return (
     <div className="flex flex-col gap-8" id="progress-report">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4">
         <div>
-          <div className="flex items-center gap-4 mb-2">
-            <h1 className="font-headline text-3xl font-bold tracking-tight text-glow">Progress Tracker</h1>
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-2">
+            <h1 className="font-headline text-2xl sm:text-3xl font-bold tracking-tight text-glow">Progress Tracker</h1>
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
               <Button 
                 variant="outline"
                 size="sm"
@@ -277,6 +283,7 @@ export default function ProgressTrackerPage() {
                   newDate.setDate(selectedDate.getDate() - 7);
                   setSelectedDate(newDate);
                 }}
+                className="flex-shrink-0"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -286,12 +293,15 @@ export default function ProgressTrackerPage() {
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-[240px] justify-start text-left font-normal",
+                      "w-[180px] sm:w-[240px] justify-start text-left font-normal text-xs sm:text-sm flex-shrink-0",
                       !selectedDate && "text-muted-foreground"
                     )}
+                    size="sm"
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                    <CalendarIcon className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="truncate">
+                      {selectedDate ? format(selectedDate, "MMM d, yyyy") : "Pick a date"}
+                    </span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -325,107 +335,122 @@ export default function ProgressTrackerPage() {
                   nextWeek.setDate(selectedDate.getDate() + 7);
                   return nextWeek > new Date();
                 })()}
+                className="flex-shrink-0"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
           </div>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm sm:text-base">
             <Balancer>Visualize your wellness journey and celebrate your milestones.</Balancer>
           </p>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             Viewing data for week ending: {format(selectedDate, "MMMM d, yyyy")}
           </p>
-          <div className="flex items-center gap-4 mt-2">
-            <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
-              <Icons.points className="h-4 w-4" />
-              <span className="font-semibold">{userProgress.totalPoints} points</span>
-              <span className="text-muted-foreground">({userProgress.dailyPoints}/30 today)</span>
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-4 mt-2">
+            <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-amber-600 dark:text-amber-400">
+              <Icons.points className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+              <div className="flex flex-col sm:flex-row sm:items-center sm:gap-1">
+                <span className="font-semibold">{totalPoints} pts</span>
+                <span className="text-muted-foreground text-xs sm:text-sm">({dailyPoints}/30)</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400">
-              <Icons.streak className="h-4 w-4" />
-              <span className="font-semibold">{userProgress.streak} day streak</span>
+            <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-orange-600 dark:text-orange-400">
+              <Icons.streak className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span className="font-semibold">{userProgress.streak} streak</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
-              <Icons.points className="h-4 w-4" />
-              <span className="font-semibold">{userProgress.completedTasks} tasks completed</span>
+            <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-blue-600 dark:text-blue-400">
+              <Icons.points className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span className="font-semibold">{userProgress.completedTasks} tasks</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-              <Icon name="Dumbbell" className="h-4 w-4" />
-              <span className="font-semibold">{currentGym} min gym today</span>
+            <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-green-600 dark:text-green-400">
+              <Icon name="Dumbbell" className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span className="font-semibold">{currentGym} min</span>
             </div>
           </div>
         </div>
-        <div className="flex gap-2 mt-4 sm:mt-0">
+        <div className="flex flex-col sm:flex-row gap-2 mt-4 sm:mt-0">
           <Button 
             variant="outline" 
             onClick={handleShareReport}
             disabled={isExporting}
+            className="w-full sm:w-auto text-xs sm:text-sm"
+            size="sm"
           >
             {isExporting ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
             ) : (
-              <Share2 className="mr-2 h-4 w-4" />
+              <Share2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
             )}
-            Share Report
+            <span className="hidden xs:inline">Share Report</span>
+            <span className="xs:hidden">Share</span>
           </Button>
           <Button 
             variant="outline" 
             onClick={handleExportReport}
             disabled={isExporting}
+            className="w-full sm:w-auto text-xs sm:text-sm"
+            size="sm"
           >
             {isExporting ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
             ) : (
-              <Download className="mr-2 h-4 w-4" />
+              <Download className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
             )}
-            Export Report
+            <span className="hidden xs:inline">Export Report</span>
+            <span className="xs:hidden">Export</span>
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Water Intake</CardTitle>
-            <CardDescription>Last 7 days (Goal: 8 glasses) | Today: {currentWater}/8</CardDescription>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg sm:text-xl">Water Intake</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
+              <span className="hidden sm:inline">Last 7 days (Goal: 8 glasses) | Today: {currentWater}/8</span>
+              <span className="sm:hidden">7 days | Today: {currentWater}/8</span>
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={waterChartConfig} className="h-64 w-full">
+            <ChartContainer config={waterChartConfig} className="h-48 sm:h-64 w-full">
               <BarChart accessibilityLayer data={waterChartData}>
                 <CartesianGrid vertical={false} />
-                <XAxis dataKey="day" tickLine={false} tickMargin={10} axisLine={false} />
+                <XAxis dataKey="day" tickLine={false} tickMargin={10} axisLine={false} fontSize={12} />
                 <YAxis hide />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="glasses" fill="var(--color-glasses)" radius={4} maxBarSize={24} />
+                <Bar dataKey="glasses" fill="var(--color-glasses)" radius={4} maxBarSize={20} />
                 <ReferenceLine y={8} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
               </BarChart>
             </ChartContainer>
           </CardContent>
         </Card>
-        <Card className="flex flex-col items-center justify-center bg-gradient-to-br from-accent to-yellow-400 dark:from-[#F15BB5] dark:to-[#FEE440]">
-          <CardHeader className="items-center text-center">
-            <CardTitle className='text-card-foreground dark:text-black'>Current Streak</CardTitle>
-            <Flame className="h-16 w-16 text-white" />
+        <Card className="flex flex-col items-center justify-center bg-gradient-to-br from-accent to-yellow-400 dark:from-[#F15BB5] dark:to-[#FEE440] min-h-[200px] sm:min-h-[250px]">
+          <CardHeader className="items-center text-center pb-2">
+            <CardTitle className='text-card-foreground dark:text-black text-lg sm:text-xl'>Current Streak</CardTitle>
+            <Flame className="h-12 w-12 sm:h-16 sm:w-16 text-white" />
           </CardHeader>
-          <CardContent>
-            <p className="text-6xl font-bold text-white animate-bounce-in">{userProgress.streak}</p>
-            <p className="text-center font-medium text-white/80">days</p>
+          <CardContent className="text-center">
+            <p className="text-4xl sm:text-6xl font-bold text-white animate-bounce-in">{userProgress.streak}</p>
+            <p className="text-center font-medium text-white/80 text-sm sm:text-base">days</p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
         <Card>
-          <CardHeader>
-            <CardTitle>Sleep Duration</CardTitle>
-            <CardDescription>Last 7 days (Goal: 8 hours) | Today: {currentSleep}h</CardDescription>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg sm:text-xl">Sleep Duration</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
+              <span className="hidden sm:inline">Last 7 days (Goal: 8 hours) | Today: {currentSleep}h</span>
+              <span className="sm:hidden">7 days | Today: {currentSleep}h</span>
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={sleepChartConfig} className="h-64 w-full">
+            <ChartContainer config={sleepChartConfig} className="h-48 sm:h-64 w-full">
               <LineChart accessibilityLayer data={sleepChartData}>
                 <CartesianGrid vertical={false} />
-                <XAxis dataKey="day" tickLine={false} tickMargin={10} axisLine={false} />
+                <XAxis dataKey="day" tickLine={false} tickMargin={10} axisLine={false} fontSize={12} />
                 <YAxis hide />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Line type="monotone" dataKey="hours" stroke="var(--color-hours)" strokeWidth={2} dot={false} />
@@ -436,18 +461,21 @@ export default function ProgressTrackerPage() {
         </Card>
         
         <Card>
-          <CardHeader>
-            <CardTitle>Gym Workouts</CardTitle>
-            <CardDescription>Last 7 days (Goal: 60 minutes) | Today: {currentGym} min</CardDescription>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg sm:text-xl">Gym Workouts</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
+              <span className="hidden sm:inline">Last 7 days (Goal: 60 minutes) | Today: {currentGym} min</span>
+              <span className="sm:hidden">7 days | Today: {currentGym} min</span>
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={gymChartConfig} className="h-64 w-full">
+            <ChartContainer config={gymChartConfig} className="h-48 sm:h-64 w-full">
               <BarChart accessibilityLayer data={gymChartData}>
                 <CartesianGrid vertical={false} />
-                <XAxis dataKey="day" tickLine={false} tickMargin={10} axisLine={false} />
+                <XAxis dataKey="day" tickLine={false} tickMargin={10} axisLine={false} fontSize={12} />
                 <YAxis hide />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="minutes" fill="var(--color-minutes)" radius={4} maxBarSize={24} />
+                <Bar dataKey="minutes" fill="var(--color-minutes)" radius={4} maxBarSize={20} />
                 <ReferenceLine y={60} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
               </BarChart>
             </ChartContainer>
@@ -456,15 +484,15 @@ export default function ProgressTrackerPage() {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Badges Unlocked</CardTitle>
-          <CardDescription>
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg sm:text-xl">Badges Unlocked</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             You've unlocked {unlockedAchievements} of {totalAchievements} badges. Keep going!
           </CardDescription>
         </CardHeader>
         <CardContent>
           <motion.div 
-            className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5"
+            className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8"
             variants={containerVariants}
             initial="hidden"
             animate="visible"

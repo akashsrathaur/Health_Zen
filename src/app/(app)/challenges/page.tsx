@@ -32,7 +32,7 @@ function ChallengeCard({ challenge, onUploadProof, onShare, onQuit }: {
 
   return (
     <Card className="overflow-hidden flex flex-col">
-      <div className="relative h-48 w-full">
+      <div className="relative h-40 sm:h-48 w-full">
         <Image
           src={challenge.imageUrl}
           alt={challenge.title}
@@ -68,30 +68,32 @@ function ChallengeCard({ challenge, onUploadProof, onShare, onQuit }: {
           </DropdownMenu>
         </div>
         
-        <div className="absolute bottom-0 left-0 p-4">
-          <h3 className="text-xl font-bold text-white">{challenge.title}</h3>
-          <p className="text-sm text-white/80">{challenge.description}</p>
+        <div className="absolute bottom-0 left-0 p-3 sm:p-4">
+          <h3 className="text-lg sm:text-xl font-bold text-white line-clamp-1">{challenge.title}</h3>
+          <p className="text-xs sm:text-sm text-white/80 line-clamp-2">{challenge.description}</p>
         </div>
       </div>
-      <CardContent className="p-4 flex-grow">
+      <CardContent className="p-3 sm:p-4 flex-grow">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-muted-foreground">Day {challenge.currentDay} of {challenge.goalDays}</span>
+          <span className="text-xs sm:text-sm font-medium text-muted-foreground">Day {challenge.currentDay} of {challenge.goalDays}</span>
            {challenge.isCompletedToday && (
-              <div className="flex items-center gap-1 text-sm text-green-500">
-                <CheckCircle className="h-4 w-4" />
-                <span>Done for today!</span>
+              <div className="flex items-center gap-1 text-xs sm:text-sm text-green-500">
+                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden xs:inline">Done for today!</span>
+                <span className="xs:hidden">Done!</span>
               </div>
             )}
         </div>
-        <Progress value={progress} />
+        <Progress value={progress} className="h-2" />
       </CardContent>
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="p-3 sm:p-4 pt-0">
         <Button 
-          className="w-full"
+          className="w-full text-xs sm:text-sm"
+          size="sm"
           onClick={() => onUploadProof(challenge.id)}
           disabled={challenge.isCompletedToday}
         >
-          <Upload className="mr-2 h-4 w-4" />
+          <Upload className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
           {challenge.isCompletedToday ? 'Completed' : 'Upload Proof'}
         </Button>
       </CardFooter>
@@ -665,25 +667,34 @@ export default function ChallengesPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-4">
         <div>
-            <h1 className="font-headline text-3xl font-bold tracking-tight">
+            <h1 className="font-headline text-2xl sm:text-3xl font-bold tracking-tight">
             Wellness Challenges
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm sm:text-base">
             <Balancer>
                 Commit to a challenge, track your progress, and build healthy habits.
             </Balancer>
             </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setIsJoinChallengeOpen(true)}>
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setIsJoinChallengeOpen(true)}
+            className="w-full sm:w-auto justify-center sm:justify-start"
+          >
             <Users className="mr-2 h-4 w-4" />
-            Browse & Join Challenges
+            <span className="hidden xs:inline">Browse & Join Challenges</span>
+            <span className="xs:hidden">Browse Challenges</span>
           </Button>
-          <Button onClick={() => setIsCreateOpen(true)}>
+          <Button 
+            onClick={() => setIsCreateOpen(true)}
+            className="w-full sm:w-auto justify-center sm:justify-start"
+          >
               <PlusCircle className="mr-2 h-4 w-4" />
-              Create New Challenge
+              <span className="hidden xs:inline">Create New Challenge</span>
+              <span className="xs:hidden">Create Challenge</span>
           </Button>
         </div>
       </div>
@@ -697,20 +708,29 @@ export default function ChallengesPage() {
           <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
             Get started on your wellness journey by joining a challenge or creating your own!
           </p>
-          <div className="flex justify-center gap-4">
-            <Button onClick={() => setIsJoinChallengeOpen(true)}>
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+            <Button 
+              onClick={() => setIsJoinChallengeOpen(true)}
+              className="w-full sm:w-auto"
+            >
               <Target className="mr-2 h-4 w-4" />
-              Browse & Join Challenges
+              <span className="hidden xs:inline">Browse & Join Challenges</span>
+              <span className="xs:hidden">Browse Challenges</span>
             </Button>
-            <Button variant="outline" onClick={() => setIsCreateOpen(true)}>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsCreateOpen(true)}
+              className="w-full sm:w-auto"
+            >
               <PlusCircle className="mr-2 h-4 w-4" />
-              Create New Challenge
+              <span className="hidden xs:inline">Create New Challenge</span>
+              <span className="xs:hidden">Create Challenge</span>
             </Button>
           </div>
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
             <AnimatePresence>
               {challenges.map((challenge, index) => (
                  <motion.div
