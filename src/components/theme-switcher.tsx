@@ -1,3 +1,15 @@
+/**
+ * Health Zen - AI-Powered Personalized Wellness Companion
+ * Copyright © 2025 Akash Rathaur. All Rights Reserved.
+ * 
+ * Theme Switcher Component - Dark/Light mode toggle
+ * Enhanced with gradient styling for consistent UI theme
+ * 
+ * @author Akash Rathaur
+ * @email akashsrathaur@gmail.com
+ * @website https://github.com/akashsrathaur
+ */
+
 'use client';
 
 import * as React from 'react';
@@ -20,12 +32,12 @@ export function ThemeSwitcher() {
         <div className="flex items-center justify-between w-full">
             <Label 
               htmlFor="dark-mode-switch" 
-              className="flex items-center gap-2 font-normal cursor-pointer hover:text-primary transition-colors"
+              className="flex items-center gap-2 font-normal cursor-pointer hover:bg-gradient-to-r hover:from-orange-400 hover:to-red-500 hover:bg-clip-text hover:text-transparent transition-colors"
             >
                 {isDarkMode ? (
-                  <Moon className="h-4 w-4 text-primary" />
+                  <Moon className="h-4 w-4 bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent" />
                 ) : (
-                  <Sun className="h-4 w-4 text-primary" />
+                  <Sun className="h-4 w-4 bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent" />
                 )}
                 <span className="text-foreground/80">
                   {isDarkMode ? 'Light Mode' : 'Dark Mode'}
@@ -35,7 +47,7 @@ export function ThemeSwitcher() {
                 id="dark-mode-switch"
                 checked={isDarkMode}
                 onCheckedChange={toggleTheme}
-                className="data-[state=checked]:bg-primary"
+                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-orange-400 data-[state=checked]:to-red-500"
             />
         </div>
     </DropdownMenuItem>
