@@ -95,7 +95,7 @@ export const doshaDescriptions = {
     characteristics: "Focused, ambitious, irritable",
     physical: "Sensitive, warm skin, medium build, strong appetite",
     mental: "Sharp, competitive",
-    color: "bg-red-500",
+    color: "bg-orange-600",
     tips: "Practice cooling activities, avoid spicy foods, and manage stress."
   },
   Kapha: {
