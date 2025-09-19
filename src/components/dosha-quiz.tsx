@@ -70,19 +70,19 @@ export default function DoshaQuiz({ onComplete, onBack }: DoshaQuizProps) {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-2xl mx-auto space-y-6"
       >
-        <Card className="text-center">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center">
+        <Card className="text-center shadow-lg border-2">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-2xl font-bold text-center text-foreground">
               🕉️ Your Dosha Result
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-8">
             {/* Primary Dosha Display */}
-            <div className={cn("rounded-lg p-6 text-white", doshaInfo.color)}>
-              <h3 className="text-xl font-bold mb-2">{doshaInfo.name}</h3>
-              <p className="mb-2">{doshaInfo.characteristics}</p>
+            <div className={cn("rounded-lg p-6 text-white shadow-lg", doshaInfo.color)}>
+              <h3 className="text-xl font-bold mb-2 text-white">{doshaInfo.name}</h3>
+              <p className="mb-2 text-white/90">{doshaInfo.characteristics}</p>
               {isBalanced && (
-                <div className="text-yellow-200 text-sm">
+                <div className="text-yellow-100 text-sm font-medium">
                   ✨ Balanced Constitution
                 </div>
               )}
@@ -97,25 +97,25 @@ export default function DoshaQuiz({ onComplete, onBack }: DoshaQuizProps) {
                   )}>
                     {score}
                   </div>
-                  <p className="text-sm font-medium">{dosha}</p>
+                  <p className="text-sm font-medium text-foreground">{dosha}</p>
                 </div>
               ))}
             </div>
 
             {/* Description */}
-            <div className="bg-muted p-4 rounded-lg">
-              <p className="text-sm text-muted-foreground">{description}</p>
+            <div className="bg-muted/30 border p-4 rounded-lg">
+              <p className="text-sm text-foreground font-medium leading-relaxed">{description}</p>
             </div>
 
             {/* Physical & Mental Traits */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-              <div className="bg-background border rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Physical Traits</h4>
-                <p className="text-sm text-muted-foreground">{doshaInfo.physical}</p>
+              <div className="bg-card border rounded-lg p-4 shadow-sm">
+                <h4 className="font-semibold mb-2 text-foreground">Physical Traits</h4>
+                <p className="text-sm text-foreground/80 leading-relaxed">{doshaInfo.physical}</p>
               </div>
-              <div className="bg-background border rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Mental Traits</h4>
-                <p className="text-sm text-muted-foreground">{doshaInfo.mental}</p>
+              <div className="bg-card border rounded-lg p-4 shadow-sm">
+                <h4 className="font-semibold mb-2 text-foreground">Mental Traits</h4>
+                <p className="text-sm text-foreground/80 leading-relaxed">{doshaInfo.mental}</p>
               </div>
             </div>
 
