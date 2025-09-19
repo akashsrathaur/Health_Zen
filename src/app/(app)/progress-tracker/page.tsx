@@ -91,16 +91,23 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
+          {achievement.unlocked ? (
+            <div className="gradient-border-card h-full">
+              <Card className={cn(
+                "gradient-border-card-inner flex flex-col items-center justify-center p-4 text-center transition-all duration-300 h-full cursor-pointer",
+                'hover:shadow-lg'
+              )}>
+          ) : (
             <Card className={cn(
               "flex flex-col items-center justify-center p-4 text-center transition-all duration-300 h-full cursor-pointer",
-              achievement.unlocked
-                ? 'bg-gradient-to-br from-secondary to-background/50 border-primary/20'
-                : 'opacity-60 grayscale hover:opacity-80 hover:grayscale-0'
+              'opacity-60 grayscale hover:opacity-80 hover:grayscale-0'
             )}>
+          )}
               <Icon name={achievement.icon} className={cn("h-8 w-8 mb-2 transition-all duration-300", iconColor, iconGlow)} />
               <p className="text-sm font-semibold">{achievement.name}</p>
               {!achievement.unlocked && <p className="text-xs text-muted-foreground">Locked</p>}
-            </Card>
+              </Card>
+            {achievement.unlocked && </div>}
         </TooltipTrigger>
         <TooltipContent>
             <p className='max-w-xs'>{achievement.description}</p>
@@ -400,7 +407,7 @@ export default function ProgressTrackerPage() {
         </div>
         <div className="flex flex-col sm:flex-row gap-2 mt-4 sm:mt-0">
           <Button 
-            variant="outline" 
+            variant="gradient" 
             onClick={handleShareReport}
             disabled={isExporting}
             className="w-full sm:w-auto text-xs sm:text-sm"
@@ -415,7 +422,7 @@ export default function ProgressTrackerPage() {
             <span className="xs:hidden">Share</span>
           </Button>
           <Button 
-            variant="outline" 
+            variant="gradient" 
             onClick={handleExportReport}
             disabled={isExporting}
             className="w-full sm:w-auto text-xs sm:text-sm"
@@ -433,14 +440,15 @@ export default function ProgressTrackerPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg sm:text-xl">Water Intake</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
-              <span className="hidden sm:inline">Last 7 days (Goal: 8 glasses) | Today: {currentWater}/8</span>
-              <span className="sm:hidden">7 days | Today: {currentWater}/8</span>
-            </CardDescription>
-          </CardHeader>
+        <div className="lg:col-span-2 gradient-border-card">
+          <Card className="gradient-border-card-inner">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg sm:text-xl">Water Intake</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
+                <span className="hidden sm:inline">Last 7 days (Goal: 8 glasses) | Today: {currentWater}/8</span>
+                <span className="sm:hidden">7 days | Today: {currentWater}/8</span>
+              </CardDescription>
+            </CardHeader>
           <CardContent>
             <ChartContainer config={waterChartConfig} className="h-48 sm:h-64 w-full">
               <BarChart accessibilityLayer data={waterChartData}>
@@ -453,28 +461,33 @@ export default function ProgressTrackerPage() {
               </BarChart>
             </ChartContainer>
           </CardContent>
-        </Card>
-        <Card className="flex flex-col items-center justify-center bg-gradient-to-br from-accent to-yellow-400 dark:from-[#F15BB5] dark:to-[#FEE440] min-h-[200px] sm:min-h-[250px]">
-          <CardHeader className="items-center text-center pb-2">
-            <CardTitle className='text-card-foreground dark:text-black text-lg sm:text-xl'>Current Streak</CardTitle>
-            <Flame className="h-12 w-12 sm:h-16 sm:w-16 text-white" />
-          </CardHeader>
-          <CardContent className="text-center">
-            <p className="text-4xl sm:text-6xl font-bold text-white animate-bounce-in">{userProgress.streak}</p>
-            <p className="text-center font-medium text-white/80 text-sm sm:text-base">days</p>
-          </CardContent>
-        </Card>
+          </Card>
+        </div>
+        <div className="gradient-border-card">
+          <Card className="gradient-border-card-inner flex flex-col items-center justify-center min-h-[200px] sm:min-h-[250px] relative overflow-hidden">
+            <div className="absolute inset-0 gradient-button opacity-80"></div>
+            <CardHeader className="items-center text-center pb-2 relative z-10">
+              <CardTitle className='text-white text-lg sm:text-xl font-semibold'>Current Streak</CardTitle>
+              <Flame className="h-12 w-12 sm:h-16 sm:w-16 text-white drop-shadow-lg" />
+            </CardHeader>
+            <CardContent className="text-center relative z-10">
+              <p className="text-4xl sm:text-6xl font-bold text-white animate-bounce-in drop-shadow-lg">{userProgress.streak}</p>
+              <p className="text-center font-medium text-white/90 text-sm sm:text-base">days</p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg sm:text-xl">Sleep Duration</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
-              <span className="hidden sm:inline">Last 7 days (Goal: 8 hours) | Today: {currentSleep}h</span>
-              <span className="sm:hidden">7 days | Today: {currentSleep}h</span>
-            </CardDescription>
-          </CardHeader>
+        <div className="gradient-border-card">
+          <Card className="gradient-border-card-inner">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg sm:text-xl">Sleep Duration</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
+                <span className="hidden sm:inline">Last 7 days (Goal: 8 hours) | Today: {currentSleep}h</span>
+                <span className="sm:hidden">7 days | Today: {currentSleep}h</span>
+              </CardDescription>
+            </CardHeader>
           <CardContent>
             <ChartContainer config={sleepChartConfig} className="h-48 sm:h-64 w-full">
               <LineChart accessibilityLayer data={sleepChartData}>
@@ -487,16 +500,18 @@ export default function ProgressTrackerPage() {
               </LineChart>
             </ChartContainer>
           </CardContent>
-        </Card>
+          </Card>
+        </div>
         
-        <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg sm:text-xl">Gym Workouts</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
-              <span className="hidden sm:inline">Last 7 days (Goal: 60 minutes) | Today: {currentGym} min</span>
-              <span className="sm:hidden">7 days | Today: {currentGym} min</span>
-            </CardDescription>
-          </CardHeader>
+        <div className="gradient-border-card">
+          <Card className="gradient-border-card-inner">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg sm:text-xl">Gym Workouts</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
+                <span className="hidden sm:inline">Last 7 days (Goal: 60 minutes) | Today: {currentGym} min</span>
+                <span className="sm:hidden">7 days | Today: {currentGym} min</span>
+              </CardDescription>
+            </CardHeader>
           <CardContent>
             <ChartContainer config={gymChartConfig} className="h-48 sm:h-64 w-full">
               <BarChart accessibilityLayer data={gymChartData}>
@@ -509,16 +524,18 @@ export default function ProgressTrackerPage() {
               </BarChart>
             </ChartContainer>
           </CardContent>
-        </Card>
+          </Card>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader className="pb-4">
-          <CardTitle className="text-lg sm:text-xl">Badges Unlocked</CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            You've unlocked {unlockedAchievements} of {totalAchievements} badges. Keep going!
-          </CardDescription>
-        </CardHeader>
+      <div className="gradient-border-card">
+        <Card className="gradient-border-card-inner">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg sm:text-xl">Badges Unlocked</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
+              You've unlocked {unlockedAchievements} of {totalAchievements} badges. Keep going!
+            </CardDescription>
+          </CardHeader>
         <CardContent>
           <motion.div 
             className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8"
@@ -533,7 +550,8 @@ export default function ProgressTrackerPage() {
             ))}
           </motion.div>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }
