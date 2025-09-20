@@ -320,6 +320,22 @@ class DailyResetServiceImpl implements DailyResetService {
       
       await updateDoc(userRef, resetData);
       
+      // Also update userData collection if it exists (where daily vibes are stored for UI)
+      try {
+        const userDataRef = doc(db, 'userData', userId);
+        const userDataDoc = await getDoc(userDataRef);
+        if (userDataDoc.exists()) {
+          await updateDoc(userDataRef, {
+            dailyVibes: resetData.dailyVibes || [],
+            challenges: resetData.challenges || [],
+            lastResetDay: today,
+          });
+          console.log(`✅ Also updated userData collection for user ${userId}`);
+        }
+      } catch (error) {
+        console.warn(`Failed to update userData collection for user ${userId}:`, error);
+      }
+      
       // Create fresh daily activities document for the new day (reset to zero)
       const newDailyActivitiesRef = doc(db, 'dailyActivities', `${userId}-${today}`);
       await setDoc(newDailyActivitiesRef, {

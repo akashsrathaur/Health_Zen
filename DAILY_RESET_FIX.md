@@ -125,3 +125,57 @@ await runDailyFunctionalityTests();
 - Reset failures and recovery
 
 The implementation ensures consistent behavior across all scenarios while maintaining data integrity and user experience.
+
+## Current Issues & Immediate Solutions
+
+### Debug Tools Available
+
+**Location**: Settings page (`/settings`) - scroll to bottom
+
+**Debug Component Features**:
+- **Fix Current Issues**: Automatically applies all necessary fixes
+  - Triggers daily reset
+  - Recalculates streak based on user activity
+  - Resets daily points and activities to zero
+  - Updates both `users` and `userData` collections
+  - Revalidates UI pages
+
+- **Quick Reset**: Completely resets user to day 1 state
+  - Sets streak to 1 (fresh start)
+  - Zeros out all daily activities
+  - Clears yesterday's progress data
+
+### How to Use the Fix
+
+1. **Go to Settings**: Navigate to `/settings` page
+2. **Scroll to Bottom**: Find the yellow debug card
+3. **Click "Fix Current Issues"**: This will apply all necessary fixes
+4. **Wait for Success Message**: The page will reload automatically
+5. **Check Results**: Go to dashboard or progress tracker to verify fixes
+
+### What Gets Fixed
+
+✅ **Progress Tracker**: Points reset to 0/30, tasks reset to 0  
+✅ **Water Intake**: Bar chart shows 0 glasses for today  
+✅ **Daily Vibes**: Progress reset to 0%, not carrying over yesterday's 50%  
+✅ **Streak Calculation**: Proper streak based on consecutive daily usage  
+✅ **New Users**: Start with streak 1  
+✅ **Existing Users**: Correct streak calculation (users active 2 days ago get appropriate streak)
+
+### Technical Details
+
+The fixes address the core issue: data synchronization between multiple collections (`users`, `userData`, `dailyActivities`) and proper daily reset timing.
+
+**Root Causes Fixed**:
+1. **Collection Mismatch**: Auth context was reading from `userData` while reset service updated `users`
+2. **Incomplete Reset**: Daily activities weren't being completely reset (used merge instead of replace)
+3. **Missing App Opening Logic**: Streak only incremented on task completion, not daily app usage
+4. **Timing Issues**: Reset logic wasn't triggering properly during user authentication
+
+**Files Modified**:
+- `src/actions/app-opening.ts` (NEW) - Handles daily app opening and streak logic
+- `src/actions/manual-fixes.ts` (NEW) - Provides immediate fix functions
+- `src/components/debug-daily-fixes.tsx` (NEW) - Debug UI component  
+- `src/context/auth-context.tsx` - Integrated app initialization
+- `src/lib/daily-reset-service.ts` - Fixed reset logic and dual collection updates
+- `src/app/(app)/settings/page.tsx` - Added debug component

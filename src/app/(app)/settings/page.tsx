@@ -36,6 +36,7 @@ import { updateNotificationSettings } from "@/actions/notifications";
 import { AvatarSelector } from "@/components/ui/avatar-selector";
 import { notificationClient } from "@/lib/notification-client";
 import DoshaDisplay from "@/components/dosha-display";
+import { DebugDailyFixes } from "@/components/debug-daily-fixes";
 
 const profileFormSchema = z.object({
   name: z.string().min(1, 'Name is required').max(50, 'Name must be less than 50 characters'),
@@ -610,6 +611,9 @@ export default function SettingsPage() {
                     </div>
                 </CardContent>
             </Card>
+            
+            {/* Debug Tools for Daily Reset & Streak Issues */}
+            <DebugDailyFixes />
         </div>
     );
 }

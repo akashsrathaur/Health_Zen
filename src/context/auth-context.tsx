@@ -87,13 +87,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         dailyResetService.setUserId(fbUser.uid);
         
         // Handle daily app opening and check for resets
-        handleAppInitialization(fbUser.uid).then(({ appOpeningResult, resetCheckNeeded }) => {
+        handleAppInitialization(fbUser.uid).then(async ({ appOpeningResult, resetCheckNeeded }) => {
           if (appOpeningResult.streakUpdated) {
             console.log(`✅ Streak updated on app opening: ${appOpeningResult.newStreak}`);
+            // Refresh user data to get the updated streak
+            const updatedUserProfile = await getUserFromFirestore(fbUser.uid);
+            if (updatedUserProfile) {
+              setUser(updatedUserProfile);
+            }
           }
           if (resetCheckNeeded) {
             console.log('⏰ Daily reset check triggered');
-            dailyResetService.checkAndTriggerResetIfNeeded(fbUser.uid);
+            await dailyResetService.checkAndTriggerResetIfNeeded(fbUser.uid);
+            // Refresh user data after reset as well
+            const updatedUserProfile = await getUserFromFirestore(fbUser.uid);
+            if (updatedUserProfile) {
+              setUser(updatedUserProfile);
+            }
           }
         }).catch(error => {
           console.warn('Failed to handle app initialization:', error);
@@ -142,8 +152,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             
             const completedChallenges = serverChallenges.filter((c: Challenge) => c.isCompletedToday).length;
 
+            // Use the most up-to-date user data for streak (user state might have been updated by app initialization)
             setUserProgress({
-                streak: user.streak, 
+                streak: user.streak || 0, 
                 completedTasks: completedTasks + completedChallenges,
             });
         } else {
