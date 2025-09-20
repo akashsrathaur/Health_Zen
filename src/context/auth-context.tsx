@@ -22,6 +22,7 @@ import { defaultUser } from '@/lib/user-store';
 import { doc, onSnapshot, setDoc, collection, query, orderBy } from 'firebase/firestore';
 import { initialChallenges, initialDailyVibes, type Challenge, type DailyVibe, type CommunityPost } from '@/lib/data';
 import { dailyResetService } from '@/lib/daily-reset-service';
+import { handleAppInitialization } from '@/actions/app-opening';
 
 type ProgressState = {
     streak: number;
@@ -84,6 +85,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(userProfile || { ...defaultUser, uid: fbUser.uid, name: "New User" });
         // Initialize daily reset service for this user
         dailyResetService.setUserId(fbUser.uid);
+        
+        // Handle daily app opening and check for resets
+        handleAppInitialization(fbUser.uid).then(({ appOpeningResult, resetCheckNeeded }) => {
+          if (appOpeningResult.streakUpdated) {
+            console.log(`✅ Streak updated on app opening: ${appOpeningResult.newStreak}`);
+          }
+          if (resetCheckNeeded) {
+            console.log('⏰ Daily reset check triggered');
+            dailyResetService.checkAndTriggerResetIfNeeded(fbUser.uid);
+          }
+        }).catch(error => {
+          console.warn('Failed to handle app initialization:', error);
+        });
+        
         // The data snapshot listener will handle the rest
       } else {
         setFirebaseUser(null);

@@ -260,6 +260,7 @@ class DailyResetServiceImpl implements DailyResetService {
       const resetData: any = {
         dailyPoints: 0,
         lastResetDate: new Date().toISOString(),
+        lastResetDay: today, // Track which day we last reset for (YYYY-MM-DD format)
       };
 
       // Reset daily vibes (keep custom ones but reset progress)
@@ -319,7 +320,7 @@ class DailyResetServiceImpl implements DailyResetService {
       
       await updateDoc(userRef, resetData);
       
-      // Ensure fresh daily activities document exists for today
+      // Create fresh daily activities document for the new day (reset to zero)
       const newDailyActivitiesRef = doc(db, 'dailyActivities', `${userId}-${today}`);
       await setDoc(newDailyActivitiesRef, {
         userId,
@@ -333,7 +334,8 @@ class DailyResetServiceImpl implements DailyResetService {
         tasksCompleted: 0,
         pointsEarned: 0,
         createdAt: new Date().toISOString(),
-      }, { merge: true }); // Use merge to avoid overwriting existing data
+        resetAt: new Date().toISOString(),
+      }); // Don't use merge - we want to completely reset for the new day
       
       console.log(`✅ Successfully reset daily metrics for user ${userId}`);
       console.log(`📅 Ensured fresh activities document for: ${today}`);
@@ -366,11 +368,11 @@ class DailyResetServiceImpl implements DailyResetService {
       
       const userData = userDoc.data();
       const today = new Date().toLocaleDateString('en-CA');
-      const lastResetDate = userData.lastResetDate ? new Date(userData.lastResetDate).toLocaleDateString('en-CA') : '';
+      const lastResetDay = userData.lastResetDay || '';
       
       // Check if we need to reset for today
-      if (lastResetDate !== today) {
-        console.log(`Daily reset needed for user ${userId}. Last reset: ${lastResetDate}, Today: ${today}`);
+      if (lastResetDay !== today) {
+        console.log(`Daily reset needed for user ${userId}. Last reset day: ${lastResetDay}, Today: ${today}`);
         await this.performDailyReset(userId);
       } else {
         console.log(`Daily reset already done today for user ${userId}`);
