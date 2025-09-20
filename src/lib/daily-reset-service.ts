@@ -41,7 +41,6 @@ class DailyResetServiceImpl implements DailyResetService {
       }
 
       const timeUntilReset = resetTime.getTime() - now.getTime();
-      console.log(`Next daily reset scheduled for: ${resetTime.toLocaleString()} (in ${Math.round(timeUntilReset / (1000 * 60))} minutes)`);
 
       this.resetTimeout = setTimeout(() => {
         this.performDailyResetForAllUsers();
@@ -72,25 +71,12 @@ class DailyResetServiceImpl implements DailyResetService {
       return;
     }
 
-    const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] Starting daily reset for user: ${userId}`);
-    
     try {
-      // 1. Save today's data before reset
-      console.log(`[${timestamp}] Step 1: Saving daily data...`);
       await this.saveDailyData(userId);
-      
-      // 2. Increment streak if user was active today
-      console.log(`[${timestamp}] Step 2: Checking and updating streak...`);
       await this.incrementDailyStreak(userId);
-      
-      // 3. Reset daily metrics for tomorrow
-      console.log(`[${timestamp}] Step 3: Resetting daily metrics...`);
       await this.resetDailyMetrics(userId);
-      
-      console.log(`[${timestamp}] Daily reset completed successfully for user: ${userId}`);
     } catch (error) {
-      console.error(`[${timestamp}] Error performing daily reset for user ${userId}:`, error);
+      console.error(`Error performing daily reset for user ${userId}:`, error);
       throw error;
     }
   }
@@ -152,9 +138,6 @@ class DailyResetServiceImpl implements DailyResetService {
       
       const historyRef = doc(db, 'dailyHistory', `${userId}-${today}`);
       await setDoc(historyRef, historicalData);
-      
-      console.log(`Successfully saved daily data for ${userId} on ${today}`);
-      console.log(`Data includes: ${activitiesData.waterIntake || 0} glasses water, ${activitiesData.sleepHours || 0}h sleep, ${activitiesData.gymMinutes || 0}min gym`);
     } catch (error) {
       console.error(`Error saving daily data for user ${userId}:`, error);
       throw error;
@@ -186,8 +169,6 @@ class DailyResetServiceImpl implements DailyResetService {
       const currentStreak = userData.streak || 0;
       const lastStreakUpdate = userData.lastStreakUpdate || '';
 
-      console.log(`Checking streak for user ${userId}: lastActivity=${lastActivityDate}, today=${today}, currentStreak=${currentStreak}`);
-
       // Check if user was active today or yesterday (to maintain streak)
       const wasActiveToday = lastActivityDate === today;
       const wasActiveYesterday = lastActivityDate === yesterdayStr;
@@ -214,10 +195,8 @@ class DailyResetServiceImpl implements DailyResetService {
           lastActivityDate: today,
         });
         
-        console.log(`✅ Updated streak for user ${userId}: ${currentStreak} -> ${newStreak}`);
       } else if (wasActiveYesterday) {
         // User was active yesterday but not today, maintain streak for one day
-        console.log(`⚠️ User ${userId} was active yesterday but not today, maintaining streak at ${currentStreak} for now`);
       } else {
         // User hasn't been active, reset streak
         if (currentStreak > 0) {
@@ -225,9 +204,8 @@ class DailyResetServiceImpl implements DailyResetService {
             streak: 0,
             lastStreakUpdate: new Date().toISOString(),
             lastStreakReset: new Date().toISOString(),
-            previousStreak: currentStreak, // Save previous streak for analytics
+            previousStreak: currentStreak,
           });
-          console.log(`❌ Reset streak for user ${userId}: ${currentStreak} -> 0 (no recent activity)`);
         }
       }
     } catch (error) {
@@ -253,8 +231,6 @@ class DailyResetServiceImpl implements DailyResetService {
 
       const userData = userDoc.data();
       const today = new Date().toLocaleDateString('en-CA');
-      
-      console.log(`Resetting daily metrics for user ${userId} for date: ${today}`);
       
       // Reset user daily metrics
       const resetData: any = {
@@ -330,7 +306,6 @@ class DailyResetServiceImpl implements DailyResetService {
             challenges: resetData.challenges || [],
             lastResetDay: today,
           });
-          console.log(`✅ Also updated userData collection for user ${userId}`);
         }
       } catch (error) {
         console.warn(`Failed to update userData collection for user ${userId}:`, error);
@@ -352,9 +327,6 @@ class DailyResetServiceImpl implements DailyResetService {
         createdAt: new Date().toISOString(),
         resetAt: new Date().toISOString(),
       }); // Don't use merge - we want to completely reset for the new day
-      
-      console.log(`✅ Successfully reset daily metrics for user ${userId}`);
-      console.log(`📅 Ensured fresh activities document for: ${today}`);
     } catch (error) {
       console.error(`❌ Error resetting daily metrics for user ${userId}:`, error);
       throw error;
@@ -388,10 +360,7 @@ class DailyResetServiceImpl implements DailyResetService {
       
       // Check if we need to reset for today
       if (lastResetDay !== today) {
-        console.log(`Daily reset needed for user ${userId}. Last reset day: ${lastResetDay}, Today: ${today}`);
         await this.performDailyReset(userId);
-      } else {
-        console.log(`Daily reset already done today for user ${userId}`);
       }
     } catch (error) {
       console.error(`Error checking reset for user ${userId}:`, error);

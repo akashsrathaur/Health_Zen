@@ -29,10 +29,8 @@ export function useAppServices() {
   }, []);
 
   useEffect(() => {
-    // Set user ID for daily reset service when user changes
     if (user) {
       dailyResetService.setUserId(user.uid);
-      // Note: Daily reset check is now handled in auth context during app initialization
     }
   }, [user]);
 

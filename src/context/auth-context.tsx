@@ -89,17 +89,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // Handle daily app opening and check for resets
         handleAppInitialization(fbUser.uid).then(async ({ appOpeningResult, resetCheckNeeded }) => {
           if (appOpeningResult.streakUpdated) {
-            console.log(`✅ Streak updated on app opening: ${appOpeningResult.newStreak}`);
-            // Refresh user data to get the updated streak
             const updatedUserProfile = await getUserFromFirestore(fbUser.uid);
             if (updatedUserProfile) {
               setUser(updatedUserProfile);
             }
           }
           if (resetCheckNeeded) {
-            console.log('⏰ Daily reset check triggered');
             await dailyResetService.checkAndTriggerResetIfNeeded(fbUser.uid);
-            // Refresh user data after reset as well
             const updatedUserProfile = await getUserFromFirestore(fbUser.uid);
             if (updatedUserProfile) {
               setUser(updatedUserProfile);
