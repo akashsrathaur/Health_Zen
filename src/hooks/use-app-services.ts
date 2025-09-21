@@ -29,14 +29,8 @@ export function useAppServices() {
   }, []);
 
   useEffect(() => {
-    // Set user ID for daily reset service when user changes
     if (user) {
       dailyResetService.setUserId(user.uid);
-      
-      // Check if daily reset is needed and trigger it
-      dailyResetService.checkAndTriggerResetIfNeeded(user.uid).catch(error => {
-        console.warn('Failed to check/trigger daily reset:', error);
-      });
     }
   }, [user]);
 

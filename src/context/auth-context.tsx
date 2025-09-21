@@ -22,6 +22,7 @@ import { defaultUser } from '@/lib/user-store';
 import { doc, onSnapshot, setDoc, collection, query, orderBy } from 'firebase/firestore';
 import { initialChallenges, initialDailyVibes, type Challenge, type DailyVibe, type CommunityPost } from '@/lib/data';
 import { dailyResetService } from '@/lib/daily-reset-service';
+import { handleAppInitialization } from '@/actions/app-opening';
 
 type ProgressState = {
     streak: number;
@@ -84,6 +85,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(userProfile || { ...defaultUser, uid: fbUser.uid, name: "New User" });
         // Initialize daily reset service for this user
         dailyResetService.setUserId(fbUser.uid);
+        
+        // Handle daily app opening and check for resets
+        handleAppInitialization(fbUser.uid).then(async ({ appOpeningResult, resetCheckNeeded }) => {
+          if (appOpeningResult.streakUpdated) {
+            const updatedUserProfile = await getUserFromFirestore(fbUser.uid);
+            if (updatedUserProfile) {
+              setUser(updatedUserProfile);
+            }
+          }
+          if (resetCheckNeeded) {
+            await dailyResetService.checkAndTriggerResetIfNeeded(fbUser.uid);
+            const updatedUserProfile = await getUserFromFirestore(fbUser.uid);
+            if (updatedUserProfile) {
+              setUser(updatedUserProfile);
+            }
+          }
+        }).catch(error => {
+          console.warn('Failed to handle app initialization:', error);
+        });
+        
         // The data snapshot listener will handle the rest
       } else {
         setFirebaseUser(null);
@@ -127,8 +148,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             
             const completedChallenges = serverChallenges.filter((c: Challenge) => c.isCompletedToday).length;
 
+            // Use the most up-to-date user data for streak (user state might have been updated by app initialization)
             setUserProgress({
-                streak: user.streak, 
+                streak: user.streak || 0, 
                 completedTasks: completedTasks + completedChallenges,
             });
         } else {
