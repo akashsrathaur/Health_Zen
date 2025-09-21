@@ -118,9 +118,9 @@ export const initialDailyVibes: DailyVibe[] = [
   },
   {
     id: 'gym',
-    title: 'Workout',
-    value: '0/60 minutes',
-    icon: 'Dumbbell',
+    title: 'Gym Workout',
+    value: '0/20 minutes',
+    icon: 'Dumbbell' as const,
     progress: 0,
   },
   {

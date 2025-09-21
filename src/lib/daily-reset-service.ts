@@ -170,23 +170,32 @@ class DailyResetServiceImpl implements DailyResetService {
       const currentStreak = userData.streak || 0;
       const lastStreakUpdate = userData.lastStreakUpdate || '';
 
-      // Check if user was active today or yesterday (to maintain streak)
-      const wasActiveToday = lastActivityDate === today;
-      const wasActiveYesterday = lastActivityDate === yesterdayStr;
-      const hasTasksToday = userData.dailyVibes?.some((vibe: any) => vibe.completedAt) || false;
+      console.log(`Checking streak for user ${userId}: lastActivity=${lastActivityDate}, today=${today}, currentStreak=${currentStreak}`);
 
-      if (wasActiveToday || hasTasksToday) {
-        // User was active today
+      // Check if user was active today (has completed tasks)
+      const hasTasksToday = userData.dailyVibes?.some((vibe: any) => 
+        vibe.completedAt || 
+        (vibe.id === 'medication' && vibe.progress === 100) ||
+        (vibe.id === 'water' && parseInt(vibe.value?.split('/')[0] || '0') > 0) ||
+        (vibe.id === 'gym' && parseInt(vibe.value?.split('/')[0] || '0') > 0) ||
+        (vibe.id === 'sleep' && parseFloat(vibe.value?.match(/^([\d.]+)/)?.[1] || '0') > 0)
+      ) || false;
+      
+      const wasActiveToday = lastActivityDate === today || hasTasksToday;
+      const wasActiveYesterday = lastActivityDate === yesterdayStr;
+
+      if (wasActiveToday) {
+        // User was active today - calculate new streak
         let newStreak = currentStreak;
         
         if (currentStreak === 0) {
           // Starting first streak
           newStreak = 1;
-        } else if (wasActiveYesterday) {
+        } else if (wasActiveYesterday || lastActivityDate === yesterdayStr) {
           // Consecutive activity - increment streak
           newStreak = currentStreak + 1;
         } else {
-          // Active today but not yesterday - reset to 1
+          // Gap in activity - reset to 1
           newStreak = 1;
         }
         
@@ -196,18 +205,25 @@ class DailyResetServiceImpl implements DailyResetService {
           lastActivityDate: today,
         });
         
-      } else if (wasActiveYesterday) {
-        // User was active yesterday but not today, maintain streak for one day
-      } else {
+        console.log(`✅ Updated streak for user ${userId}: ${currentStreak} -> ${newStreak}`);
+      } else if (wasActiveYesterday && currentStreak > 0) {
+        // User was active yesterday but not today, reset streak after grace period
+        await updateDoc(userRef, {
+          streak: 0,
+          lastStreakUpdate: new Date().toISOString(),
+          lastStreakReset: new Date().toISOString(),
+          previousStreak: currentStreak,
+        });
+        console.log(`❌ Reset streak for user ${userId}: ${currentStreak} -> 0 (missed day)`);
+      } else if (currentStreak > 0) {
         // User hasn't been active, reset streak
-        if (currentStreak > 0) {
-          await updateDoc(userRef, {
-            streak: 0,
-            lastStreakUpdate: new Date().toISOString(),
-            lastStreakReset: new Date().toISOString(),
-            previousStreak: currentStreak,
-          });
-        }
+        await updateDoc(userRef, {
+          streak: 0,
+          lastStreakUpdate: new Date().toISOString(),
+          lastStreakReset: new Date().toISOString(),
+          previousStreak: currentStreak,
+        });
+        console.log(`❌ Reset streak for user ${userId}: ${currentStreak} -> 0 (no recent activity)`);
       }
     } catch (error) {
       console.error(`Error updating streak for user ${userId}:`, error);
@@ -242,59 +258,64 @@ class DailyResetServiceImpl implements DailyResetService {
         lastResetDay: tomorrowStr, // Track which day we last reset for (YYYY-MM-DD format)
       };
 
-      // Reset daily vibes (keep custom ones but reset progress)
+      // Refresh daily vibes for new day - preserve all user's tasks and custom vibes
       if (userData.dailyVibes && Array.isArray(userData.dailyVibes)) {
-        const resetDailyVibes = userData.dailyVibes.map((vibe: any) => {
-          // Reset all vibes except streak (which should maintain its value)
+        const refreshedDailyVibes = userData.dailyVibes.map((vibe: any) => {
+          // Preserve streak value - it should maintain its current value
           if (vibe.id === 'streak') {
-            return vibe; // Keep streak as is
+            return vibe; // Keep streak exactly as is
           }
           
-          // Reset other vibes
-          const resetVibe = {
-            ...vibe,
-            progress: 0,
-            completedAt: undefined
+          // Refresh daily progress for new day
+          const refreshedVibe = {
+            ...vibe, // Keep all existing properties (title, icon, isCustom, etc.)
+            progress: 0, // Reset daily progress to 0
+            completedAt: undefined // Clear completion timestamp for new day
           };
           
-          // Reset specific vibe types to their default values
+          // Reset specific daily metrics to starting values for new day
           switch (vibe.id) {
             case 'water':
-              resetVibe.value = '0/8 glasses';
+              refreshedVibe.value = '0/8 glasses'; // Reset to 0 glasses for new day
               break;
             case 'sleep':
-              resetVibe.value = '0h';
+              refreshedVibe.value = '0h'; // Reset sleep hours for new day
               break;
             case 'gym':
-              resetVibe.value = '0/60 minutes';
+              refreshedVibe.value = '0/20 minutes'; // Reset gym minutes for new day
               break;
             case 'medication':
-              resetVibe.value = 'Pending';
-              if (resetVibe.medicationConfig) {
-                resetVibe.medicationConfig.dosesTaken = 0;
-                resetVibe.medicationConfig.lastDoseTime = undefined;
+              refreshedVibe.value = 'Pending'; // Reset medication status for new day
+              if (refreshedVibe.medicationConfig) {
+                refreshedVibe.medicationConfig.dosesTaken = 0; // Reset doses taken for new day
+                refreshedVibe.medicationConfig.lastDoseTime = undefined; // Clear last dose time
               }
               break;
             default:
+              // For custom tasks, only reset progress, keep the user's custom values
               if (vibe.isCustom) {
-                resetVibe.value = 'Not set';
+                // Don't reset custom task values - user may want to keep them
+                // Only reset completion status for new day
               }
               break;
           }
           
-          return resetVibe;
+          return refreshedVibe;
         });
         
-        resetData.dailyVibes = resetDailyVibes;
+        resetData.dailyVibes = refreshedDailyVibes;
       }
 
-      // Reset challenges completion status
+      // Reset challenges completion status for today only - preserve challenge enrollment
       if (userData.challenges && Array.isArray(userData.challenges)) {
-        const resetChallenges = userData.challenges.map((challenge: any) => ({
+        const refreshedChallenges = userData.challenges.map((challenge: any) => ({
           ...challenge,
-          isCompletedToday: false
+          // Only reset today's completion status, preserve all other progress
+          isCompletedToday: false,
+          // If challenge was completed today, increment the currentDay
+          currentDay: challenge.isCompletedToday ? (challenge.currentDay || 0) + 1 : challenge.currentDay || 0
         }));
-        resetData.challenges = resetChallenges;
+        resetData.challenges = refreshedChallenges;
       }
       
       await updateDoc(userRef, resetData);
@@ -314,22 +335,30 @@ class DailyResetServiceImpl implements DailyResetService {
         console.warn(`Failed to update userData collection for user ${userId}:`, error);
       }
       
-      // Create fresh daily activities document for tomorrow (reset to zero)
+      // Create fresh daily activities document for the new day
       const newDailyActivitiesRef = doc(db, 'dailyActivities', `${userId}-${tomorrowStr}`);
-      await setDoc(newDailyActivitiesRef, {
-        userId,
-        date: tomorrowStr,
-        waterIntake: 0,
-        waterGoal: 8,
-        sleepHours: 0,
-        gymMinutes: 0,
-        medicationTaken: false,
-        customActivities: {},
-        tasksCompleted: 0,
-        pointsEarned: 0,
-        createdAt: new Date().toISOString(),
-        resetAt: new Date().toISOString(),
-      }); // Don't use merge - we want to completely reset for the new day
+      const existingTomorrowDoc = await getDoc(newDailyActivitiesRef);
+      
+      // Only create new document if it doesn't exist for tomorrow
+      if (!existingTomorrowDoc.exists()) {
+        await setDoc(newDailyActivitiesRef, {
+          userId,
+          date: tomorrowStr,
+          waterIntake: 0, // Start fresh for new day
+          waterGoal: 8,
+          sleepHours: 0, // Start fresh for new day
+          gymMinutes: 0, // Start fresh for new day
+          medicationTaken: false, // Start fresh for new day
+          customActivities: {},
+          tasksCompleted: 0,
+          pointsEarned: 0,
+          createdAt: new Date().toISOString(),
+          resetAt: new Date().toISOString(),
+        });
+        console.log(`📅 Created fresh daily activities document for: ${tomorrowStr}`);
+      } else {
+        console.log(`📅 Daily activities document already exists for: ${tomorrowStr}`);
+      }
     } catch (error) {
       console.error(`❌ Error resetting daily metrics for user ${userId}:`, error);
       throw error;
@@ -342,10 +371,10 @@ class DailyResetServiceImpl implements DailyResetService {
   }
   
   // Check if daily reset is needed for user and trigger it
-  async checkAndTriggerResetIfNeeded(userId: string): Promise<void> {
+  async checkAndTriggerResetIfNeeded(userId: string): Promise<boolean> {
     if (!db) {
       console.warn('Firebase not configured, skipping reset check');
-      return;
+      return false;
     }
     
     try {
@@ -354,19 +383,27 @@ class DailyResetServiceImpl implements DailyResetService {
       
       if (!userDoc.exists()) {
         console.warn(`User ${userId} not found for reset check`);
-        return;
+        return false;
       }
       
       const userData = userDoc.data();
       const today = new Date().toLocaleDateString('en-CA');
       const lastResetDay = userData.lastResetDay || '';
       
+      console.log(`Checking daily reset for user ${userId}: lastResetDay=${lastResetDay}, today=${today}`);
+      
       // Check if we need to reset for today
       if (lastResetDay !== today) {
+        console.log(`Triggering daily reset for user ${userId}`);
         await this.performDailyReset(userId);
+        return true; // Reset was performed
+      } else {
+        console.log(`Daily reset already completed today for user ${userId}`);
+        return false; // No reset needed
       }
     } catch (error) {
       console.error(`Error checking reset for user ${userId}:`, error);
+      return false;
     }
   }
 }

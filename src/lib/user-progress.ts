@@ -34,7 +34,7 @@ export function getUserProgressData(user: User): UserProgress {
       sleepHours: 0,
       sleepGoal: 8,
       gymMinutes: 0,
-      gymGoal: 60, // 60 minutes goal
+      gymGoal: 20, // 20 minutes goal
       lastActivityDate: today,
       weeklyWaterData: [0, 0, 0, 0, 0, 0, 0], // All zeros for new user
       weeklySleepData: [0, 0, 0, 0, 0, 0, 0], // All zeros for new user
@@ -60,7 +60,7 @@ export function getUserProgressData(user: User): UserProgress {
     sleepHours: getTodaySleepHours(user), // This should come from daily tracking
     sleepGoal: 8,
     gymMinutes: getTodayGymMinutes(user), // This should come from daily tracking
-    gymGoal: 60,
+    gymGoal: 20,
     lastActivityDate: user.lastActivityDate || today,
     weeklyWaterData,
     weeklySleepData,
@@ -149,7 +149,7 @@ function getTodayGymMinutes(user: User): number {
   const streak = user.streak || 0;
   if (streak === 0 && (user.totalTasksCompleted || 0) === 0) return 0;
   if (streak === 0) return 15; // User has some activity but no streak
-  return Math.min(60, streak * 3); // 3 minutes per streak day, max 60 minutes
+  return Math.min(20, streak * 1); // 1 minute per streak day, max 20 minutes
 }
 
 // Get achievements based on REAL user progress

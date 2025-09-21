@@ -49,11 +49,14 @@ export function MainNav() {
           <Link href={item.href} onClick={handleNavItemClick}>
             <SidebarMenuButton
               isActive={pathname === item.href}
-              tooltip={item.label}
+              tooltip={state === 'collapsed' ? item.label : undefined}
               data-state={state}
+              className="data-[state=collapsed]:justify-center"
             >
-              <item.icon className="h-5 w-5" />
-              <span className={state === 'collapsed' ? 'hidden' : 'block'}>{item.label}</span>
+              <item.icon className="h-5 w-5 shrink-0" />
+              <span className={`transition-all duration-300 ${state === 'collapsed' ? 'sr-only' : 'block'}`}>
+                {item.label}
+              </span>
             </SidebarMenuButton>
           </Link>
         </SidebarMenuItem>

@@ -25,7 +25,7 @@ export type DailyActivity = {
 export async function updateWaterIntake(userId: string, glasses: number): Promise<{ success: boolean; pointsEarned?: number; error?: string }> {
   try {
     // Check if Firebase is properly configured
-    if (!db || !db.app || !process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID === 'your-project-id') {
+    if (!db || !db.app) {
       console.log('Firebase not configured, skipping database update');
       return { success: false, error: 'Firebase not configured' };
     }
@@ -131,9 +131,9 @@ export async function updateGymMinutes(userId: string, minutes: number): Promise
       updatedAt: new Date().toISOString(),
     }, { merge: true });
 
-    // Award points for workout milestones (15, 30, 45, 60 minutes)
+    // Award points for workout milestones (5, 10, 15, 20 minutes)
     let pointsEarned = 0;
-    const milestones = [15, 30, 45, 60];
+    const milestones = [5, 10, 15, 20];
     const previousMinutes = existingData.gymMinutes || 0;
     
     for (const milestone of milestones) {
