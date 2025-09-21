@@ -188,23 +188,30 @@ class DailyResetServiceImpl implements DailyResetService {
 
       console.log(`Checking streak for user ${userId}: lastActivity=${lastActivityDate}, today=${today}, currentStreak=${currentStreak}`);
 
-      // Check if user was active today or yesterday (to maintain streak)
-      const wasActiveToday = lastActivityDate === today;
+      // Check if user was active today (has completed tasks)
+      const hasTasksToday = userData.dailyVibes?.some((vibe: any) => 
+        vibe.completedAt || 
+        (vibe.id === 'medication' && vibe.progress === 100) ||
+        (vibe.id === 'water' && parseInt(vibe.value?.split('/')[0] || '0') > 0) ||
+        (vibe.id === 'gym' && parseInt(vibe.value?.split('/')[0] || '0') > 0) ||
+        (vibe.id === 'sleep' && parseFloat(vibe.value?.match(/^([\d.]+)/)?.[1] || '0') > 0)
+      ) || false;
+      
+      const wasActiveToday = lastActivityDate === today || hasTasksToday;
       const wasActiveYesterday = lastActivityDate === yesterdayStr;
-      const hasTasksToday = userData.dailyVibes?.some((vibe: any) => vibe.completedAt) || false;
 
-      if (wasActiveToday || hasTasksToday) {
-        // User was active today
+      if (wasActiveToday) {
+        // User was active today - calculate new streak
         let newStreak = currentStreak;
         
         if (currentStreak === 0) {
           // Starting first streak
           newStreak = 1;
-        } else if (wasActiveYesterday) {
+        } else if (wasActiveYesterday || lastActivityDate === yesterdayStr) {
           // Consecutive activity - increment streak
           newStreak = currentStreak + 1;
         } else {
-          // Active today but not yesterday - reset to 1
+          // Gap in activity - reset to 1
           newStreak = 1;
         }
         
@@ -215,20 +222,24 @@ class DailyResetServiceImpl implements DailyResetService {
         });
         
         console.log(`✅ Updated streak for user ${userId}: ${currentStreak} -> ${newStreak}`);
-      } else if (wasActiveYesterday) {
-        // User was active yesterday but not today, maintain streak for one day
-        console.log(`⚠️ User ${userId} was active yesterday but not today, maintaining streak at ${currentStreak} for now`);
-      } else {
+      } else if (wasActiveYesterday && currentStreak > 0) {
+        // User was active yesterday but not today, reset streak after grace period
+        await updateDoc(userRef, {
+          streak: 0,
+          lastStreakUpdate: new Date().toISOString(),
+          lastStreakReset: new Date().toISOString(),
+          previousStreak: currentStreak,
+        });
+        console.log(`❌ Reset streak for user ${userId}: ${currentStreak} -> 0 (missed day)`);
+      } else if (currentStreak > 0) {
         // User hasn't been active, reset streak
-        if (currentStreak > 0) {
-          await updateDoc(userRef, {
-            streak: 0,
-            lastStreakUpdate: new Date().toISOString(),
-            lastStreakReset: new Date().toISOString(),
-            previousStreak: currentStreak, // Save previous streak for analytics
-          });
-          console.log(`❌ Reset streak for user ${userId}: ${currentStreak} -> 0 (no recent activity)`);
-        }
+        await updateDoc(userRef, {
+          streak: 0,
+          lastStreakUpdate: new Date().toISOString(),
+          lastStreakReset: new Date().toISOString(),
+          previousStreak: currentStreak,
+        });
+        console.log(`❌ Reset streak for user ${userId}: ${currentStreak} -> 0 (no recent activity)`);
       }
     } catch (error) {
       console.error(`Error updating streak for user ${userId}:`, error);

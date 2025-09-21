@@ -129,7 +129,7 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete, userData }: {
 
     if (!currentVibe) return null;
 
-    const handleWaterChange = async (amount: number) => {
+  const handleWaterChange = async (amount: number) => {
         if (!userData) return;
         setCurrentVibe(prev => {
             if (!prev || prev.id !== 'water') return prev;
@@ -138,15 +138,25 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete, userData }: {
             const newValue = Math.max(0, current + amount);
             const newProgress = Math.min((newValue / goal) * 100, 100);
             
-            // Update the backend immediately (ignore Firebase errors for now)
-            updateWaterIntake(userData.uid, newValue).catch(error => {
+            // Update the backend immediately and update streak logic
+            updateWaterIntake(userData.uid, newValue).then(result => {
+                if (result.success && newValue > current) {
+                    // Update user progress and potentially streak
+                    if (userProgress) {
+                        const newUserProgress = { ...userProgress, completedTasks: userProgress.completedTasks + 1 };
+                        checkAchievements(newUserProgress);
+                    }
+                }
+            }).catch(error => {
                 console.warn('Firebase water update failed in dialog, continuing with local update:', error);
             });
             
             return { 
                 ...prev, 
                 value: `${newValue}/${goal} glasses`, 
-                progress: newProgress
+                progress: newProgress,
+                // Update completedAt if this is progress (not regression)
+                completedAt: amount > 0 && newValue > current ? new Date().toISOString() : prev.completedAt
             };
         });
     }
@@ -794,6 +804,30 @@ export default function DashboardPage() {
                     }
                     
                     await updateDailyVibesAction(user.uid, updatedVibes);
+                    
+                    // Update streak if this is the first meaningful activity today
+                    const today = new Date().toLocaleDateString('en-CA');
+                    if (newValue === 1 && user.lastActivityDate !== today) {
+                      // This is the first activity of the day, update the streak
+                      const currentStreak = user.streak || 0;
+                      const yesterday = new Date();
+                      yesterday.setDate(yesterday.getDate() - 1);
+                      const yesterdayStr = yesterday.toLocaleDateString('en-CA');
+                      
+                      let newStreak = currentStreak;
+                      if (currentStreak === 0) {
+                        newStreak = 1; // Starting first streak
+                      } else if (user.lastActivityDate === yesterdayStr) {
+                        newStreak = currentStreak + 1; // Continue streak
+                      } else {
+                        newStreak = 1; // Reset streak after gap
+                      }
+                      
+                      // Update user progress with new streak
+                      const newUserProgress = { ...userProgress, streak: newStreak };
+                      setUserProgress(newUserProgress);
+                      checkAchievements(newUserProgress);
+                    }
                     
                     toast({
                       title: `Water logged! 💧`,
