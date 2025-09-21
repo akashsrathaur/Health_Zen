@@ -82,10 +82,23 @@
   }
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden; /* Prevent horizontal scroll on mobile */
   }
 
   html {
     scroll-behavior: smooth;
+  }
+
+  /* Ensure consistent sizing model and prevent overflow from padding on 100% width elements */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  /* Media elements should never overflow their containers */
+  img, video, canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
   }
 
   * {

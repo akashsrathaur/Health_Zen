@@ -39,6 +39,7 @@ import { defaultUser } from '@/lib/user-store';
 import { getUserProgressData, type UserProgress } from '@/lib/user-progress';
 import { format } from 'date-fns';
 import { getTodayActivity, type DailyActivity } from '@/actions/daily-activities';
+import { getWeeklyHistoricalData, type DailyHistoricalData } from '@/actions/daily-history';
 
 const waterChartConfig = {
   glasses: {
@@ -140,6 +141,7 @@ export default function ProgressTrackerPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [todayActivity, setTodayActivity] = useState<DailyActivity | null>(null);
+  const [weeklyHistoricalData, setWeeklyHistoricalData] = useState<{ [date: string]: DailyHistoricalData | null }>({});
   
   // Use live user data from auth context instead of static data
   const userData = user || { ...defaultUser, uid: 'default' };
@@ -161,6 +163,30 @@ export default function ProgressTrackerPage() {
     fetchTodayActivity();
   }, [userData.uid]);
   
+  // Fetch historical data for the selected week
+  useEffect(() => {
+    async function fetchWeeklyHistoricalData() {
+      if (userData.uid && userData.uid !== 'default') {
+        try {
+          // Generate dates for the last 7 days from selected date
+          const dates = [];
+          for (let i = 6; i >= 0; i--) {
+            const date = new Date(selectedDate);
+            date.setDate(date.getDate() - i);
+            dates.push(date.toLocaleDateString('en-CA')); // YYYY-MM-DD format
+          }
+          
+          const historicalData = await getWeeklyHistoricalData(userData.uid, dates);
+          setWeeklyHistoricalData(historicalData);
+        } catch (error) {
+          console.error('Error fetching weekly historical data:', error);
+        }
+      }
+    }
+    
+    fetchWeeklyHistoricalData();
+  }, [userData.uid, selectedDate]);
+  
   // Generate date labels for the last 7 days from selected date
   const generateLast7Days = (fromDate: Date = selectedDate) => {
     const days = [];
@@ -172,68 +198,59 @@ export default function ProgressTrackerPage() {
     return days;
   };
   
-  // Get real historical data for the selected week
+  // Get real historical data for the selected week using saved data from dailyHistory
   const getRealHistoricalData = (fromDate: Date) => {
     const today = new Date();
-    const weekStart = new Date(fromDate);
-    weekStart.setDate(weekStart.getDate() - 6); // Start of the 7-day period
-    
-    // Check if this week contains today
-    const weekEnd = new Date(fromDate);
-    const isCurrentWeekRange = today >= weekStart && today <= weekEnd;
-    
-    if (!isCurrentWeekRange) {
-      // Past or future weeks - show empty data since user hasn't been active then
-      return {
-        water: [0, 0, 0, 0, 0, 0, 0],
-        sleep: [0, 0, 0, 0, 0, 0, 0], 
-        gym: [0, 0, 0, 0, 0, 0, 0]
-      };
-    }
-    
-    // Current week range - calculate which day index today falls on
-    const daysDiff = Math.floor((today.getTime() - weekStart.getTime()) / (1000 * 60 * 60 * 24));
-    const todayIndex = Math.max(0, Math.min(6, daysDiff));
+    const todayDateStr = today.toLocaleDateString('en-CA');
     
     // Initialize arrays with zeros
     const waterData = [0, 0, 0, 0, 0, 0, 0];
     const sleepData = [0, 0, 0, 0, 0, 0, 0];
     const gymData = [0, 0, 0, 0, 0, 0, 0];
     
-    // Get actual daily vibes data from live context
-    const liveWaterVibe = dailyVibes.find(vibe => vibe.id === 'water');
-    const liveSleepVibe = dailyVibes.find(vibe => vibe.id === 'sleep');
-    const liveGymVibe = dailyVibes.find(vibe => vibe.id === 'gym');
-    
-    // Set today's actual data at the correct position if it exists
-    if (todayIndex >= 0 && todayIndex < 7) {
-      // Prioritize Firebase activity data over daily vibes data if available
-      if (todayActivity) {
-        waterData[todayIndex] = Math.max(0, Math.min(todayActivity.waterIntake || 0, 8));
-        sleepData[todayIndex] = Math.max(0, Math.min(todayActivity.sleepHours || 0, 12));
-        gymData[todayIndex] = Math.max(0, Math.min(todayActivity.gymMinutes || 0, 120));
+    // Generate dates for the last 7 days from selected date
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(fromDate);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toLocaleDateString('en-CA');
+      const dayIndex = 6 - i;
+      
+      if (dateStr === todayDateStr) {
+        // For today, use live data (current activities)
+        if (todayActivity) {
+          waterData[dayIndex] = Math.max(0, Math.min(todayActivity.waterIntake || 0, 8));
+          sleepData[dayIndex] = Math.max(0, Math.min(todayActivity.sleepHours || 0, 12));
+          gymData[dayIndex] = Math.max(0, Math.min(todayActivity.gymMinutes || 0, 120));
+        } else {
+          // Fallback to parsing from daily vibes data for today
+          const liveWaterVibe = dailyVibes.find(vibe => vibe.id === 'water');
+          const liveSleepVibe = dailyVibes.find(vibe => vibe.id === 'sleep');
+          const liveGymVibe = dailyVibes.find(vibe => vibe.id === 'gym');
+          
+          if (liveWaterVibe?.value) {
+            const waterMatch = liveWaterVibe.value.match(/^(\d+)/);
+            waterData[dayIndex] = Math.max(0, Math.min(parseInt(waterMatch?.[1] || '0'), 8));
+          }
+          
+          if (liveSleepVibe?.value) {
+            const sleepMatch = liveSleepVibe.value.match(/^([\d.]+)/);
+            sleepData[dayIndex] = Math.max(0, Math.min(parseFloat(sleepMatch?.[1] || '0'), 12));
+          }
+          
+          if (liveGymVibe?.value) {
+            const gymMatch = liveGymVibe.value.match(/^(\d+)/);
+            gymData[dayIndex] = Math.max(0, Math.min(parseInt(gymMatch?.[1] || '0'), 120));
+          }
+        }
       } else {
-        // Fallback to parsing from daily vibes data
-        // Water data - parse from "X/8 glasses" format
-        if (liveWaterVibe?.value) {
-          const waterMatch = liveWaterVibe.value.match(/^(\d+)/);
-          const waterCount = waterMatch ? parseInt(waterMatch[1]) : 0;
-          waterData[todayIndex] = Math.max(0, Math.min(waterCount, 8));
+        // For past days, use historical data from dailyHistory collection
+        const historicalData = weeklyHistoricalData[dateStr];
+        if (historicalData) {
+          waterData[dayIndex] = Math.max(0, Math.min(historicalData.activities.waterIntake || 0, 8));
+          sleepData[dayIndex] = Math.max(0, Math.min(historicalData.activities.sleepHours || 0, 12));
+          gymData[dayIndex] = Math.max(0, Math.min(historicalData.activities.gymMinutes || 0, 120));
         }
-        
-        // Sleep data - parse from "X.Xh" format
-        if (liveSleepVibe?.value) {
-          const sleepMatch = liveSleepVibe.value.match(/^([\d.]+)/);
-          const sleepHours = sleepMatch ? parseFloat(sleepMatch[1]) : 0;
-          sleepData[todayIndex] = Math.max(0, Math.min(sleepHours, 12));
-        }
-        
-        // Gym data - parse from "X/60 minutes" format
-        if (liveGymVibe?.value) {
-          const gymMatch = liveGymVibe.value.match(/^(\d+)/);
-          const gymMinutes = gymMatch ? parseInt(gymMatch[1]) : 0;
-          gymData[todayIndex] = Math.max(0, Math.min(gymMinutes, 120));
-        }
+        // If no historical data exists for this date, it remains 0 (which is correct)
       }
     }
     

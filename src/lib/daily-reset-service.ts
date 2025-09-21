@@ -33,7 +33,7 @@ class DailyResetServiceImpl implements DailyResetService {
     const scheduleNextReset = () => {
       const now = new Date();
       const resetTime = new Date();
-      resetTime.setHours(23, 59, 0, 0); // 11:59 PM
+      resetTime.setHours(23, 59, 0, 0); // 11:59 PM - save data before day ends
 
       // If it's already past 11:59 PM today, schedule for tomorrow
       if (now.getTime() > resetTime.getTime()) {
@@ -87,6 +87,7 @@ class DailyResetServiceImpl implements DailyResetService {
       return;
     }
 
+    // Get current date (today) since reset runs at end of day at 11:59 PM
     const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format
     const timestamp = new Date().toISOString();
     
@@ -107,7 +108,7 @@ class DailyResetServiceImpl implements DailyResetService {
       const userData = userDoc.data();
       const activitiesData = dailyActivitiesDoc.exists() ? dailyActivitiesDoc.data() : {};
       
-      // Save comprehensive daily summary to history
+      // Save comprehensive daily summary to history for today
       const historicalData = {
         userId,
         date: today,
@@ -230,13 +231,15 @@ class DailyResetServiceImpl implements DailyResetService {
       }
 
       const userData = userDoc.data();
-      const today = new Date().toLocaleDateString('en-CA');
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toLocaleDateString('en-CA');
       
-      // Reset user daily metrics
+      // Reset user daily metrics for tomorrow
       const resetData: any = {
         dailyPoints: 0,
         lastResetDate: new Date().toISOString(),
-        lastResetDay: today, // Track which day we last reset for (YYYY-MM-DD format)
+        lastResetDay: tomorrowStr, // Track which day we last reset for (YYYY-MM-DD format)
       };
 
       // Reset daily vibes (keep custom ones but reset progress)
@@ -304,18 +307,18 @@ class DailyResetServiceImpl implements DailyResetService {
           await updateDoc(userDataRef, {
             dailyVibes: resetData.dailyVibes || [],
             challenges: resetData.challenges || [],
-            lastResetDay: today,
+            lastResetDay: tomorrowStr,
           });
         }
       } catch (error) {
         console.warn(`Failed to update userData collection for user ${userId}:`, error);
       }
       
-      // Create fresh daily activities document for the new day (reset to zero)
-      const newDailyActivitiesRef = doc(db, 'dailyActivities', `${userId}-${today}`);
+      // Create fresh daily activities document for tomorrow (reset to zero)
+      const newDailyActivitiesRef = doc(db, 'dailyActivities', `${userId}-${tomorrowStr}`);
       await setDoc(newDailyActivitiesRef, {
         userId,
-        date: today,
+        date: tomorrowStr,
         waterIntake: 0,
         waterGoal: 8,
         sleepHours: 0,
