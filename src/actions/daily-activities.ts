@@ -131,9 +131,9 @@ export async function updateGymMinutes(userId: string, minutes: number): Promise
       updatedAt: new Date().toISOString(),
     }, { merge: true });
 
-    // Award points for workout milestones (15, 30, 45, 60 minutes)
+    // Award points for workout milestones (5, 10, 15, 20 minutes)
     let pointsEarned = 0;
-    const milestones = [15, 30, 45, 60];
+    const milestones = [5, 10, 15, 20];
     const previousMinutes = existingData.gymMinutes || 0;
     
     for (const milestone of milestones) {

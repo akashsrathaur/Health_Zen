@@ -524,7 +524,7 @@ export default function ProgressTrackerPage() {
             <CardHeader className="pb-4">
               <CardTitle className="text-lg sm:text-xl">Gym Workouts</CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                <span className="hidden sm:inline">Last 7 days (Goal: 60 minutes) | Today: {currentGym} min</span>
+                <span className="hidden sm:inline">Last 7 days (Goal: 20 minutes) | Today: {currentGym} min</span>
                 <span className="sm:hidden">7 days | Today: {currentGym} min</span>
               </CardDescription>
             </CardHeader>
@@ -536,7 +536,7 @@ export default function ProgressTrackerPage() {
                 <YAxis hide />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar dataKey="minutes" fill="var(--color-minutes)" radius={4} maxBarSize={20} />
-                <ReferenceLine y={60} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
+                <ReferenceLine y={20} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
               </BarChart>
             </ChartContainer>
           </CardContent>

@@ -48,6 +48,7 @@ import { updateWaterIntake, updateGymMinutes } from '@/actions/daily-activities'
 import { dailyResetService } from '@/lib/daily-reset-service';
 import { MotivationalNotificationTest } from '@/components/motivational-notification-test';
 import { CameraDialog } from '@/components/ui/camera-dialog';
+import { restoreUserData, safeRefreshDailyTasks } from '@/lib/restore-user-data';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -174,8 +175,8 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete, userData }: {
         const minutes = parseInt(e.target.value) || 0;
         setCurrentVibe(prev => {
              if (!prev || prev.id !== 'gym') return prev;
-             const goal = 60;
-             return { ...prev, value: `${minutes}/60 minutes`, progress: (minutes / goal) * 100 }
+             const goal = 20;
+             return { ...prev, value: `${minutes}/20 minutes`, progress: (minutes / goal) * 100 }
         })
     }
     
@@ -681,14 +682,14 @@ export default function DashboardPage() {
       startTransition(async () => {
         if (!user) return;
         const current = parseInt(vibe.value.split('/')[0]);
-        const newValue = Math.min(current + 15, 120); // Add 15 minutes, max 120
-        const newProgress = Math.min((newValue / 60) * 100, 100);
+        const newValue = Math.min(current + 5, 30); // Add 5 minutes, max 30
+        const newProgress = Math.min((newValue / 20) * 100, 100);
         
         const updatedVibe = { 
           ...vibe, 
-          value: `${newValue}/60 minutes`,
+          value: `${newValue}/20 minutes`,
           progress: newProgress,
-          completedAt: newValue >= 60 ? new Date().toISOString() : undefined
+          completedAt: newValue >= 20 ? new Date().toISOString() : undefined
         };
         
         const updatedVibes = dailyVibes.map(v => v.id === vibeId ? updatedVibe : v);
@@ -700,7 +701,7 @@ export default function DashboardPage() {
           
           toast({
             title: `Workout logged! 💪`,
-            description: `You've worked out for ${newValue} minutes today. ${newValue >= 60 ? 'Daily goal achieved!' : `${60 - newValue} more minutes to go!`}`
+            description: `You've worked out for ${newValue} minutes today. ${newValue >= 20 ? 'Daily goal achieved!' : `${20 - newValue} more minutes to go!`}`
           });
         } catch (error) {
           console.error('Error updating gym minutes:', error);
@@ -774,15 +775,42 @@ export default function DashboardPage() {
     if (!user) return;
     
     try {
-      await dailyResetService.manualReset(user.uid);
-      toast({
-        title: "Manual Reset Complete",
-        description: "Daily data has been saved and metrics reset for testing.",
-      });
+      // Use safe refresh that preserves challenges and custom tasks
+      const result = await safeRefreshDailyTasks(user.uid);
+      if (result.success) {
+        toast({
+          title: "Daily Tasks Refreshed",
+          description: "Your daily progress has been reset while preserving your challenges and custom tasks.",
+        });
+      } else {
+        throw new Error(result.error);
+      }
     } catch (error) {
       toast({
-        title: "Reset Failed",
-        description: "Failed to perform manual reset.",
+        title: "Refresh Failed", 
+        description: "Failed to refresh daily tasks. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  const handleRestoreData = async () => {
+    if (!user) return;
+    
+    try {
+      const result = await restoreUserData(user.uid);
+      if (result.success) {
+        toast({
+          title: "Data Restored",
+          description: "Your challenges and daily tasks have been restored.",
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      toast({
+        title: "Restore Failed",
+        description: "Failed to restore your data. Please try again.",
         variant: "destructive",
       });
     }
@@ -922,8 +950,11 @@ export default function DashboardPage() {
                 <div className='flex items-center justify-between mb-4'>
                     <h2 className="text-xl font-semibold">Daily Vibe</h2>
                     <div className='flex gap-2'>
+                        <Button variant="ghost" size="sm" onClick={handleRestoreData}>
+                            <RefreshCcw className='mr-2 h-4 w-4' /> Restore Tasks
+                        </Button>
                         <Button variant="ghost" size="sm" onClick={handleManualReset}>
-                            <RefreshCcw className='mr-2 h-4 w-4' /> Reset Day
+                            <RefreshCcw className='mr-2 h-4 w-4' /> Refresh Day
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => setIsAddVibeOpen(true)}>
                             <PlusCircle className='mr-2 h-4 w-4' /> Add Vibe
@@ -1015,7 +1046,7 @@ export default function DashboardPage() {
                                         ) : isGymCard ? (
                                           <>
                                             <Plus className="mr-2 h-4 w-4" />
-                                            {isCompleted ? 'Add More' : 'Add 15min'}
+                                            {isCompleted ? 'Add More' : 'Add 5min'}
                                           </>
                                         ) : (
                                           <>
