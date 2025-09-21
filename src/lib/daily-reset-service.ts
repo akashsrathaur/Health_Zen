@@ -169,7 +169,6 @@ class DailyResetServiceImpl implements DailyResetService {
       const currentStreak = userData.streak || 0;
       const lastStreakUpdate = userData.lastStreakUpdate || '';
 
-<<<<<<< HEAD
       console.log(`Checking streak for user ${userId}: lastActivity=${lastActivityDate}, today=${today}, currentStreak=${currentStreak}`);
 
       // Check if user was active today (has completed tasks)
@@ -205,7 +204,6 @@ class DailyResetServiceImpl implements DailyResetService {
           lastActivityDate: today,
         });
         
-<<<<<<< HEAD
         console.log(`✅ Updated streak for user ${userId}: ${currentStreak} -> ${newStreak}`);
       } else if (wasActiveYesterday && currentStreak > 0) {
         // User was active yesterday but not today, reset streak after grace period
@@ -357,10 +355,10 @@ class DailyResetServiceImpl implements DailyResetService {
   }
   
   // Check if daily reset is needed for user and trigger it
-  async checkAndTriggerResetIfNeeded(userId: string): Promise<void> {
+  async checkAndTriggerResetIfNeeded(userId: string): Promise<boolean> {
     if (!db) {
       console.warn('Firebase not configured, skipping reset check');
-      return;
+      return false;
     }
     
     try {
@@ -369,19 +367,27 @@ class DailyResetServiceImpl implements DailyResetService {
       
       if (!userDoc.exists()) {
         console.warn(`User ${userId} not found for reset check`);
-        return;
+        return false;
       }
       
       const userData = userDoc.data();
       const today = new Date().toLocaleDateString('en-CA');
       const lastResetDay = userData.lastResetDay || '';
       
+      console.log(`Checking daily reset for user ${userId}: lastResetDay=${lastResetDay}, today=${today}`);
+      
       // Check if we need to reset for today
       if (lastResetDay !== today) {
+        console.log(`Triggering daily reset for user ${userId}`);
         await this.performDailyReset(userId);
+        return true; // Reset was performed
+      } else {
+        console.log(`Daily reset already completed today for user ${userId}`);
+        return false; // No reset needed
       }
     } catch (error) {
       console.error(`Error checking reset for user ${userId}:`, error);
+      return false;
     }
   }
 }

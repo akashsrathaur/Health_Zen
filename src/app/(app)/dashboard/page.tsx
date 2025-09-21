@@ -470,6 +470,37 @@ export default function DashboardPage() {
   const { toast } = useToast();
   const { addNotification } = useNotifications();
 
+  // Daily refresh mechanism - check for reset every time dashboard loads
+  useEffect(() => {
+    async function checkDailyReset() {
+      if (!user || !user.uid || user.uid === 'default') return;
+      
+      try {
+        // Check if we need to trigger daily reset
+        await dailyResetService.checkAndTriggerResetIfNeeded(user.uid);
+      } catch (error) {
+        console.warn('Error checking daily reset:', error);
+      }
+    }
+    
+    checkDailyReset();
+  }, [user]);
+  
+  // Set up periodic check every 5 minutes to ensure daily refresh
+  useEffect(() => {
+    if (!user || !user.uid || user.uid === 'default') return;
+    
+    const checkInterval = setInterval(async () => {
+      try {
+        await dailyResetService.checkAndTriggerResetIfNeeded(user.uid);
+      } catch (error) {
+        console.warn('Error in periodic daily reset check:', error);
+      }
+    }, 5 * 60 * 1000); // Check every 5 minutes
+    
+    return () => clearInterval(checkInterval);
+  }, [user]);
+
   // Achievement Check Logic
   const checkAchievements = (newProgress: { streak: number, completedTasks: number }) => {
     if (!userProgress) return;
@@ -890,9 +921,14 @@ export default function DashboardPage() {
             <section>
                 <div className='flex items-center justify-between mb-4'>
                     <h2 className="text-xl font-semibold">Daily Vibe</h2>
-                    <Button variant="ghost" size="sm" onClick={() => setIsAddVibeOpen(true)}>
-                        <PlusCircle className='mr-2 h-4 w-4' /> Add Vibe
-                    </Button>
+                    <div className='flex gap-2'>
+                        <Button variant="ghost" size="sm" onClick={handleManualReset}>
+                            <RefreshCcw className='mr-2 h-4 w-4' /> Reset Day
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => setIsAddVibeOpen(true)}>
+                            <PlusCircle className='mr-2 h-4 w-4' /> Add Vibe
+                        </Button>
+                    </div>
                 </div>
                 <motion.div 
                   className="grid grid-cols-1 gap-4"
