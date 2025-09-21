@@ -83,10 +83,12 @@
   body {
     @apply bg-background text-foreground;
     overflow-x: hidden; /* Prevent horizontal scroll on mobile */
+    font-size: 14px; /* Base font size for better mobile readability */
   }
 
   html {
     scroll-behavior: smooth;
+    font-size: 16px; /* Root font size */
   }
 
   /* Ensure consistent sizing model and prevent overflow from padding on 100% width elements */
@@ -101,8 +103,24 @@
     display: block;
   }
 
+  /* Improve touch targets on mobile */
+  button, [role="button"], input[type="submit"], input[type="button"] {
+    min-height: 44px; /* Apple's recommended minimum touch target */
+    min-width: 44px;
+  }
+
+  /* Better text rendering */
   * {
     -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Prevent zoom on input focus on iOS */
+  @media screen and (max-width: 768px) {
+    input, textarea, select {
+      font-size: 16px !important;
+    }
   }
 }
 
@@ -256,6 +274,9 @@
     .xs\:hidden {
       display: none;
     }
+    .xs\:inline {
+      display: none;
+    }
   }
   
   @media (min-width: 476px) {
@@ -264,9 +285,45 @@
     }
   }
   
-  @media (max-width: 475px) {
-    .xs\:inline {
-      display: none;
+  /* Mobile-first spacing utilities */
+  .mobile-padding {
+    padding: 0.75rem; /* 12px */
+  }
+  
+  @media (min-width: 640px) {
+    .mobile-padding {
+      padding: 1rem; /* 16px */
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .mobile-padding {
+      padding: 1.5rem; /* 24px */
+    }
+  }
+  
+  /* Mobile-optimized text sizes */
+  .mobile-text {
+    font-size: 0.75rem; /* 12px */
+  }
+  
+  @media (min-width: 640px) {
+    .mobile-text {
+      font-size: 0.875rem; /* 14px */
+    }
+  }
+  
+  /* Better mobile button spacing */
+  .mobile-button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  @media (min-width: 640px) {
+    .mobile-button-group {
+      flex-direction: row;
+      gap: 0.75rem;
     }
   }
 
@@ -648,6 +705,49 @@
     min-height: 100%;
     min-height: 100vh;
     min-height: 100dvh;
+  }
+  
+  /* Mobile-specific improvements */
+  @media (max-width: 768px) {
+    /* Reduce font sizes slightly on mobile for better space utilization */
+    h1 {
+      font-size: 1.5rem !important;
+      line-height: 2rem !important;
+    }
+    
+    h2 {
+      font-size: 1.25rem !important;
+      line-height: 1.75rem !important;
+    }
+    
+    h3 {
+      font-size: 1.125rem !important;
+      line-height: 1.75rem !important;
+    }
+    
+    /* Better card spacing on mobile */
+    .card {
+      margin-bottom: 1rem;
+    }
+    
+    /* Optimize button sizing for mobile */
+    .btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+    
+    /* Better form input spacing */
+    .form-input {
+      margin-bottom: 1rem;
+    }
+  }
+  
+  /* Tablet-specific optimizations */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    /* Optimize for tablet layouts */
+    body {
+      font-size: 15px;
+    }
   }
 
 }

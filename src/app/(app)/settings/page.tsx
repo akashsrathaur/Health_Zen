@@ -287,43 +287,45 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="mx-auto max-w-3xl space-y-6 sm:space-y-8">
-            <div className="px-1">
-                <h1 className="font-headline text-2xl sm:text-3xl font-bold tracking-tight">Account Settings</h1>
-                <p className="text-muted-foreground text-sm sm:text-base">
+        <div className="mx-auto max-w-4xl space-y-4 sm:space-y-6 lg:space-y-8">
+            <div className="space-y-2">
+                <h1 className="font-headline text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Account Settings</h1>
+                <p className="text-muted-foreground text-xs sm:text-sm lg:text-base">
                     Manage your account details and preferences.
                 </p>
             </div>
             
             {/* Profile Settings */}
             <Card>
-                <CardHeader className="pb-4">
-                    <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                <CardHeader className="pb-3 sm:pb-4">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg lg:text-xl">
                         <User className="h-4 w-4 sm:h-5 sm:w-5" />
                         Profile
                     </CardTitle>
                     <CardDescription className="text-xs sm:text-sm">This is how others will see you on the site.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4 sm:space-y-6">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        <Avatar className="h-16 w-16 sm:h-20 sm:w-20 mx-auto sm:mx-0">
-                            <AvatarImage src={userData.avatarUrl} />
-                            <AvatarFallback>{userData.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div className="grid gap-1 text-center sm:text-left flex-1">
-                            <h3 className="font-semibold text-lg sm:text-base">{userData.name}</h3>
-                            <p className="text-sm text-muted-foreground">{userData.age} years old</p>
-                            <div className="flex items-center gap-1.5 text-sm text-yellow-500 justify-center sm:justify-start">
-                                <Flame className="h-4 w-4"/>
-                                <span className="font-semibold">{userData.streak} Day Streak</span>
+                    <div className="flex flex-col gap-4 sm:gap-6">
+                        <div className="flex flex-col sm:flex-row items-center gap-4">
+                            <Avatar className="h-16 w-16 sm:h-20 sm:w-20">
+                                <AvatarImage src={userData.avatarUrl} />
+                                <AvatarFallback>{userData.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 space-y-2 text-center sm:text-left">
+                                <h3 className="font-semibold text-base sm:text-lg">{userData.name}</h3>
+                                <p className="text-sm text-muted-foreground">{userData.age} years old</p>
+                                <div className="flex items-center gap-1.5 text-sm text-yellow-500 justify-center sm:justify-start">
+                                    <Flame className="h-4 w-4"/>
+                                    <span className="font-semibold">{userData.streak} Day Streak</span>
+                                </div>
                             </div>
-                        </div>
-                        <div className="w-full sm:w-auto sm:ml-auto">
-                            <AvatarSelector
-                                currentAvatarUrl={userData.avatarUrl}
-                                onAvatarSelect={handleAvatarSelect}
-                                disabled={isUploading}
-                            />
+                            <div className="flex-shrink-0">
+                                <AvatarSelector
+                                    currentAvatarUrl={userData.avatarUrl}
+                                    onAvatarSelect={handleAvatarSelect}
+                                    disabled={isUploading}
+                                />
+                            </div>
                         </div>
                     </div>
                     
@@ -366,8 +368,8 @@ export default function SettingsPage() {
 
             {/* Buddy Settings */}
             <Card>
-                <CardHeader className="pb-4">
-                    <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                <CardHeader className="pb-3 sm:pb-4">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg lg:text-xl">
                         <Bot className="h-4 w-4 sm:h-5 sm:w-5" />
                         Wellness Buddy
                     </CardTitle>
@@ -473,37 +475,37 @@ export default function SettingsPage() {
 
             {/* Contact Information */}
             <Card>
-                <CardHeader className="pb-4">
-                    <CardTitle className="text-lg sm:text-xl">Contact Information</CardTitle>
+                <CardHeader className="pb-3 sm:pb-4">
+                    <CardTitle className="text-base sm:text-lg lg:text-xl">Contact Information</CardTitle>
                     <CardDescription className="text-xs sm:text-sm">Your email and mobile number (read-only).</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid gap-2">
-                        <Label htmlFor="email" className="text-sm font-medium">Email</Label>
-                        <Input id="email" type="email" readOnly value={firebaseUser?.email || "No email provided"} className="text-sm" />
+                <CardContent className="space-y-3 sm:space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="email" className="text-xs sm:text-sm font-medium">Email</Label>
+                        <Input id="email" type="email" readOnly value={firebaseUser?.email || "No email provided"} className="text-xs sm:text-sm" />
                     </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="mobile" className="text-sm font-medium">Mobile Number</Label>
-                        <Input id="mobile" type="tel" readOnly value={userData.phone || "No phone provided"} className="text-sm" />
+                    <div className="space-y-2">
+                        <Label htmlFor="mobile" className="text-xs sm:text-sm font-medium">Mobile Number</Label>
+                        <Input id="mobile" type="tel" readOnly value={userData.phone || "No phone provided"} className="text-xs sm:text-sm" />
                     </div>
                 </CardContent>
             </Card>
 
             {/* Notifications */}
             <Card>
-                <CardHeader className="pb-4">
-                    <CardTitle className="text-lg sm:text-xl">Notifications</CardTitle>
+                <CardHeader className="pb-3 sm:pb-4">
+                    <CardTitle className="text-base sm:text-lg lg:text-xl">Notifications</CardTitle>
                     <CardDescription className="text-xs sm:text-sm">Choose how you want to be notified.</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 rounded-lg border p-4 transition-colors hover:bg-secondary/50">
+                <CardContent className="space-y-3 sm:space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 rounded-lg border p-3 sm:p-4 transition-colors hover:bg-secondary/50">
                         <div className="space-y-0.5 flex-1">
-                            <Label htmlFor="email-notifications" className="text-sm sm:text-base font-normal cursor-pointer">Email Notifications</Label>
-                            <p className="text-xs sm:text-sm text-muted-foreground">
+                            <Label htmlFor="email-notifications" className="text-xs sm:text-sm font-normal cursor-pointer">Email Notifications</Label>
+                            <p className="text-xs text-muted-foreground">
                                 Receive challenge updates and motivational quotes in your inbox.
                             </p>
                         </div>
-                        <div className="flex justify-end">
+                        <div className="flex justify-end sm:justify-center">
                             <Switch 
                                 id="email-notifications" 
                                 checked={emailNotifications}

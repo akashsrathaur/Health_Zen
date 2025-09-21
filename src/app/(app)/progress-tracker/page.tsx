@@ -338,155 +338,176 @@ export default function ProgressTrackerPage() {
   };
 
   return (
-    <div className="flex flex-col gap-8" id="progress-report">
-      <div className="flex flex-col gap-4">
-        <div>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-2">
-            <h1 className="font-headline text-2xl sm:text-3xl font-bold tracking-tight text-glow">Progress Tracker</h1>
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
-              <Button 
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const newDate = new Date(selectedDate);
-                  newDate.setDate(selectedDate.getDate() - 7);
-                  setSelectedDate(newDate);
-                }}
-                className="flex-shrink-0"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              
-              <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-[180px] sm:w-[240px] justify-start text-left font-normal text-xs sm:text-sm flex-shrink-0",
-                      !selectedDate && "text-muted-foreground"
-                    )}
-                    size="sm"
-                  >
-                    <CalendarIcon className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                    <span className="truncate">
-                      {selectedDate ? format(selectedDate, "MMM d, yyyy") : "Pick a date"}
-                    </span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={(date) => {
-                      if (date) {
-                        setSelectedDate(date);
-                        setIsDatePickerOpen(false);
-                      }
-                    }}
-                    disabled={(date) => date > new Date() || date < new Date("2024-01-01")}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              
-              <Button 
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const newDate = new Date(selectedDate);
-                  newDate.setDate(selectedDate.getDate() + 7);
-                  if (newDate <= new Date()) {
-                    setSelectedDate(newDate);
-                  }
-                }}
-                disabled={(() => {
-                  const nextWeek = new Date(selectedDate);
-                  nextWeek.setDate(selectedDate.getDate() + 7);
-                  return nextWeek > new Date();
-                })()}
-                className="flex-shrink-0"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          <p className="text-muted-foreground text-sm sm:text-base">
-            <Balancer>Visualize your wellness journey and celebrate your milestones.</Balancer>
-          </p>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Viewing data for week ending: {format(selectedDate, "MMMM d, yyyy")}
-          </p>
-          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-4 mt-2">
-            <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-amber-600 dark:text-amber-400">
-              <Icons.points className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-              <div className="flex flex-col sm:flex-row sm:items-center sm:gap-1">
-                <span className="font-semibold">{totalPoints} pts</span>
-                <span className="text-muted-foreground text-xs sm:text-sm">({dailyPoints}/30)</span>
+    <div className="flex flex-col gap-6 sm:gap-8" id="progress-report">
+      <div className="space-y-4">
+        <div className="space-y-3">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+              <div>
+                <h1 className="font-headline text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-glow">Progress Tracker</h1>
+                <p className="text-muted-foreground text-xs sm:text-sm lg:text-base mt-1">
+                  <Balancer>Visualize your wellness journey and celebrate your milestones.</Balancer>
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button 
+                  variant="gradient" 
+                  onClick={handleShareReport}
+                  disabled={isExporting}
+                  className="w-full sm:w-auto text-xs sm:text-sm"
+                  size="sm"
+                >
+                  {isExporting ? (
+                    <Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                  ) : (
+                    <Share2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                  )}
+                  <span className="hidden xs:inline">Share Report</span>
+                  <span className="xs:hidden">Share</span>
+                </Button>
+                <Button 
+                  variant="gradient" 
+                  onClick={handleExportReport}
+                  disabled={isExporting}
+                  className="w-full sm:w-auto text-xs sm:text-sm"
+                  size="sm"
+                >
+                  {isExporting ? (
+                    <Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                  ) : (
+                    <Download className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                  )}
+                  <span className="hidden xs:inline">Export Report</span>
+                  <span className="xs:hidden">Export</span>
+                </Button>
               </div>
             </div>
-            <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-              <Icons.streak className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0 bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent" />
-              <span className="font-semibold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">{userProgress.streak} streak</span>
-            </div>
-            <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-blue-600 dark:text-blue-400">
-              <Icons.points className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-              <span className="font-semibold">{userProgress.completedTasks} tasks</span>
-            </div>
-            <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-green-600 dark:text-green-400">
-              <Icon name="Dumbbell" className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-              <span className="font-semibold">{currentGym} min</span>
+            
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newDate = new Date(selectedDate);
+                    newDate.setDate(selectedDate.getDate() - 7);
+                    setSelectedDate(newDate);
+                  }}
+                  className="flex-shrink-0"
+                >
+                  <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+                </Button>
+                
+                <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-[140px] sm:w-[200px] justify-start text-left font-normal text-xs sm:text-sm flex-shrink-0",
+                        !selectedDate && "text-muted-foreground"
+                      )}
+                      size="sm"
+                    >
+                      <CalendarIcon className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="truncate">
+                        {selectedDate ? format(selectedDate, "MMM d, yyyy") : "Pick a date"}
+                      </span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="center">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(date) => {
+                        if (date) {
+                          setSelectedDate(date);
+                          setIsDatePickerOpen(false);
+                        }
+                      }}
+                      disabled={(date) => date > new Date() || date < new Date("2024-01-01")}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const newDate = new Date(selectedDate);
+                    newDate.setDate(selectedDate.getDate() + 7);
+                    if (newDate <= new Date()) {
+                      setSelectedDate(newDate);
+                    }
+                  }}
+                  disabled={(() => {
+                    const nextWeek = new Date(selectedDate);
+                    nextWeek.setDate(selectedDate.getDate() + 7);
+                    return nextWeek > new Date();
+                  })()}
+                  className="flex-shrink-0"
+                >
+                  <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
+                </Button>
+              </div>
+              
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Week ending: {format(selectedDate, "MMM d, yyyy")}
+              </p>
             </div>
           </div>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-2 mt-4 sm:mt-0">
-          <Button 
-            variant="gradient" 
-            onClick={handleShareReport}
-            disabled={isExporting}
-            className="w-full sm:w-auto text-xs sm:text-sm"
-            size="sm"
-          >
-            {isExporting ? (
-              <Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
-            ) : (
-              <Share2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-            )}
-            <span className="hidden xs:inline">Share Report</span>
-            <span className="xs:hidden">Share</span>
-          </Button>
-          <Button 
-            variant="gradient" 
-            onClick={handleExportReport}
-            disabled={isExporting}
-            className="w-full sm:w-auto text-xs sm:text-sm"
-            size="sm"
-          >
-            {isExporting ? (
-              <Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
-            ) : (
-              <Download className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-            )}
-            <span className="hidden xs:inline">Export Report</span>
-            <span className="xs:hidden">Export</span>
-          </Button>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+              <Icons.points className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-amber-700 dark:text-amber-300">{totalPoints} pts</p>
+                <p className="text-xs text-amber-600 dark:text-amber-500">({dailyPoints}/30)</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800">
+              <Icons.streak className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-orange-700 dark:text-orange-300">{userProgress.streak}</p>
+                <p className="text-xs text-orange-600 dark:text-orange-500">streak</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+              <Icons.points className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300">{userProgress.completedTasks}</p>
+                <p className="text-xs text-blue-600 dark:text-blue-500">tasks</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
+              <Icon name="Dumbbell" className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-green-700 dark:text-green-300">{currentGym}</p>
+                <p className="text-xs text-green-600 dark:text-green-500">min</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 gradient-border-card">
           <Card className="gradient-border-card-inner">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg sm:text-xl">Water Intake</CardTitle>
+            <CardHeader className="pb-3 sm:pb-4">
+              <CardTitle className="text-base sm:text-lg lg:text-xl">Water Intake</CardTitle>
               <CardDescription className="text-xs sm:text-sm">
                 <span className="hidden sm:inline">Last 7 days (Goal: 8 glasses) | Today: {currentWater}/8</span>
-                <span className="sm:hidden">7 days | Today: {currentWater}/8</span>
+                <span className="sm:hidden">7 days | {currentWater}/8</span>
               </CardDescription>
             </CardHeader>
           <CardContent>
-            <ChartContainer config={waterChartConfig} className="h-48 sm:h-64 w-full">
+            <ChartContainer config={waterChartConfig} className="h-40 sm:h-48 lg:h-64 w-full">
               <BarChart accessibilityLayer data={waterChartData}>
                 <CartesianGrid vertical={false} />
-                <XAxis dataKey="day" tickLine={false} tickMargin={10} axisLine={false} fontSize={12} />
+                <XAxis dataKey="day" tickLine={false} tickMargin={10} axisLine={false} fontSize={10} />
                 <YAxis hide />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar dataKey="glasses" fill="var(--color-glasses)" radius={4} maxBarSize={20} />
@@ -497,15 +518,15 @@ export default function ProgressTrackerPage() {
           </Card>
         </div>
         <div className="gradient-border-card">
-          <Card className="gradient-border-card-inner flex flex-col items-center justify-center min-h-[200px] sm:min-h-[250px] relative overflow-hidden">
+          <Card className="gradient-border-card-inner flex flex-col items-center justify-center min-h-[180px] sm:min-h-[200px] lg:min-h-[250px] relative overflow-hidden">
             <div className="absolute inset-0 gradient-button opacity-80"></div>
             <CardHeader className="items-center text-center pb-2 relative z-10">
-              <CardTitle className='text-white text-lg sm:text-xl font-semibold'>Current Streak</CardTitle>
-              <Flame className="h-12 w-12 sm:h-16 sm:w-16 text-white drop-shadow-lg" />
+              <CardTitle className='text-white text-base sm:text-lg lg:text-xl font-semibold'>Current Streak</CardTitle>
+              <Flame className="h-10 w-10 sm:h-12 sm:w-12 lg:h-16 lg:w-16 text-white drop-shadow-lg" />
             </CardHeader>
             <CardContent className="text-center relative z-10">
-              <p className="text-4xl sm:text-6xl font-bold text-white animate-bounce-in drop-shadow-lg">{userProgress.streak}</p>
-              <p className="text-center font-medium text-white/90 text-sm sm:text-base">days</p>
+              <p className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white animate-bounce-in drop-shadow-lg">{userProgress.streak}</p>
+              <p className="text-center font-medium text-white/90 text-xs sm:text-sm lg:text-base">days</p>
             </CardContent>
           </Card>
         </div>

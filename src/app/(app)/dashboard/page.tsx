@@ -934,35 +934,41 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      <div>
-        <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground">
+    <div className="flex flex-col gap-6 sm:gap-8">
+      <div className="space-y-2">
+        <h1 className="font-headline text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
           Welcome back, <span>{(user && user.name) ? user.name.split(' ')[0] : 'friend'}!</span>
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground text-sm sm:text-base">
           <Balancer>Here's your wellness summary for today. Keep up the great work!</Balancer>
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
          <div className='lg:col-span-1'>
-            <section>
-                <div className='flex items-center justify-between mb-4'>
-                    <h2 className="text-xl font-semibold">Daily Vibe</h2>
-                    <div className='flex gap-2'>
-                        <Button variant="ghost" size="sm" onClick={handleRestoreData}>
-                            <RefreshCcw className='mr-2 h-4 w-4' /> Restore Tasks
+            <section className="space-y-4">
+                <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4'>
+                    <h2 className="text-lg sm:text-xl font-semibold">Daily Vibe</h2>
+                    <div className='flex flex-wrap gap-2'>
+                        <Button variant="ghost" size="sm" onClick={handleRestoreData} className="text-xs">
+                            <RefreshCcw className='mr-2 h-3 w-3 sm:h-4 sm:w-4' /> 
+                            <span className="hidden sm:inline">Restore Tasks</span>
+                            <span className="sm:hidden">Restore</span>
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={handleManualReset}>
-                            <RefreshCcw className='mr-2 h-4 w-4' /> Refresh Day
+                        <Button variant="ghost" size="sm" onClick={handleManualReset} className="text-xs">
+                            <RefreshCcw className='mr-2 h-3 w-3 sm:h-4 sm:w-4' /> 
+                            <span className="hidden sm:inline">Refresh Day</span>
+                            <span className="sm:hidden">Refresh</span>
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => setIsAddVibeOpen(true)}>
-                            <PlusCircle className='mr-2 h-4 w-4' /> Add Vibe
+                        <Button variant="ghost" size="sm" onClick={() => setIsAddVibeOpen(true)} className="text-xs">
+                            <PlusCircle className='mr-2 h-3 w-3 sm:h-4 sm:w-4' /> 
+                            <span className="hidden sm:inline">Add Vibe</span>
+                            <span className="sm:hidden">Add</span>
                         </Button>
                     </div>
                 </div>
                 <motion.div 
-                  className="grid grid-cols-1 gap-4"
+                  className="grid grid-cols-1 gap-3 sm:gap-4"
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
@@ -1079,15 +1085,19 @@ export default function DashboardPage() {
             </section>
         </div>
         <div className="lg:col-span-2">
-            <section>
-                <div className='flex items-center justify-between mb-4'>
-                    <h2 className="text-xl font-semibold">Your Challenges</h2>
-                    <Button variant="ghost" asChild>
-                        <Link href="/challenges">View All <ArrowRight className='ml-2 h-4 w-4'/></Link>
+            <section className="space-y-4">
+                <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4'>
+                    <h2 className="text-lg sm:text-xl font-semibold">Your Challenges</h2>
+                    <Button variant="ghost" asChild size="sm" className="self-start sm:self-auto">
+                        <Link href="/challenges" className="text-xs sm:text-sm">
+                          <span className="hidden sm:inline">View All</span>
+                          <span className="sm:hidden">All</span>
+                          <ArrowRight className='ml-2 h-3 w-3 sm:h-4 sm:w-4'/>
+                        </Link>
                     </Button>
                 </div>
                 <motion.div 
-                  className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                  className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2"
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
@@ -1101,15 +1111,15 @@ export default function DashboardPage() {
       </div>
       
       {/* Motivational Notification Test Section - Temporary for Testing */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
         <div className="lg:col-span-1">
           <MotivationalNotificationTest />
         </div>
       </div>
       
       {/* Coming Soon Section */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-3">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6">
+        <div className="w-full">
           <motion.div 
             variants={itemVariants}
             initial="hidden"

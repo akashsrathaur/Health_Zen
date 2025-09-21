@@ -80,20 +80,20 @@ function PostCard({ post, currentUser }: { post: CommunityPost; currentUser: Use
   return (
     <div className="gradient-border-card">
       <Card className="gradient-border-card-inner overflow-hidden">
-      <CardHeader className="flex flex-row items-center gap-3">
-        <Avatar variant="gradient">
+      <CardHeader className="flex flex-row items-center gap-2 sm:gap-3 pb-3 sm:pb-4">
+        <Avatar variant="gradient" className="h-8 w-8 sm:h-10 sm:w-10">
           <AvatarImage src={post.user.avatarUrl} alt={post.user.name} />
           <AvatarFallback>{post.user.name.charAt(0)}</AvatarFallback>
         </Avatar>
-        <div className="grid gap-0.5">
-          <p className="font-semibold">{post.user.name}</p>
-          <p className="text-sm text-muted-foreground">
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-sm sm:text-base truncate">{post.user.name}</p>
+          <p className="text-xs sm:text-sm text-muted-foreground">
             {formatDistanceToNow(new Date(post.timestamp), { addSuffix: true })}
           </p>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <p>{post.content}</p>
+      <CardContent className="space-y-3 sm:space-y-4 pt-0">
+        <p className="text-sm sm:text-base break-words">{post.content}</p>
         {post.imageUrl && (
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
             <Image
@@ -108,9 +108,9 @@ function PostCard({ post, currentUser }: { post: CommunityPost; currentUser: Use
       </CardContent>
       
       {/* Reaction Bar */}
-      <div className="px-6 pb-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+      <div className="px-4 sm:px-6 pb-3 sm:pb-4">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
             {commonReactions.map((emoji) => {
               const count = post.reactions[emoji] || 0;
               const isActive = userReaction === emoji;
@@ -119,12 +119,15 @@ function PostCard({ post, currentUser }: { post: CommunityPost; currentUser: Use
                   key={emoji}
                   variant={isActive ? "default" : "ghost"}
                   size="sm"
-                  className={cn("rounded-full h-8 px-2", isActive && "bg-primary text-primary-foreground")}
+                  className={cn(
+                    "rounded-full h-6 sm:h-8 px-1 sm:px-2 text-xs sm:text-sm", 
+                    isActive && "bg-primary text-primary-foreground"
+                  )}
                   onClick={() => {}} // Disabled - readonly mode
                   disabled={true} // Always disabled
                 >
                   {emoji}
-                  {count > 0 && <span className="ml-1 text-xs">{count}</span>}
+                  {count > 0 && <span className="ml-0.5 sm:ml-1 text-xs">{count}</span>}
                 </Button>
               );
             })}
@@ -134,10 +137,11 @@ function PostCard({ post, currentUser }: { post: CommunityPost; currentUser: Use
             size="sm"
             onClick={() => {}} // Disabled - readonly mode
             disabled={true} // Always disabled
-            className="flex items-center gap-1"
+            className="flex items-center gap-1 text-xs sm:text-sm px-2"
           >
-            <MessageCircle className="h-4 w-4" />
-            {post.comments?.length || 0}
+            <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline">{post.comments?.length || 0} comments</span>
+            <span className="xs:hidden">{post.comments?.length || 0}</span>
           </Button>
         </div>
       </div>
@@ -435,51 +439,50 @@ export default function CommunityPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="font-headline text-3xl font-bold tracking-tight">
+    <div className="mx-auto max-w-3xl">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div className="flex-1">
+            <h1 className="font-headline text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">
               Community Feed
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm sm:text-base mt-1 sm:mt-2">
               <Balancer>
                 Share your journey and get inspired by others in the HealthZen community.
               </Balancer>
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-end">
             <Button
               variant="outline"
               size="sm"
               onClick={handleRefresh}
               disabled={refreshing}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 text-xs sm:text-sm"
             >
-              <RotateCcw className={cn("h-4 w-4", refreshing && "animate-spin")} />
+              <RotateCcw className={cn("h-3 w-3 sm:h-4 sm:w-4", refreshing && "animate-spin")} />
               {refreshing ? 'Refreshing...' : 'Refresh'}
             </Button>
           </div>
         </div>
       </div>
 
-
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* CreatePost component disabled - readonly mode */}
-        <Separator />
+        <Separator className="my-4 sm:my-6" />
         {posts.length === 0 ? (
           <div className="gradient-border-card">
-            <Card className="gradient-border-card-inner text-center py-12">
+            <Card className="gradient-border-card-inner text-center py-8 sm:py-12">
             <CardContent>
-              <div className="flex flex-col items-center gap-4">
-                <Users className="h-12 w-12 text-muted-foreground" />
-                <div>
-                  <h3 className="font-semibold mb-2">No posts yet</h3>
-                  <p className="text-muted-foreground mb-4">
+              <div className="flex flex-col items-center gap-3 sm:gap-4">
+                <Users className="h-8 w-8 sm:h-12 sm:w-12 text-muted-foreground" />
+                <div className="space-y-2 sm:space-y-3">
+                  <h3 className="font-semibold text-sm sm:text-base">No posts yet</h3>
+                  <p className="text-muted-foreground text-xs sm:text-sm">
                     Be the first to share something with the community!
                   </p>
-                  <Button onClick={handleRefresh} variant="outline" size="sm">
-                    <RotateCcw className="h-4 w-4 mr-2" />
+                  <Button onClick={handleRefresh} variant="outline" size="sm" className="mt-2 sm:mt-4">
+                    <RotateCcw className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                     Check for posts
                   </Button>
                 </div>
