@@ -39,40 +39,41 @@
   }
 
   .dark {
-    --background: 0 0% 0%; /* Pure black for dark mode */
-    --foreground: 0 0% 100%; /* Pure white text for dark mode */
-    --card: 0 0% 5%; /* Very dark card background */
-    --card-foreground: 0 0% 100%;
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 25 95% 53%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 223 47% 11%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 216 34% 17%;
-    --accent-foreground: 210 40% 98%;
+    --background: 220 13% 9%; /* Dark charcoal background like in the image */
+    --foreground: 0 0% 98%; /* Near-white text */
+    --card: 220 13% 12%; /* Slightly lighter dark card background */
+    --card-foreground: 0 0% 98%;
+    --popover: 220 13% 12%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 14 100% 57%; /* Orange/coral primary color from image */
+    --primary-foreground: 0 0% 98%;
+    --secondary: 220 13% 15%; /* Slightly lighter than card for variety */
+    --secondary-foreground: 0 0% 98%;
+    --muted: 220 13% 15%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 220 13% 15%;
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 32% 17%;
-    --input: 217 32% 17%;
-    --ring: 25 95% 53%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 13% 18%; /* Subtle border */
+    --input: 220 13% 15%;
+    --ring: 14 100% 57%;
     
-    --chart-1: 25 95% 53%;
-    --chart-2: 0 84% 60%;
-    --chart-3: 48 100% 67%;
-    --chart-4: 262 83% 58%;
-    --chart-5: 142 76% 36%;
+    /* Health metric colors matching the reference image */
+    --chart-1: 196 100% 47%; /* Cyan/blue for water */
+    --chart-2: 271 81% 56%; /* Purple for sleep */
+    --chart-3: 142 76% 36%; /* Green for exercise */
+    --chart-4: 14 100% 57%; /* Orange for heart rate */
+    --chart-5: 45 93% 58%; /* Yellow for calories */
 
     --radius: 1rem;
 
-    --sidebar-background: 222 84% 5%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-border: 217 32% 17%;
-    --sidebar-accent: 25 95% 53%;
-    --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-ring: 25 95% 53%;
+    --sidebar-background: 220 13% 11%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-border: 220 13% 18%;
+    --sidebar-accent: 14 100% 57%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-ring: 14 100% 57%;
   }
 }
 
@@ -392,11 +393,77 @@
   }
   
   .dark .card {
-    box-shadow: 0 1px 3px 0 hsl(217 32% 17% / 0.5);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 1px 3px 0 hsl(var(--border) / 0.3);
+    backdrop-filter: blur(8px);
   }
   
   .dark .border {
-    border-color: hsl(217 32% 17%);
+    border-color: hsl(var(--border));
+  }
+  
+  /* Enhanced card styling for health metrics */
+  .dark .health-metric-card {
+    background: linear-gradient(135deg, hsl(var(--card)), hsl(var(--card) / 0.8));
+    border: 1px solid hsl(var(--border));
+    border-radius: 1rem;
+    backdrop-filter: blur(12px);
+    transition: all 0.2s ease;
+  }
+  
+  .dark .health-metric-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px hsl(var(--border) / 0.4);
+    border-color: hsl(var(--primary) / 0.3);
+  }
+  
+  /* Specific metric card colors matching reference image */
+  .dark .water-card {
+    background: linear-gradient(135deg, hsl(196 100% 47% / 0.1), hsl(var(--card)));
+    border-left: 4px solid hsl(196 100% 47%);
+  }
+  
+  .dark .sleep-card {
+    background: linear-gradient(135deg, hsl(271 81% 56% / 0.1), hsl(var(--card)));
+    border-left: 4px solid hsl(271 81% 56%);
+  }
+  
+  .dark .exercise-card {
+    background: linear-gradient(135deg, hsl(142 76% 36% / 0.1), hsl(var(--card)));
+    border-left: 4px solid hsl(142 76% 36%);
+  }
+  
+  .dark .heart-rate-card {
+    background: linear-gradient(135deg, hsl(14 100% 57% / 0.1), hsl(var(--card)));
+    border-left: 4px solid hsl(14 100% 57%);
+  }
+  
+  .dark .temperature-card {
+    background: linear-gradient(135deg, hsl(45 93% 58% / 0.1), hsl(var(--card)));
+    border-left: 4px solid hsl(45 93% 58%);
+  }
+  
+  /* Card utility classes */
+  .soft-shadow {
+    box-shadow: 0 1px 3px 0 hsl(var(--border) / 0.2), 0 1px 2px 0 hsl(var(--border) / 0.1);
+  }
+  
+  .warm-shadow {
+    box-shadow: 0 4px 6px -1px hsl(var(--border) / 0.3), 0 2px 4px -1px hsl(var(--border) / 0.2);
+  }
+  
+  .smooth-transition {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Enhanced dark mode card shadows */
+  .dark .soft-shadow {
+    box-shadow: 0 1px 3px 0 hsl(var(--border) / 0.4), 0 1px 2px 0 hsl(var(--border) / 0.2);
+  }
+  
+  .dark .warm-shadow {
+    box-shadow: 0 4px 6px -1px hsl(var(--border) / 0.5), 0 2px 4px -1px hsl(var(--border) / 0.3);
   }
 
   /* Light mode gradient enhancements */

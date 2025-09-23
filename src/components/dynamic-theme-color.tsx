@@ -12,7 +12,7 @@ export function DynamicThemeColor() {
     
     // Define theme colors that match the app's background colors
     const lightThemeColor = '#FFFFFF'; // Pure white (hsl(0, 0%, 100%)) - Light background
-    const darkThemeColor = '#000000';  // Pure black (hsl(0, 0%, 0%)) - Dark background
+    const darkThemeColor = '#1a1d23';  // Dark charcoal (hsl(220, 13%, 9%)) - Dark background
     
     // Update the theme-color meta tag
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
