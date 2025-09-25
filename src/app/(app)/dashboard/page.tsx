@@ -121,7 +121,7 @@ function ChallengeCard({ challenge, onMarkAsDone }: { challenge: Challenge, onMa
   );
 }
 
-function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete, userData }: { isOpen: boolean, onClose: () => void, vibe: DailyVibe | null, onSave: (vibe: DailyVibe) => void, onDelete: (vibeId: string) => void, userData: any}) {
+function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete, userData, userProgress, onAchievementsCheck }: { isOpen: boolean, onClose: () => void, vibe: DailyVibe | null, onSave: (vibe: DailyVibe) => void, onDelete: (vibeId: string) => void, userData: any, userProgress?: { streak: number; completedTasks: number } | null, onAchievementsCheck?: (newProgress: { streak: number; completedTasks: number }) => void }) {
     const [currentVibe, setCurrentVibe] = useState<DailyVibe | null>(vibe);
 
     useEffect(() => {
@@ -142,10 +142,10 @@ function EditVibeDialog({ isOpen, onClose, vibe, onSave, onDelete, userData }: {
             // Update the backend immediately and update streak logic
             updateWaterIntake(userData.uid, newValue).then(result => {
                 if (result.success && newValue > current) {
-                    // Update user progress and potentially streak
-                    if (userProgress) {
+                    // Update user progress and potentially streak via callback from parent
+                    if (userProgress && onAchievementsCheck) {
                         const newUserProgress = { ...userProgress, completedTasks: userProgress.completedTasks + 1 };
-                        checkAchievements(newUserProgress);
+                        onAchievementsCheck(newUserProgress);
                     }
                 }
             }).catch(error => {
@@ -1177,6 +1177,8 @@ export default function DashboardPage() {
         onSave={handleSaveVibe}
         onDelete={handleDeleteVibe}
         userData={userData}
+        userProgress={userProgress}
+        onAchievementsCheck={checkAchievements}
       />
       <CameraDialog
         isOpen={isCameraOpen}
