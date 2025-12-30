@@ -20,10 +20,10 @@ class NotificationClientImpl implements NotificationClientService {
     try {
       const permission = await Notification.requestPermission();
       const granted = permission === 'granted';
-      
+
       // Save the permission result to localStorage
       this.savePermissionStatus(granted);
-      
+
       return granted;
     } catch (error) {
       console.error('Error requesting notification permission:', error);
@@ -40,6 +40,7 @@ class NotificationClientImpl implements NotificationClientService {
   }
 
   private savePermissionStatus(granted: boolean) {
+    if (typeof window === 'undefined') return;
     try {
       const settings = this.getSettings();
       const updatedSettings = {
@@ -54,6 +55,7 @@ class NotificationClientImpl implements NotificationClientService {
   }
 
   saveSettings(settings: { emailNotifications: boolean; pushNotifications: boolean }) {
+    if (typeof window === 'undefined') return;
     try {
       const currentSettings = this.getStoredSettings();
       const updatedSettings = {
@@ -77,6 +79,7 @@ class NotificationClientImpl implements NotificationClientService {
   }
 
   private getStoredSettings(): any {
+    if (typeof window === 'undefined') return {};
     try {
       const stored = localStorage.getItem(this.STORAGE_KEY);
       return stored ? JSON.parse(stored) : {};
@@ -107,7 +110,7 @@ class NotificationClientImpl implements NotificationClientService {
 
       // Auto-close after 5 seconds
       setTimeout(() => notification.close(), 5000);
-      
+
       notification.onclick = () => {
         window.focus();
         notification.close();
@@ -122,15 +125,15 @@ class NotificationClientImpl implements NotificationClientService {
     if (Notification.permission === 'granted') {
       return false; // Already granted
     }
-    
+
     if (Notification.permission === 'denied') {
       return false; // User explicitly denied, don't ask again
     }
-    
+
     const stored = this.getStoredSettings();
     const lastRequest = stored.lastPermissionRequest;
     const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000); // Reduced from 1 week to 1 day
-    
+
     // Ask if we haven't asked before, or if it's been more than a day since last request
     return !stored.browserPermissionGranted && (!lastRequest || lastRequest < oneDayAgo);
   }
@@ -138,7 +141,7 @@ class NotificationClientImpl implements NotificationClientService {
   // Initialize service and optionally request permission
   async initialize(autoRequestPermission: boolean = true): Promise<void> {
     console.log('🔔 Initializing notification service...');
-    
+
     if (!('Notification' in window)) {
       console.warn('⚠️ This browser does not support notifications');
       return;
@@ -146,11 +149,11 @@ class NotificationClientImpl implements NotificationClientService {
 
     // Check current permission status
     console.log(`📋 Current notification permission: ${Notification.permission}`);
-    
+
     if (autoRequestPermission && this.shouldRequestPermission()) {
       console.log('🔔 Requesting notification permission...');
       const granted = await this.requestPermission();
-      
+
       if (granted) {
         console.log('✅ Notification permission granted!');
         // Send a test notification to confirm it's working

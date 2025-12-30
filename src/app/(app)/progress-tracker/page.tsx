@@ -127,7 +127,7 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
           )}
         </TooltipTrigger>
         <TooltipContent>
-            <p className='max-w-xs'>{achievement.description}</p>
+          <p className='max-w-xs'>{achievement.description}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
@@ -142,11 +142,11 @@ export default function ProgressTrackerPage() {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [todayActivity, setTodayActivity] = useState<DailyActivity | null>(null);
   const [weeklyHistoricalData, setWeeklyHistoricalData] = useState<{ [date: string]: DailyHistoricalData | null }>({});
-  
+
   // Use live user data from auth context instead of static data
   const userData = user || { ...defaultUser, uid: 'default' };
   const userProgress = liveUserProgress || { streak: userData.streak || 0, completedTasks: 0 };
-  
+
   // Fetch real activity data from Firebase on component mount and when user changes
   useEffect(() => {
     async function fetchTodayActivity() {
@@ -159,10 +159,10 @@ export default function ProgressTrackerPage() {
         }
       }
     }
-    
+
     fetchTodayActivity();
   }, [userData.uid]);
-  
+
   // Fetch historical data for the selected week
   useEffect(() => {
     async function fetchWeeklyHistoricalData() {
@@ -175,7 +175,7 @@ export default function ProgressTrackerPage() {
             date.setDate(date.getDate() - i);
             dates.push(date.toLocaleDateString('en-CA')); // YYYY-MM-DD format
           }
-          
+
           const historicalData = await getWeeklyHistoricalData(userData.uid, dates);
           setWeeklyHistoricalData(historicalData);
         } catch (error) {
@@ -183,10 +183,10 @@ export default function ProgressTrackerPage() {
         }
       }
     }
-    
+
     fetchWeeklyHistoricalData();
   }, [userData.uid, selectedDate]);
-  
+
   // Generate date labels for the last 7 days from selected date
   const generateLast7Days = (fromDate: Date = selectedDate) => {
     const days = [];
@@ -197,24 +197,24 @@ export default function ProgressTrackerPage() {
     }
     return days;
   };
-  
+
   // Get real historical data for the selected week using saved data from dailyHistory
   const getRealHistoricalData = (fromDate: Date) => {
     const today = new Date();
     const todayDateStr = today.toLocaleDateString('en-CA');
-    
+
     // Initialize arrays with zeros
     const waterData = [0, 0, 0, 0, 0, 0, 0];
     const sleepData = [0, 0, 0, 0, 0, 0, 0];
     const gymData = [0, 0, 0, 0, 0, 0, 0];
-    
+
     // Generate dates for the last 7 days from selected date
     for (let i = 6; i >= 0; i--) {
       const date = new Date(fromDate);
       date.setDate(date.getDate() - i);
       const dateStr = date.toLocaleDateString('en-CA');
       const dayIndex = 6 - i;
-      
+
       if (dateStr === todayDateStr) {
         // For today, use live data (current activities)
         if (todayActivity) {
@@ -226,17 +226,17 @@ export default function ProgressTrackerPage() {
           const liveWaterVibe = dailyVibes.find(vibe => vibe.id === 'water');
           const liveSleepVibe = dailyVibes.find(vibe => vibe.id === 'sleep');
           const liveGymVibe = dailyVibes.find(vibe => vibe.id === 'gym');
-          
+
           if (liveWaterVibe?.value) {
             const waterMatch = liveWaterVibe.value.match(/^(\d+)/);
             waterData[dayIndex] = Math.max(0, Math.min(parseInt(waterMatch?.[1] || '0'), 8));
           }
-          
+
           if (liveSleepVibe?.value) {
             const sleepMatch = liveSleepVibe.value.match(/^([\d.]+)/);
             sleepData[dayIndex] = Math.max(0, Math.min(parseFloat(sleepMatch?.[1] || '0'), 12));
           }
-          
+
           if (liveGymVibe?.value) {
             const gymMatch = liveGymVibe.value.match(/^(\d+)/);
             gymData[dayIndex] = Math.max(0, Math.min(parseInt(gymMatch?.[1] || '0'), 120));
@@ -253,30 +253,30 @@ export default function ProgressTrackerPage() {
         // If no historical data exists for this date, it remains 0 (which is correct)
       }
     }
-    
+
     return {
       water: waterData,
       sleep: sleepData,
       gym: gymData
     };
   };
-  
+
   const days = generateLast7Days(selectedDate);
   const dateData = getRealHistoricalData(selectedDate);
-  
+
   // Get current values from live daily vibes data
   const waterVibe = dailyVibes.find(vibe => vibe.id === 'water');
   const sleepVibe = dailyVibes.find(vibe => vibe.id === 'sleep');
   const gymVibe = dailyVibes.find(vibe => vibe.id === 'gym');
-  
+
   // Parse current values from live data - prioritize Firebase data over daily vibes
-  const currentWater = todayActivity?.waterIntake ? todayActivity.waterIntake : 
+  const currentWater = todayActivity?.waterIntake ? todayActivity.waterIntake :
     (waterVibe?.value ? parseInt(waterVibe.value.match(/^(\d+)/)?.[1] || '0') : 0);
   const currentSleep = todayActivity?.sleepHours ? todayActivity.sleepHours :
     (sleepVibe?.value ? parseFloat(sleepVibe.value.match(/^([\d.]+)/)?.[1] || '0') : 0);
   const currentGym = todayActivity?.gymMinutes ? todayActivity.gymMinutes :
     (gymVibe?.value ? parseInt(gymVibe.value.match(/^(\d+)/)?.[1] || '0') : 0);
-  
+
   // Calculate daily points from completed vibes (real-time sync)
   const completedVibes = dailyVibes.filter(vibe => {
     if (vibe.id === 'medication') return vibe.progress === 100;
@@ -284,25 +284,25 @@ export default function ProgressTrackerPage() {
   });
   const dailyPoints = Math.min(completedVibes.length * 5, 30); // 5 points per completed vibe, max 30
   const totalPoints = (userProgress.streak * 10) + dailyPoints;
-  
-  const waterChartData = days.map((day, i) => ({ 
-    day, 
+
+  const waterChartData = days.map((day, i) => ({
+    day,
     glasses: dateData.water[i] || 0
   }));
-  const sleepChartData = days.map((day, i) => ({ 
-    day, 
+  const sleepChartData = days.map((day, i) => ({
+    day,
     hours: dateData.sleep[i] || 0
   }));
-  const gymChartData = days.map((day, i) => ({ 
-    day, 
+  const gymChartData = days.map((day, i) => ({
+    day,
     minutes: dateData.gym[i] || 0
   }));
-  
+
   // Get achievements based on live progress data
   const achievements = getAchievements({ streak: userProgress.streak, completedTasks: userProgress.completedTasks });
   const unlockedAchievements = achievements.filter(a => a.unlocked).length;
   const totalAchievements = achievements.length;
-  
+
   const handleExportReport = async () => {
     setIsExporting(true);
     try {
@@ -321,7 +321,7 @@ export default function ProgressTrackerPage() {
       setIsExporting(false);
     }
   };
-  
+
   const handleShareReport = async () => {
     setIsExporting(true);
     try {
@@ -350,8 +350,8 @@ export default function ProgressTrackerPage() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-2">
-                <Button 
-                  variant="gradient" 
+                <Button
+                  variant="gradient"
                   onClick={handleShareReport}
                   disabled={isExporting}
                   className="w-full sm:w-auto text-xs sm:text-sm"
@@ -365,8 +365,8 @@ export default function ProgressTrackerPage() {
                   <span className="hidden xs:inline">Share Report</span>
                   <span className="xs:hidden">Share</span>
                 </Button>
-                <Button 
-                  variant="gradient" 
+                <Button
+                  variant="gradient"
                   onClick={handleExportReport}
                   disabled={isExporting}
                   className="w-full sm:w-auto text-xs sm:text-sm"
@@ -382,10 +382,10 @@ export default function ProgressTrackerPage() {
                 </Button>
               </div>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
               <div className="flex items-center gap-2">
-                <Button 
+                <Button
                   variant="outline"
                   size="sm"
                   onClick={() => {
@@ -397,7 +397,7 @@ export default function ProgressTrackerPage() {
                 >
                   <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
-                
+
                 <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
                   <PopoverTrigger asChild>
                     <Button
@@ -429,8 +429,8 @@ export default function ProgressTrackerPage() {
                     />
                   </PopoverContent>
                 </Popover>
-                
-                <Button 
+
+                <Button
                   variant="outline"
                   size="sm"
                   onClick={() => {
@@ -450,13 +450,13 @@ export default function ProgressTrackerPage() {
                   <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
-              
+
               <p className="text-xs sm:text-sm text-muted-foreground">
                 Week ending: {format(selectedDate, "MMM d, yyyy")}
               </p>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
               <Icons.points className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
@@ -465,7 +465,7 @@ export default function ProgressTrackerPage() {
                 <p className="text-xs text-amber-600 dark:text-amber-500">({dailyPoints}/30)</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800">
               <Icons.streak className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
               <div className="min-w-0">
@@ -473,7 +473,7 @@ export default function ProgressTrackerPage() {
                 <p className="text-xs text-orange-600 dark:text-orange-500">streak</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
               <Icons.points className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
               <div className="min-w-0">
@@ -481,7 +481,7 @@ export default function ProgressTrackerPage() {
                 <p className="text-xs text-blue-600 dark:text-blue-500">tasks</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
               <Icon name="Dumbbell" className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
               <div className="min-w-0">
@@ -494,8 +494,8 @@ export default function ProgressTrackerPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 gradient-border-card">
-          <Card className="gradient-border-card-inner">
+        <div className="lg:col-span-2">
+          <Card className="shadow-sm border-border h-full">
             <CardHeader className="pb-3 sm:pb-4">
               <CardTitle className="text-base sm:text-lg lg:text-xl">Water Intake</CardTitle>
               <CardDescription className="text-xs sm:text-sm">
@@ -503,45 +503,43 @@ export default function ProgressTrackerPage() {
                 <span className="sm:hidden">7 days | {currentWater}/8</span>
               </CardDescription>
             </CardHeader>
-          <CardContent>
-            <ChartContainer config={waterChartConfig} className="h-40 sm:h-48 lg:h-64 w-full">
-              <BarChart accessibilityLayer data={waterChartData}>
-                <CartesianGrid vertical={false} />
-                <XAxis dataKey="day" tickLine={false} tickMargin={10} axisLine={false} fontSize={10} />
-                <YAxis hide />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="glasses" fill="var(--color-glasses)" radius={4} maxBarSize={20} />
-                <ReferenceLine y={8} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
+            <CardContent>
+              <ChartContainer config={waterChartConfig} className="h-40 sm:h-48 lg:h-64 w-full">
+                <BarChart accessibilityLayer data={waterChartData}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="day" tickLine={false} tickMargin={10} axisLine={false} fontSize={10} />
+                  <YAxis hide />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="glasses" fill="var(--color-glasses)" radius={4} maxBarSize={20} />
+                  <ReferenceLine y={8} stroke="hsl(var(--foreground))" strokeDasharray="3 3" />
+                </BarChart>
+              </ChartContainer>
+            </CardContent>
           </Card>
         </div>
-        <div className="gradient-border-card">
-          <Card className="gradient-border-card-inner flex flex-col items-center justify-center min-h-[180px] sm:min-h-[200px] lg:min-h-[250px] relative overflow-hidden">
-            <div className="absolute inset-0 gradient-button opacity-80"></div>
+        <div>
+          <Card className="shadow-sm border-border h-full flex flex-col items-center justify-center min-h-[180px] sm:min-h-[200px] lg:min-h-[250px] relative overflow-hidden bg-primary/5 dark:bg-primary/10">
             <CardHeader className="items-center text-center pb-2 relative z-10">
-              <CardTitle className='text-white text-base sm:text-lg lg:text-xl font-semibold'>Current Streak</CardTitle>
-              <Flame className="h-10 w-10 sm:h-12 sm:w-12 lg:h-16 lg:w-16 text-white drop-shadow-lg" />
+              <CardTitle className='text-primary text-base sm:text-lg lg:text-xl font-semibold'>Current Streak</CardTitle>
+              <Flame className="h-10 w-10 sm:h-12 sm:w-12 lg:h-16 lg:w-16 text-primary" />
             </CardHeader>
             <CardContent className="text-center relative z-10">
-              <p className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white animate-bounce-in drop-shadow-lg">{userProgress.streak}</p>
-              <p className="text-center font-medium text-white/90 text-xs sm:text-sm lg:text-base">days</p>
+              <p className="text-3xl sm:text-4xl lg:text-6xl font-bold text-foreground">{userProgress.streak}</p>
+              <p className="text-center font-medium text-muted-foreground text-xs sm:text-sm lg:text-base">days</p>
             </CardContent>
           </Card>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
-        <div className="gradient-border-card">
-          <Card className="gradient-border-card-inner">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg sm:text-xl">Sleep Duration</CardTitle>
-              <CardDescription className="text-xs sm:text-sm">
-                <span className="hidden sm:inline">Last 7 days (Goal: 8 hours) | Today: {currentSleep}h</span>
-                <span className="sm:hidden">7 days | Today: {currentSleep}h</span>
-              </CardDescription>
-            </CardHeader>
+        <Card className="shadow-sm border-border">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg sm:text-xl">Sleep Duration</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
+              <span className="hidden sm:inline">Last 7 days (Goal: 8 hours) | Today: {currentSleep}h</span>
+              <span className="sm:hidden">7 days | Today: {currentSleep}h</span>
+            </CardDescription>
+          </CardHeader>
           <CardContent>
             <ChartContainer config={sleepChartConfig} className="h-48 sm:h-64 w-full">
               <LineChart accessibilityLayer data={sleepChartData}>
@@ -554,18 +552,16 @@ export default function ProgressTrackerPage() {
               </LineChart>
             </ChartContainer>
           </CardContent>
-          </Card>
-        </div>
-        
-        <div className="gradient-border-card">
-          <Card className="gradient-border-card-inner">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg sm:text-xl">Gym Workouts</CardTitle>
-              <CardDescription className="text-xs sm:text-sm">
-                <span className="hidden sm:inline">Last 7 days (Goal: 20 minutes) | Today: {currentGym} min</span>
-                <span className="sm:hidden">7 days | Today: {currentGym} min</span>
-              </CardDescription>
-            </CardHeader>
+        </Card>
+
+        <Card className="shadow-sm border-border">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg sm:text-xl">Gym Workouts</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
+              <span className="hidden sm:inline">Last 7 days (Goal: 20 minutes) | Today: {currentGym} min</span>
+              <span className="sm:hidden">7 days | Today: {currentGym} min</span>
+            </CardDescription>
+          </CardHeader>
           <CardContent>
             <ChartContainer config={gymChartConfig} className="h-48 sm:h-64 w-full">
               <BarChart accessibilityLayer data={gymChartData}>
@@ -578,20 +574,18 @@ export default function ProgressTrackerPage() {
               </BarChart>
             </ChartContainer>
           </CardContent>
-          </Card>
-        </div>
+        </Card>
       </div>
 
-      <div className="gradient-border-card">
-        <Card className="gradient-border-card-inner">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg sm:text-xl">Badges Unlocked</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
-              You've unlocked {unlockedAchievements} of {totalAchievements} badges. Keep going!
-            </CardDescription>
-          </CardHeader>
+      <Card className="shadow-sm border-border">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg sm:text-xl">Badges Unlocked</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
+            You've unlocked {unlockedAchievements} of {totalAchievements} badges. Keep going!
+          </CardDescription>
+        </CardHeader>
         <CardContent>
-          <motion.div 
+          <motion.div
             className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8"
             variants={containerVariants}
             initial="hidden"
@@ -604,10 +598,8 @@ export default function ProgressTrackerPage() {
             ))}
           </motion.div>
         </CardContent>
-        </Card>
-      </div>
+      </Card>
     </div>
   );
 }
 
-    

@@ -66,6 +66,7 @@ class MotivationalNotificationServiceImpl implements MotivationalNotificationSer
   }
 
   private saveLastNotificationTime() {
+    if (typeof window === 'undefined') return;
     try {
       const data = {
         lastHourlyNotification: Date.now(),
@@ -78,6 +79,7 @@ class MotivationalNotificationServiceImpl implements MotivationalNotificationSer
   }
 
   private saveLastVisitNotificationTime() {
+    if (typeof window === 'undefined') return;
     try {
       const data = {
         lastVisitNotification: Date.now(),
@@ -90,6 +92,7 @@ class MotivationalNotificationServiceImpl implements MotivationalNotificationSer
   }
 
   private getLastVisitNotificationTime(): number | null {
+    if (typeof window === 'undefined') return null;
     try {
       const stored = localStorage.getItem(this.VISIT_NOTIFICATION_KEY);
       if (stored) {
@@ -105,6 +108,7 @@ class MotivationalNotificationServiceImpl implements MotivationalNotificationSer
 
   // Helper method to check if hourly notifications should resume
   shouldResumeHourlyNotifications(): boolean {
+    if (typeof window === 'undefined') return true;
     try {
       const stored = localStorage.getItem(this.STORAGE_KEY);
       if (stored) {
@@ -112,7 +116,7 @@ class MotivationalNotificationServiceImpl implements MotivationalNotificationSer
         const lastNotification = data.lastHourlyNotification;
         const currentTime = Date.now();
         const oneHourAgo = currentTime - (60 * 60 * 1000);
-        
+
         // Resume if last notification was more than an hour ago
         return !lastNotification || lastNotification < oneHourAgo;
       }
@@ -125,8 +129,9 @@ class MotivationalNotificationServiceImpl implements MotivationalNotificationSer
 
   // Initialize the service
   initialize() {
+    if (typeof window === 'undefined') return;
     console.log('🌿 Initializing motivational notification service...');
-    
+
     // Show a visit notification when the service initializes
     setTimeout(() => {
       this.showVisitNotification();

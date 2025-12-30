@@ -27,6 +27,7 @@ const navItems = [
   { href: '/symptom-check', label: 'Dr. Cure', icon: Bot },
   { href: '/community', label: 'Community', icon: Users },
   { href: '/progress-tracker', label: 'Tracker', icon: BarChart },
+  { href: '/diet', label: 'Diet Plan', icon: Leaf },
   { href: '/challenges', label: 'Challenges', icon: Target },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
